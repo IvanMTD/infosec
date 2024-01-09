@@ -10,6 +10,7 @@
         <header th:insert="~{block/header}"></header>
         <nav th:insert="~{block/navbar}"></nav>
         <div th:insert="~{content/home-page}" th:if="${index} == 'home-page'"></div>
+        <div th:insert="~{content/admin-reg-role-page}" th:if="${index} == 'admin-reg-role-page'"></div>
         <footer th:insert="~{block/footer}"></footer>
     </body>
 </html>

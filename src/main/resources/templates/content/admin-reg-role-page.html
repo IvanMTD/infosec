@@ -1,0 +1,19 @@
+<div>
+    <form th:method="POST" th:action="@{/admin/add/role}" th:object="${role}">
+        <label for="name">name: </label>
+        <input type="text" id="name" th:filed="*{name}">
+        <br>
+        <label for="description">description: </label>
+        <input type="text" id="description" th:field="*{description}">
+        <br>
+        <div style="border: solid 1px black; padding: 5px; margin: 5px">
+            <div th:each="authority, stat : ${authorities}">
+                <label th:for="${stat.index}" th:text="${authority.getName()}">name</label>
+                <input type="checkbox" th:id="${stat.index}" th:value="${authority}">
+            </div>
+        </div>
+
+        <br>
+        <input type="submit" value="submit">
+    </form>
+</div>
