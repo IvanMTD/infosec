@@ -5,9 +5,6 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import net.security.infosec.models.Role;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Data
 @RequiredArgsConstructor
 public class RoleDataTransferObject {
@@ -15,5 +12,5 @@ public class RoleDataTransferObject {
     private String name;
     @NotBlank(message = "Поле не может быть пустым")
     private String description;
-    private Set<Role.Authority> authorities = new HashSet<>();
+    private Role.Authority[] authorities = new Role.Authority[6];
 }

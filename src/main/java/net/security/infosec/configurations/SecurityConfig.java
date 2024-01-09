@@ -20,17 +20,18 @@ import java.net.URI;
 public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain filterChain(ServerHttpSecurity http){
-        /*ServerCsrfTokenRequestAttributeHandler requestHandler = new ServerCsrfTokenRequestAttributeHandler();
+        ServerCsrfTokenRequestAttributeHandler requestHandler = new ServerCsrfTokenRequestAttributeHandler();
         requestHandler.setTokenFromMultipartDataEnabled(true);
+
         RedirectServerLogoutSuccessHandler handler = new RedirectServerLogoutSuccessHandler();
-        handler.setLogoutSuccessUrl(URI.create("/"));*/
+        handler.setLogoutSuccessUrl(URI.create("/"));
 
         return http
-                //.csrf((csrf -> csrf.csrfTokenRequestHandler(requestHandler)))
-                //.httpBasic(Customizer.withDefaults())
+                .csrf(csrf -> csrf.csrfTokenRequestHandler(requestHandler))
+                .httpBasic(Customizer.withDefaults())
                 .authorizeExchange(auth -> auth.anyExchange().permitAll())
-                //.formLogin(loginSpec -> loginSpec.loginPage("/login"))
-                //.logout(logoutSpec -> logoutSpec.logoutSuccessHandler(handler))
+                .formLogin(loginSpec -> loginSpec.loginPage("/login"))
+                .logout(logoutSpec -> logoutSpec.logoutSuccessHandler(handler))
                 .build();
     }
 
