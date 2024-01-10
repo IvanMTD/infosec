@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.security.infosec.dto.ImplementerDataTransferObject;
 import net.security.infosec.dto.RoleDataTransferObject;
+import net.security.infosec.dto.TroubleDataTransferObject;
 import net.security.infosec.models.Role;
 import net.security.infosec.services.ImplementerService;
 import net.security.infosec.services.RoleService;
+import net.security.infosec.services.TroubleService;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +27,7 @@ public class AdminController {
 
     private final RoleService roleService;
     private final ImplementerService implementerService;
+    private final TroubleService troubleService;
 
     @GetMapping()
     public Mono<Rendering> adminPage(){
@@ -94,6 +97,25 @@ public class AdminController {
 
         return implementerService.saveImplementer(implementer).flatMap(impl -> {
             log.info("user saved: " + impl.toString());
+            return Mono.just(Rendering.redirectTo("/admin").build());
+        });
+    }
+
+    @GetMapping("/trouble/reg")
+    public Mono<Rendering> troubleReg(){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Trouble registration")
+                        .modelAttribute("index","trouble-reg-page")
+                        .modelAttribute("trouble", new TroubleDataTransferObject())
+                        .build()
+        );
+    }
+
+    @PostMapping("/trouble/add")
+    public Mono<Rendering> troubleAdd(@ModelAttribute(name = "trouble") TroubleDataTransferObject trouble){
+        return troubleService.saveTrouble(trouble).flatMap(t -> {
+            log.info("trouble saved: " + t.toString());
             return Mono.just(Rendering.redirectTo("/admin").build());
         });
     }
