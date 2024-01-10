@@ -10,7 +10,10 @@
         <header th:insert="~{block/header}"></header>
         <nav th:insert="~{block/navbar}"></nav>
         <div th:insert="~{content/home-page}" th:if="${index} == 'home-page'"></div>
-        <div th:insert="~{content/admin-reg-role-page}" th:if="${index} == 'admin-reg-role-page'"></div>
+        <div th:insert="~{content/admin-page}" th:if="${index} == 'admin-page'"></div>
+        <div th:insert="~{content/role-reg-page}" th:if="${index} == 'role-reg-page'"></div>
+        <div th:insert="~{content/user-reg-page}" th:if="${index} == 'user-reg-page'"></div>
+        <div th:insert="~{content/task-page}" th:if="${index} == 'task-page'"></div>
         <footer th:insert="~{block/footer}"></footer>
     </body>
 </html>

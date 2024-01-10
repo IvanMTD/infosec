@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -15,8 +16,16 @@ public class Role {
     private String name;
     private String description;
 
-    private Set<Authority> authorities;
-    private Set<Integer> implementersIds;
+    private Set<Authority> authorities = new HashSet<>();
+    private Set<Integer> implementersIds = new HashSet<>();
+
+    public void addAuthority(Authority authority){
+        authorities.add(authority);
+    }
+
+    public void addImplementer(Implementer implementer){
+        implementersIds.add(implementer.getId());
+    }
 
     public enum Authority {
         CREATE("Создавать"),

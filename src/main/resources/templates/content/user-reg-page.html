@@ -1,0 +1,49 @@
+<div>
+  <form th:method="POST" th:action="@{/admin/user/add}" th:object="${implementer}">
+    <ul>
+      <li>
+        <label for="email">email: </label>
+        <input type="text" id="email" th:field="*{email}">
+        <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color: red"></span>
+      </li>
+      <li>
+        <label for="password">password: </label>
+        <input type="password" id="password" th:field="*{password}">
+        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color: red"></span>
+      </li>
+      <li>
+        <label for="confirm">confirm password: </label>
+        <input type="password" id="confirm" th:field="*{confirmPassword}">
+        <span th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" style="color: red"></span>
+      </li>
+      <li>
+        <label for="firstname">firstname: </label>
+        <input type="text" id="firstname" th:field="*{firstname}">
+        <span th:if="${#fields.hasErrors('firstname')}" th:errors="*{firstname}" style="color: red"></span>
+      </li>
+      <li>
+        <label for="middlename">middle name: </label>
+        <input type="text" id="middlename" th:field="*{middleName}">
+        <span th:if="${#fields.hasErrors('middleName')}" th:errors="*{middleName}" style="color: red"></span>
+      </li>
+      <li>
+        <label for="lastname">lastname: </label>
+        <input type="text" id="lastname" th:field="*{lastname}">
+        <span th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}" style="color: red"></span>
+      </li>
+      <li>
+        <label for="position">office position: </label>
+        <input type="text" id="position" th:field="*{officePosition}">
+        <span th:if="${#fields.hasErrors('officePosition')}" th:errors="*{officePosition}" style="color: red"></span>
+      </li>
+      <li>
+        <select th:field="*{roleId}">
+          <option th:each="r : ${roles}" th:text="${r.getName()}" th:value="${r.getId()}"></option>
+        </select>
+      </li>
+      <li>
+        <input type="submit" value="submit">
+      </li>
+    </ul>
+  </form>
+</div>

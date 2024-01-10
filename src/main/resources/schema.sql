@@ -8,7 +8,7 @@ create table if not exists implementer(
     office_position text,
 
     task_ids integer[],
-    role_ids integer[]
+    role_id int
 );
 
 create table if not exists task(

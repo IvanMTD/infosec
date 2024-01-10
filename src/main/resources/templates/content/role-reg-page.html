@@ -1,5 +1,5 @@
 <div>
-    <form th:method="POST" th:action="@{/admin/add/role}" th:object="${role}">
+    <form th:method="POST" th:action="@{/admin/role/add}" th:object="${role}">
         <label for="name">name: </label>
         <input type="text" id="name" th:field="*{name}">
         <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color: red"></span>

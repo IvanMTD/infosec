@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -19,7 +20,7 @@ public class Trouble {
     /**
      * Связные модели
      */
-    private Set<Integer> taskIds;
+    private Set<Integer> taskIds = new HashSet<>();
 
     public void addTask(Task task){
         taskIds.add(task.getId());

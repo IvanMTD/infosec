@@ -2,6 +2,7 @@ package net.security.infosec.models;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import net.security.infosec.dto.ImplementerDataTransferObject;
 import org.springframework.data.annotation.Id;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,15 +28,21 @@ public class Implementer implements UserDetails {
     /**
      * Связные модели
      */
-    private Set<Integer> taskIds;
-    private Set<Integer> rolesIds;
+    private Set<Integer> taskIds = new HashSet<>();
+    private int roleId;
+
+    public Implementer(ImplementerDataTransferObject dto){
+        setEmail(dto.getEmail());
+        setPassword(dto.getPassword());
+        setFirstname(dto.getFirstname());
+        setMiddleName(dto.getMiddleName());
+        setLastname(dto.getLastname());
+        setOfficePosition(dto.getOfficePosition());
+        setRoleId(dto.getRoleId());
+    }
 
     public void addTask(Task task){
         taskIds.add(task.getId());
-    }
-
-    public void addRole(Role role){
-        rolesIds.add(role.getId());
     }
 
     @Override
