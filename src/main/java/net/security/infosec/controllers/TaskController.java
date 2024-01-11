@@ -2,6 +2,7 @@ package net.security.infosec.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.security.infosec.services.TroubleTicketService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,12 +14,14 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @RequestMapping("/task")
 public class TaskController {
+    private final TroubleTicketService troubleTicketService;
     @GetMapping()
     public Mono<Rendering> taskPage(){
         return Mono.just(
                 Rendering.view("template")
                         .modelAttribute("title","Task page")
                         .modelAttribute("index","task-page")
+                        .modelAttribute("troubleTickets", troubleTicketService.getTroubleTickets())
                         .build()
         );
     }

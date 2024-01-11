@@ -1,3 +1,30 @@
 <div>
-    <p>TASK PAGE</p>
+    <ul>
+        <li>
+            <select id="select" onchange="setupTrouble()">
+                <option th:each="ticket, stat : ${troubleTickets}" th:text="${ticket.getCategoryName()}" th:value="${ticket.getCategoryId()}"></option>
+            </select>
+        </li>
+        <li>
+            <select id="trouble_select">
+                <option th:each="trouble : ${troubleTickets[0].getTroubles()}" th:text="${trouble.getName()}" th:value="${trouble.getId()}"></option>
+            </select>
+        </li>
+    </ul>
+    <script th:inline="javascript">
+        function setupTrouble(){
+            let categoryId = document.getElementById("select").value;
+            let tickets = [[${troubleTickets}]];
+            for(let i=0; i<tickets.length; i++){
+                if(tickets[i].categoryId == categoryId){
+                    $('#trouble_select').html('');
+                    tickets[i].troubles.forEach((trouble) => {
+                        $('#trouble_select').append('' +
+                            '<option value="' + trouble.id + '">' + trouble.name + '</option>' +
+                            '')
+                    })
+                }
+            }
+        }
+    </script>
 </div>

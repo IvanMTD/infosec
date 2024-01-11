@@ -2,11 +2,8 @@ package net.security.infosec.models;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import net.security.infosec.dto.TroubleDataTransferObject;
+import net.security.infosec.dto.TicketDataTransferObject;
 import org.springframework.data.annotation.Id;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @RequiredArgsConstructor
@@ -21,14 +18,11 @@ public class Trouble {
     /**
      * Связные модели
      */
-    private Set<Integer> taskIds = new HashSet<>();
+    private int categoryId;
 
-    public Trouble(TroubleDataTransferObject dto){
+    public Trouble(TicketDataTransferObject dto) {
         setName(dto.getName());
         setDescription(dto.getDescription());
-    }
-
-    public void addTask(Task task){
-        taskIds.add(task.getId());
+        setCategoryId(dto.getCategoryId());
     }
 }
