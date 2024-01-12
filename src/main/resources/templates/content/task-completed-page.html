@@ -1,0 +1,47 @@
+<div>
+    <form th:method="POST" th:action="@{/task/new/add}" th:object="${task}">
+        <ul>
+            <li>
+                <select id="select" onchange="setupTrouble()">
+                    <option th:each="ticket, stat : ${troubleTickets}" th:text="${ticket.getCategoryName()}" th:value="${ticket.getCategoryId()}"></option>
+                </select>
+            </li>
+            <li>
+                <select id="trouble_select" th:field="*{troubleId}">
+                    <option th:each="trouble : ${troubleTickets[0].getTroubles()}" th:text="${trouble.getName()}" th:value="${trouble.getId()}"></option>
+                </select>
+            </li>
+            <li>
+                <label for="title">title: </label>
+                <br>
+                <input type="text" id="title" th:field="*{title}">
+                <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}" style="color: red"></span>
+            </li>
+            <li>
+                <label for="description">description: </label>
+                <br>
+                <textarea type="text" id="description" th:field="*{description}" cols="30" rows="5"></textarea>
+                <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red"></span>
+            </li>
+            <li>
+                <input type="submit" value="submit">
+            </li>
+            <script th:inline="javascript">
+                function setupTrouble(){
+                    let categoryId = document.getElementById("select").value;
+                    let tickets = [[${troubleTickets}]];
+                    for(let i=0; i<tickets.length; i++){
+                        if(tickets[i].categoryId == categoryId){
+                            $('#trouble_select').html('');
+                            tickets[i].troubles.forEach((trouble) => {
+                                $('#trouble_select').append('' +
+                                    '<option value="' + trouble.id + '">' + trouble.name + '</option>' +
+                                    '')
+                            })
+                        }
+                    }
+                }
+            </script>
+        </ul>
+    </form>
+</div>

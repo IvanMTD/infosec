@@ -1,5 +1,7 @@
 package net.security.infosec.controllers;
 
+import net.security.infosec.models.Implementer;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.reactive.result.view.CsrfRequestDataValueProcessor;
 import org.springframework.security.web.server.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -13,5 +15,14 @@ public class SecurityControllerAdvice {
     Mono<CsrfToken> csrfToken(ServerWebExchange exchange) {
         Mono<CsrfToken> csrfToken = exchange.getAttribute(CsrfToken.class.getName());
         return csrfToken.doOnSuccess(token -> exchange.getAttributes().put(CsrfRequestDataValueProcessor.DEFAULT_CSRF_ATTR_NAME, token));
+    }
+
+    @ModelAttribute(name = "userName")
+    Mono<String> userName(@AuthenticationPrincipal Implementer implementer){
+        if(implementer != null){
+            return Mono.just(implementer.getFullName());
+        }else{
+            return Mono.empty();
+        }
     }
 }

@@ -1,5 +1,8 @@
 <div>
+  <form id="logoutForm" method="post" th:action="@{/logout}"></form>
   <ul>
     <li><a th:href="@{/}">home</a></li>
+    <li><a id="logout" href="#" onclick="document.getElementById('logoutForm').submit()">logout</a></li>
+    <li><p th:text="'current user: ' + ${userName}"></p></li>
   </ul>
 </div>

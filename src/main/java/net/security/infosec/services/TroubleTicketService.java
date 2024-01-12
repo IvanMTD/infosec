@@ -5,9 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import net.security.infosec.dto.TicketDataTransferObject;
 import net.security.infosec.dto.TroubleTicketDataTransferObject;
 import net.security.infosec.models.Category;
+import net.security.infosec.models.Implementer;
+import net.security.infosec.models.Task;
 import net.security.infosec.models.Trouble;
 import net.security.infosec.repositories.CategoryRepository;
 import net.security.infosec.repositories.TroubleRepository;
+import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -49,5 +52,13 @@ public class TroubleTicketService {
                 return Mono.just(dto);
             });
         });
+    }
+
+    public Mono<Trouble> getTaskTrouble(Task task) {
+        return troubleRepository.findById(task.getTroubleId());
+    }
+
+    public Mono<Category> getTroubleCategory(Trouble trouble) {
+        return categoryRepository.findById(trouble.getCategoryId());
     }
 }

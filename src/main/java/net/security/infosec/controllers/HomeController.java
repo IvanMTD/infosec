@@ -16,4 +16,14 @@ public class HomeController {
                         .build()
         );
     }
+
+    @GetMapping("/login")
+    public Mono<Rendering> loginPage(){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Login page")
+                        .modelAttribute("index","login-page")
+                        .build()
+        );
+    }
 }

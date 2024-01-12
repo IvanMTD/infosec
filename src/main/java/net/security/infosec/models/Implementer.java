@@ -45,6 +45,10 @@ public class Implementer implements UserDetails {
         taskIds.add(task.getId());
     }
 
+    public String getFullName(){
+        return lastname + " " + firstname + " " + middleName;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return new HashSet<>();

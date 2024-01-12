@@ -1,0 +1,9 @@
+<div>
+    <div th:each="stat : ${stats}" style="margin: 5px; padding: 5px; border: solid 1px black">
+        <p th:text="${stat.getCategory().getName()}"></p>
+        <p th:text="${stat.getTrouble().getName()}"></p>
+        <p th:text="${stat.getImplementer().getFullName()}"></p>
+        <p th:text="${stat.getTask().getTitle()}"></p>
+        <p th:text="${stat.getTask().getDescription()}"></p>
+    </div>
+</div>
