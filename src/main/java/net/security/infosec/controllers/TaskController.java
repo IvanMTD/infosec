@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.reactive.result.view.Rendering;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -38,25 +37,51 @@ public class TaskController {
         );
     }
 
-    @GetMapping("/stat")
-    public Mono<Rendering> taskStat(@AuthenticationPrincipal Implementer implementer){
+    @GetMapping("/stat/all")
+    public Mono<Rendering> taskStatAll(){
         return Mono.just(
                 Rendering.view("template")
                         .modelAttribute("title","Task statistic")
                         .modelAttribute("index","task-stat-page")
                         .modelAttribute("stats",
-                                implementerService.getAll().flatMap(impl -> {
+                                taskService.getAll().flatMap(task -> {
                                     StatDataTransferObject stat = new StatDataTransferObject();
-                                    stat.setImplementer(impl);
-                                    return taskService.getImplementerTasks(impl).flatMap(task -> {
-                                        stat.setTask(task);
-                                        return troubleTicketService.getTaskTrouble(task);
-                                    }).flatMap(trouble -> {
-                                        stat.setTrouble(trouble);
-                                        return troubleTicketService.getTroubleCategory(trouble);
-                                    }).flatMap(category -> {
-                                        stat.setCategory(category);
-                                        return Mono.just(stat);
+                                    stat.setTask(task);
+                                    return implementerService.getUserById(stat.getTask().getImplementerId()).flatMap(implementer -> {
+                                        stat.setImplementer(implementer);
+                                        return troubleTicketService.getTaskTrouble(stat.getTask()).flatMap(trouble -> {
+                                            stat.setTrouble(trouble);
+                                            return troubleTicketService.getTroubleCategory(stat.getTrouble()).flatMap(category -> {
+                                                stat.setCategory(category);
+                                                return Mono.just(stat);
+                                            });
+                                        });
+                                    });
+                                })
+                        )
+                        .build()
+        );
+    }
+
+    @GetMapping("/stat/week")
+    public Mono<Rendering> taskStatWeek(){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Task statistic")
+                        .modelAttribute("index","task-stat-page")
+                        .modelAttribute("stats",
+                                taskService.getWeek().flatMap(task -> {
+                                    StatDataTransferObject stat = new StatDataTransferObject();
+                                    stat.setTask(task);
+                                    return implementerService.getUserById(stat.getTask().getImplementerId()).flatMap(implementer -> {
+                                        stat.setImplementer(implementer);
+                                        return troubleTicketService.getTaskTrouble(stat.getTask()).flatMap(trouble -> {
+                                            stat.setTrouble(trouble);
+                                            return troubleTicketService.getTroubleCategory(stat.getTrouble()).flatMap(category -> {
+                                                stat.setCategory(category);
+                                                return Mono.just(stat);
+                                            });
+                                        });
                                     });
                                 })
                         )

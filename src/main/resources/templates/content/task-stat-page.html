@@ -1,9 +1,19 @@
 <div>
+    <div style="margin: 5px; padding: 5px; border:solid 1px black">
+        <ul>
+            <li><a th:href="@{/task/stat/all}">Показать за все время</a></li>
+            <li><a th:href="@{/task/stat/week}">Показать за все неделю</a></li>
+        </ul>
+    </div>
+    <div style="margin: 5px; padding: 5px; border:solid 1px black">
+        <p>Всего выполнено: <a th:href="@{/task/stat/all}"><span th:text="${stats.size()}"></span></a></p>
+    </div>
     <div th:each="stat : ${stats}" style="margin: 5px; padding: 5px; border: solid 1px black">
-        <p th:text="${stat.getCategory().getName()}"></p>
-        <p th:text="${stat.getTrouble().getName()}"></p>
-        <p th:text="${stat.getImplementer().getFullName()}"></p>
-        <p th:text="${stat.getTask().getTitle()}"></p>
+        <p th:text="'Категория: ' + ${stat.getCategory().getName()}"></p>
+        <p th:text="'Вид проблемы: ' + ${stat.getTrouble().getName()}"></p>
+        <p th:text="'Исполнитель: ' + ${stat.getImplementer().getFullName()}"></p>
+        <p th:text="'Заголовок:' + ${stat.getTask().getTitle()}"></p>
         <p th:text="${stat.getTask().getDescription()}"></p>
+        <p th:text="'Дата выполнения: ' + ${stat.getTask().getExecuteDate()}"></p>
     </div>
 </div>

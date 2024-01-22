@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+
 @Service
 @RequiredArgsConstructor
 public class TaskService {
@@ -23,7 +26,25 @@ public class TaskService {
         return taskRepository.findAll();
     }
 
+    public Flux<Task> getWeek() {
+        LocalDate localDate = LocalDate.now();
+        boolean over = false;
+        while (!over){
+            System.out.println(localDate.getDayOfWeek());
+            if(localDate.getDayOfWeek() == DayOfWeek.SUNDAY){
+                over = true;
+            }else{
+                localDate = localDate.minusDays(1);
+            }
+        }
+        return taskRepository.findTasksByExecuteDateAfter(localDate);
+    }
+
     public Flux<Task> getImplementerTasks(Implementer implementer) {
         return taskRepository.findAllByIdIn(implementer.getTaskIds());
+    }
+
+    public Mono<Task> getTaskById(Integer taskId) {
+        return taskRepository.findById(taskId);
     }
 }
