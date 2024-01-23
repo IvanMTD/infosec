@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.security.infosec.dto.StatDataTransferObject;
 import net.security.infosec.dto.TaskDataTransferObject;
+import net.security.infosec.dto.TaskStatDTO;
 import net.security.infosec.models.Implementer;
 import net.security.infosec.services.ImplementerService;
 import net.security.infosec.services.TaskService;
@@ -33,6 +34,17 @@ public class TaskController {
                 Rendering.view("template")
                         .modelAttribute("title","Task page")
                         .modelAttribute("index","task-page")
+                        .build()
+        );
+    }
+
+    @GetMapping("/stat")
+    public Mono<Rendering> taskStatPage(){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Task statistic page")
+                        .modelAttribute("index","task-graph-page")
+                        .modelAttribute("implementers", implementerService.getAll())
                         .build()
         );
     }

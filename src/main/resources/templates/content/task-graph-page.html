@@ -1,0 +1,51 @@
+<div style="display: inline-block; border: solid 1px black; margin: 1vh">
+    <script th:inline="javascript">
+        google.load("visualization", "1", {packages:["corechart"]});
+        google.setOnLoadCallback(drawChart);
+        function drawChart() {
+
+            var implementers = [[${implementers}]]
+            var dataArray = new Array();
+            dataArray[0] = ['Имя исполнителя','Количество выполненных заявок'];
+            for(var i=0; i<implementers.length; i++){
+                dataArray[i+1] = [implementers[i].fullName,implementers[i].taskIds.length]
+            }
+
+            var data = google.visualization.arrayToDataTable(dataArray,false);
+            var options = {
+                title: 'Процент выполненных работ сотрудниками',
+                is3D: false,
+                pieResidueSliceLabel: 'Остальное'
+            };
+            var chart = new google.visualization.PieChart(document.getElementById('statistics1'));
+            chart.draw(data, options);
+        }
+    </script>
+    <div id="statistics1" style="width: 500px; height: 500px"></div>
+</div>
+
+<div style="display: inline-block; border: solid 1px black; margin: 1vh">
+    <script th:inline="javascript">
+        google.load("visualization", "1", {packages:["corechart"]});
+        google.setOnLoadCallback(drawChart);
+        function drawChart() {
+
+            var implementers = [[${implementers}]]
+            var dataArray = new Array();
+            dataArray[0] = ['Имя исполнителя','Количество выполненных заявок'];
+            for(var i=0; i<implementers.length; i++){
+                dataArray[i+1] = [implementers[i].fullName,implementers[i].taskIds.length]
+            }
+
+            var data = google.visualization.arrayToDataTable(dataArray,false);
+            var options = {
+                title: 'Все задачи в процентах',
+                is3D: false,
+                pieResidueSliceLabel: 'Остальное'
+            };
+            var chart = new google.visualization.PieChart(document.getElementById('statistics2'));
+            chart.draw(data, options);
+        }
+    </script>
+    <div id="statistics2" style="width: 500px; height: 500px"></div>
+</div>
