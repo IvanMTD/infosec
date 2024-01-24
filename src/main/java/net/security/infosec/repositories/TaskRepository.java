@@ -10,4 +10,5 @@ import java.util.Set;
 public interface TaskRepository extends ReactiveCrudRepository<Task,Integer> {
     Flux<Task> findAllByIdIn(Set<Integer> ids);
     Flux<Task> findTasksByExecuteDateAfter(LocalDate date);
+    Flux<Task> findTasksByExecuteDate(LocalDate date);
 }

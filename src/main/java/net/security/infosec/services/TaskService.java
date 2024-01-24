@@ -47,4 +47,8 @@ public class TaskService {
     public Mono<Task> getTaskById(Integer taskId) {
         return taskRepository.findById(taskId);
     }
+
+    public Flux<Task> getTasksByLocalDate(LocalDate localDate) {
+        return taskRepository.findTasksByExecuteDate(localDate);
+    }
 }

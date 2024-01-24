@@ -3,10 +3,11 @@ package net.security.infosec.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.security.infosec.dto.ChartDTO;
 import net.security.infosec.dto.StatDataTransferObject;
 import net.security.infosec.dto.TaskDataTransferObject;
-import net.security.infosec.dto.TaskStatDTO;
 import net.security.infosec.models.Implementer;
+import net.security.infosec.models.Task;
 import net.security.infosec.services.ImplementerService;
 import net.security.infosec.services.TaskService;
 import net.security.infosec.services.TroubleTicketService;
@@ -18,7 +19,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.reactive.result.view.Rendering;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -40,11 +46,30 @@ public class TaskController {
 
     @GetMapping("/stat")
     public Mono<Rendering> taskStatPage(){
+
+        Flux<ChartDTO> chartFlux = taskService.getAll().collectList().flatMapMany(tasks -> {
+            Set<LocalDate> localDates = new HashSet<>();
+            for(Task task : tasks){
+                localDates.add(task.getExecuteDate());
+            }
+            List<LocalDate> dates = new ArrayList<>(localDates);
+            dates = dates.stream().sorted(Comparator.comparing(LocalDate::getDayOfMonth)).collect(Collectors.toList());
+            return Flux.fromIterable(dates);
+        }).flatMapSequential(localDate -> {
+            ChartDTO chart = new ChartDTO();
+            chart.setLocalDate(localDate);
+            return taskService.getTasksByLocalDate(localDate).collectList().flatMap(tasks -> {
+                chart.setTasks(tasks);
+                return Mono.just(chart);
+            });
+        });
+
         return Mono.just(
                 Rendering.view("template")
                         .modelAttribute("title","Task statistic page")
                         .modelAttribute("index","task-graph-page")
                         .modelAttribute("implementers", implementerService.getAll())
+                        .modelAttribute("chart", chartFlux)
                         .build()
         );
     }

@@ -26,26 +26,31 @@
 
 <div style="display: inline-block; border: solid 1px black; margin: 1vh">
     <script th:inline="javascript">
-        google.load("visualization", "1", {packages:["corechart"]});
-        google.setOnLoadCallback(drawChart);
-        function drawChart() {
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
 
-            var implementers = [[${implementers}]]
+        function drawChart() {
+            var chartList = [[${chart}]];
+            console.log(chartList)
+
             var dataArray = new Array();
-            dataArray[0] = ['Имя исполнителя','Количество выполненных заявок'];
-            for(var i=0; i<implementers.length; i++){
-                dataArray[i+1] = [implementers[i].fullName,implementers[i].taskIds.length]
+            dataArray[0] = ['Дата','Количество выполненных заявок'];
+            for(var i=0; i<chartList.length; i++){
+                dataArray[i+1] = [chartList[i].localDate,chartList[i].tasks.length]
             }
 
             var data = google.visualization.arrayToDataTable(dataArray,false);
+
             var options = {
-                title: 'Все задачи в процентах',
-                is3D: false,
-                pieResidueSliceLabel: 'Остальное'
+                title: 'Выполненные заявки по датам',
+                vAxis: {title: 'Все выполнено заявок'},
+                isStacked: true
             };
-            var chart = new google.visualization.PieChart(document.getElementById('statistics2'));
+
+            var chart = new google.visualization.SteppedAreaChart(document.getElementById('chart_div'));
+
             chart.draw(data, options);
         }
     </script>
-    <div id="statistics2" style="width: 500px; height: 500px"></div>
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
 </div>
