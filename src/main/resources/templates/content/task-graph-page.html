@@ -72,3 +72,51 @@
     </script>
     <div id="chart_div" style="width: 1200px; height: 500px;"></div>
 </div>
+
+<div style="display: inline-block; border: solid 1px black; margin: 1vh">
+    <script th:inline="javascript">
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            let chartTitle = [[${chartTitle}]];
+            console.log(chartTitle)
+            let tableTitle = [];
+            tableTitle[0] = 'Дата';
+            for(let i=0; i<chartTitle.length; i++){
+                tableTitle[i+1] = chartTitle[i].name;
+            }
+            console.log(tableTitle)
+
+            let chartList = [[${chart}]];
+            console.log(chartList)
+
+            let dataArray = [];
+            dataArray[0] = tableTitle;
+
+            for(let i=0; i<chartList.length; i++){
+                let arrayStroke = [];
+                arrayStroke[0] = chartList[i].localDate;
+                let tasks = chartList[i].taskOnTrouble;
+                for(let j=0; j<tasks.length; j++){
+                    arrayStroke[j+1] = tasks[j];
+                }
+                dataArray[i+1] = arrayStroke;
+            }
+
+            console.log(dataArray)
+
+            let data = google.visualization.arrayToDataTable(dataArray, false);
+
+            var options = {
+                title: 'Выполненных работ по датам',
+                hAxis: {title: 'Даты',  titleTextStyle: {color: '#333'}},
+                vAxis: {minValue: 0}
+            };
+
+            var chart = new google.visualization.AreaChart(document.getElementById('chart_div2'));
+            chart.draw(data, options);
+        }
+    </script>
+    <div id="chart_div2" style="width: 1726px; height: 500px;"></div>
+</div>
