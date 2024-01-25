@@ -8,6 +8,7 @@ import net.security.infosec.dto.StatDataTransferObject;
 import net.security.infosec.dto.TaskDataTransferObject;
 import net.security.infosec.models.Implementer;
 import net.security.infosec.models.Task;
+import net.security.infosec.models.Trouble;
 import net.security.infosec.services.ImplementerService;
 import net.security.infosec.services.TaskService;
 import net.security.infosec.services.TroubleTicketService;
@@ -58,10 +59,22 @@ public class TaskController {
         }).flatMapSequential(localDate -> {
             ChartDTO chart = new ChartDTO();
             chart.setLocalDate(localDate);
-            return taskService.getTasksByLocalDate(localDate).collectList().flatMap(tasks -> {
+            return troubleTicketService.getAllTrouble().collectList().flatMap(troubles -> taskService.getTasksByLocalDate(localDate).collectList().flatMap(tasks -> {
+               for(Trouble trouble : troubles){
+                   int tCount = 0;
+                   for(Task task : tasks){
+                       if(task.getTroubleId() == trouble.getId()) {
+                           tCount++;
+                       }
+                   }
+                   chart.addTaskOnTrouble(tCount);
+               }
+               return Mono.just(chart);
+            }));
+            /*return taskService.getTasksByLocalDate(localDate).collectList().flatMap(tasks -> {
                 chart.setTasks(tasks);
                 return Mono.just(chart);
-            });
+            });*/
         });
 
         return Mono.just(
@@ -69,6 +82,7 @@ public class TaskController {
                         .modelAttribute("title","Task statistic page")
                         .modelAttribute("index","task-graph-page")
                         .modelAttribute("implementers", implementerService.getAll())
+                        .modelAttribute("chartTitle", troubleTicketService.getAllTrouble())
                         .modelAttribute("chart", chartFlux)
                         .build()
         );

@@ -61,4 +61,8 @@ public class TroubleTicketService {
     public Mono<Category> getTroubleCategory(Trouble trouble) {
         return categoryRepository.findById(trouble.getCategoryId());
     }
+
+    public Flux<Trouble> getAllTrouble() {
+        return troubleRepository.findAll();
+    }
 }

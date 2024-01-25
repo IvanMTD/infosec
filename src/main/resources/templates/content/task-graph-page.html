@@ -30,27 +30,45 @@
         google.charts.setOnLoadCallback(drawChart);
 
         function drawChart() {
-            var chartList = [[${chart}]];
+            let chartTitle = [[${chartTitle}]];
+            console.log(chartTitle)
+            let tableTitle = [];
+            tableTitle[0] = 'Дата';
+            for(let i=0; i<chartTitle.length; i++){
+                tableTitle[i+1] = chartTitle[i].name;
+            }
+            console.log(tableTitle)
+
+            let chartList = [[${chart}]];
             console.log(chartList)
 
-            var dataArray = new Array();
-            dataArray[0] = ['Дата','Количество выполненных заявок'];
-            for(var i=0; i<chartList.length; i++){
-                dataArray[i+1] = [chartList[i].localDate,chartList[i].tasks.length]
+            let dataArray = [];
+            dataArray[0] = tableTitle;
+
+            for(let i=0; i<chartList.length; i++){
+                let arrayStroke = [];
+                arrayStroke[0] = chartList[i].localDate;
+                let tasks = chartList[i].taskOnTrouble;
+                for(let j=0; j<tasks.length; j++){
+                    arrayStroke[j+1] = tasks[j];
+                }
+                dataArray[i+1] = arrayStroke;
             }
 
-            var data = google.visualization.arrayToDataTable(dataArray,false);
+            console.log(dataArray)
 
-            var options = {
+            let data = google.visualization.arrayToDataTable(dataArray, false);
+
+            let options = {
                 title: 'Выполненные заявки по датам',
-                vAxis: {title: 'Все выполнено заявок'},
+                vAxis: {title: 'Всего выполнено заявок'},
                 isStacked: true
             };
 
-            var chart = new google.visualization.SteppedAreaChart(document.getElementById('chart_div'));
+            let chart = new google.visualization.SteppedAreaChart(document.getElementById('chart_div'));
 
             chart.draw(data, options);
         }
     </script>
-    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+    <div id="chart_div" style="width: 1200px; height: 500px;"></div>
 </div>

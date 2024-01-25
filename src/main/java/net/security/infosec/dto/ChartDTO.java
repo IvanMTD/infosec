@@ -13,8 +13,12 @@ import java.util.List;
 public class ChartDTO {
     private LocalDate localDate;
     private List<Task> tasks = new ArrayList<>();
+    private List<Integer> taskOnTrouble = new ArrayList<>();
 
     public void addTask(Task task){
         tasks.add(task);
+    }
+    public void addTaskOnTrouble(int size){
+        taskOnTrouble.add(size);
     }
 }
