@@ -12,10 +12,7 @@ import net.security.infosec.services.RoleService;
 import net.security.infosec.services.TroubleTicketService;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Mono;
 
@@ -41,6 +38,17 @@ public class AdminController {
                             }
                             return Mono.just(false);
                         }))
+                        .build()
+        );
+    }
+
+    @GetMapping("/roles")
+    public Mono<Rendering> rolesPage(){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Roles page")
+                        .modelAttribute("index","roles-page")
+                        .modelAttribute("roles", roleService.getAll())
                         .build()
         );
     }
@@ -73,6 +81,36 @@ public class AdminController {
         return roleService.saveRole(role).flatMap(r -> {
             log.info("saved role data: " + r.toString());
             return Mono.just(Rendering.redirectTo("/admin").build());
+        });
+    }
+
+    @GetMapping("/role/edit")
+    public Mono<Rendering> roleEdit(@RequestParam(name = "select") int id){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Role edit page")
+                        .modelAttribute("index","role-edit-page")
+                        .modelAttribute("role", roleService.getRoleDTOById(id))
+                        .modelAttribute("authorities", Role.Authority.values())
+                        .build()
+        );
+    }
+
+    @PostMapping("/role/update/{id}")
+    public Mono<Rendering> roleUpdate(@ModelAttribute(name = "role") @Valid RoleDataTransferObject role, Errors errors, @PathVariable(name = "id") int id){
+        if(errors.hasErrors()){
+            return Mono.just(
+                    Rendering.view("template")
+                            .modelAttribute("title","Role edit page")
+                            .modelAttribute("index","role-edit-page")
+                            .modelAttribute("role", role)
+                            .modelAttribute("authorities", Role.Authority.values())
+                            .build()
+            );
+        }
+        return roleService.updateRole(role, id).flatMap(r -> {
+            log.info("updated role data: " + r.toString());
+            return Mono.just(Rendering.redirectTo("/admin/roles").build());
         });
     }
 

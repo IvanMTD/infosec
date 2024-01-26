@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,6 +26,10 @@ public class Role {
 
     public void addImplementer(Implementer implementer){
         implementersIds.add(implementer.getId());
+    }
+
+    public void updateAuthorities(Authority[] authorities) {
+        setAuthorities(new HashSet<>(Arrays.asList(authorities)));
     }
 
     public enum Authority {
