@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -35,6 +36,14 @@ public class ImplementerService implements ReactiveUserDetailsService {
         return implementerRepository.findById(id);
     }
 
+    public Mono<Implementer> updateImplementer(ImplementerDataTransferObject implementerDTO, int id) {
+        return implementerRepository.findById(id).flatMap(implementer -> implementerRepository.save(implementer.update(implementerDTO)));
+    }
+
+    public Mono<ImplementerDataTransferObject> getUserDtoById(int id) {
+        return implementerRepository.findById(id).flatMap(implementer -> Mono.just(new ImplementerDataTransferObject(implementer)));
+    }
+
     @Override
     public Mono<UserDetails> findByUsername(String username) {
         return implementerRepository.findByEmail(username).map(implementer -> implementer);
@@ -42,5 +51,9 @@ public class ImplementerService implements ReactiveUserDetailsService {
 
     public Flux<Implementer> getAll() {
         return implementerRepository.findAll();
+    }
+
+    public Mono<Void> deleteImplementerById(int id) {
+        return implementerRepository.findById(id).flatMap(implementerRepository::delete);
     }
 }

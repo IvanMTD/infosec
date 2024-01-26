@@ -32,4 +32,10 @@ public class Category {
     public void addTask(Task task){
         taskIds.add(task.getId());
     }
+
+    public Category update(TicketDataTransferObject ticketDTO) {
+        setName(ticketDTO.getName());
+        setDescription(ticketDTO.getDescription());
+        return this;
+    }
 }

@@ -6,10 +6,12 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import net.security.infosec.models.Implementer;
 
 @Data
 @RequiredArgsConstructor
 public class ImplementerDataTransferObject {
+    private int id;
     @Email(message = "not valid email")
     @NotBlank(message = "not blank")
     private String email;
@@ -31,4 +33,13 @@ public class ImplementerDataTransferObject {
     @NotBlank(message = "Поле не может быть пустым")
     private String officePosition;
     private int roleId;
+
+    public ImplementerDataTransferObject(Implementer implementer) {
+        setId(implementer.getId());
+        setFirstname(implementer.getFirstname());
+        setMiddleName(implementer.getMiddleName());
+        setLastname(implementer.getLastname());
+        setOfficePosition(implementer.getOfficePosition());
+        setRoleId(implementer.getRoleId());
+    }
 }

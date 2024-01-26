@@ -78,4 +78,13 @@ public class Implementer implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public Implementer update(ImplementerDataTransferObject implementerDTO) {
+        setFirstname(implementerDTO.getFirstname());
+        setMiddleName(implementerDTO.getMiddleName());
+        setLastname(implementerDTO.getLastname());
+        setOfficePosition(implementerDTO.getOfficePosition());
+        setRoleId(implementerDTO.getRoleId());
+        return this;
+    }
 }

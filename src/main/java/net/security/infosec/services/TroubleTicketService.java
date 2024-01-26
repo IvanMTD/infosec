@@ -5,12 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.security.infosec.dto.TicketDataTransferObject;
 import net.security.infosec.dto.TroubleTicketDataTransferObject;
 import net.security.infosec.models.Category;
-import net.security.infosec.models.Implementer;
 import net.security.infosec.models.Task;
 import net.security.infosec.models.Trouble;
 import net.security.infosec.repositories.CategoryRepository;
 import net.security.infosec.repositories.TroubleRepository;
-import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -64,5 +62,25 @@ public class TroubleTicketService {
 
     public Flux<Trouble> getAllTrouble() {
         return troubleRepository.findAll();
+    }
+
+    public Mono<TicketDataTransferObject> getCategoryDTOById(int id) {
+        return categoryRepository.findById(id).flatMap(category -> Mono.just(new TicketDataTransferObject(category)));
+    }
+
+    public Mono<Category> updateCategory(TicketDataTransferObject ticketDTO, int id) {
+        return categoryRepository.findById(id).flatMap(category -> {
+            return categoryRepository.save(category.update(ticketDTO));
+        });
+    }
+
+    public Mono<TicketDataTransferObject> getTroubleDTOById(int id) {
+        return troubleRepository.findById(id).flatMap(trouble -> Mono.just(new TicketDataTransferObject(trouble)));
+    }
+
+    public Mono<Trouble> updateTrouble(TicketDataTransferObject ticketDTO, int id) {
+        return troubleRepository.findById(id).flatMap(trouble -> {
+            return troubleRepository.save(trouble.update(ticketDTO));
+        });
     }
 }

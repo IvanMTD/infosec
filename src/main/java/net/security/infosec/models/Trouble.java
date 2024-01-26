@@ -25,4 +25,10 @@ public class Trouble {
         setDescription(dto.getDescription());
         setCategoryId(dto.getCategoryId());
     }
+
+    public Trouble update(TicketDataTransferObject ticketDTO) {
+        setName(ticketDTO.getName());
+        setDescription(ticketDTO.getDescription());
+        return this;
+    }
 }

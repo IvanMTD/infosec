@@ -32,12 +32,6 @@ public class AdminController {
                 Rendering.view("template")
                         .modelAttribute("title","Admin page")
                         .modelAttribute("index","admin-page")
-                        .modelAttribute("showTrouble", troubleTicketService.getAllCategories().collectList().flatMap(l -> {
-                            if(l.size() > 0){
-                                return Mono.just(true);
-                            }
-                            return Mono.just(false);
-                        }))
                         .build()
         );
     }
@@ -80,7 +74,7 @@ public class AdminController {
 
         return roleService.saveRole(role).flatMap(r -> {
             log.info("saved role data: " + r.toString());
-            return Mono.just(Rendering.redirectTo("/admin").build());
+            return Mono.just(Rendering.redirectTo("/admin/roles").build());
         });
     }
 
@@ -114,6 +108,17 @@ public class AdminController {
         });
     }
 
+    @GetMapping("/users")
+    public Mono<Rendering> usersPage(){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Users page")
+                        .modelAttribute("index","users-page")
+                        .modelAttribute("users", implementerService.getAll())
+                        .build()
+        );
+    }
+
     @GetMapping("/user/reg")
     public Mono<Rendering> userReg(){
         return Mono.just(
@@ -141,8 +146,58 @@ public class AdminController {
 
         return implementerService.saveImplementer(implementer).flatMap(impl -> {
             log.info("user saved: " + impl.toString());
+            return Mono.just(impl);
+        }).flatMap(roleService::addImplementerIdToRole).flatMap(role -> {
+            log.info("role updated: " + role.toString());
             return Mono.just(Rendering.redirectTo("/admin").build());
         });
+    }
+
+    @GetMapping("/user/edit")
+    public Mono<Rendering> userEdit(@RequestParam(name = "select") int id){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","User edit page")
+                        .modelAttribute("index","user-edit-page")
+                        .modelAttribute("implementer", implementerService.getUserDtoById(id))
+                        .modelAttribute("roles", roleService.getAll())
+                        .build()
+        );
+    }
+
+    @PostMapping("/user/update/{id}")
+    public Mono<Rendering> userUpdate(@ModelAttribute(name = "implementer") @Valid ImplementerDataTransferObject implementerDTO, Errors errors, @PathVariable(name = "id") int id){
+        if(errors.hasFieldErrors("firstname") || errors.hasFieldErrors("middleName") || errors.hasFieldErrors("lastname") || errors.hasFieldErrors("officePosition")){
+            return Mono.just(
+                    Rendering.view("template")
+                            .modelAttribute("title","User edit page")
+                            .modelAttribute("index","user-edit-page")
+                            .modelAttribute("implementer", implementerDTO)
+                            .modelAttribute("roles", roleService.getAll())
+                            .build()
+            );
+        }
+        return implementerService.updateImplementer(implementerDTO,id).flatMap(implementer -> {
+            log.info("implementer updated: " + implementer.toString());
+            return Mono.just(Rendering.redirectTo("/admin/users").build());
+        });
+    }
+
+    // При удалении исполнителя нужно решить, удалять ли все задания выполненные этим исполнителем. Так что вопрос пока открытый.
+    /*@GetMapping("/user/delete")
+    public Mono<Rendering> userDelete(@RequestParam(name = "select") int id){
+        return implementerService.deleteImplementerById(id).then(Mono.just(Rendering.redirectTo("/admin/users").build()));
+    }*/
+
+    @GetMapping("/categories")
+    public Mono<Rendering> categoriesPage(){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Categories page")
+                        .modelAttribute("index", "categories-page")
+                        .modelAttribute("categories", troubleTicketService.getAllCategories())
+                        .build()
+        );
     }
 
     @GetMapping("/category/reg")
@@ -173,6 +228,45 @@ public class AdminController {
         });
     }
 
+    @GetMapping("/category/edit")
+    public Mono<Rendering> categoryEdit(@RequestParam(name = "select") int id){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Category edit page")
+                        .modelAttribute("index","category-edit-page")
+                        .modelAttribute("ticket", troubleTicketService.getCategoryDTOById(id))
+                        .build()
+        );
+    }
+
+    @PostMapping("/category/update/{id}")
+    public Mono<Rendering> categoryUpdate(@ModelAttribute(name = "ticket") @Valid TicketDataTransferObject ticketDTO, Errors errors, @PathVariable(name = "id") int id){
+        if(errors.hasErrors()){
+            return Mono.just(
+                    Rendering.view("template")
+                            .modelAttribute("title","Category edit page")
+                            .modelAttribute("index","category-edit-page")
+                            .modelAttribute("ticket", ticketDTO)
+                            .build()
+            );
+        }
+        return troubleTicketService.updateCategory(ticketDTO,id).flatMap(category -> {
+            log.info("category updated: " + category.toString());
+            return Mono.just(Rendering.redirectTo("/admin/categories").build());
+        });
+    }
+
+    @GetMapping("/troubles")
+    public Mono<Rendering> troublesPage(){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Troubles page")
+                        .modelAttribute("index","troubles-page")
+                        .modelAttribute("troubles", troubleTicketService.getAllTrouble())
+                        .build()
+        );
+    }
+
     @GetMapping("/trouble/reg")
     public Mono<Rendering> troubleReg(){
         return Mono.just(
@@ -200,6 +294,36 @@ public class AdminController {
         return troubleTicketService.saveTroubleInCategory(ticket).flatMap(category -> {
             log.info("Trouble added to category " + category.getName() + " and now: " + category);
             return Mono.just(Rendering.redirectTo("/admin").build());
+        });
+    }
+
+    @GetMapping("/trouble/edit")
+    public Mono<Rendering> troubleEdit(@RequestParam(name = "select") int id){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Trouble edit page")
+                        .modelAttribute("index","trouble-edit-page")
+                        .modelAttribute("categories", troubleTicketService.getAllCategories())
+                        .modelAttribute("ticket", troubleTicketService.getTroubleDTOById(id))
+                        .build()
+        );
+    }
+
+    @PostMapping("/trouble/update/{id}")
+    public Mono<Rendering> troubleUpdate(@ModelAttribute(name = "ticket") @Valid TicketDataTransferObject ticketDTO, Errors errors, @PathVariable(name = "id") int id){
+        if(errors.hasErrors()){
+            return Mono.just(
+                    Rendering.view("template")
+                            .modelAttribute("title","Trouble edit page")
+                            .modelAttribute("index","trouble-edit-page")
+                            .modelAttribute("categories", troubleTicketService.getAllCategories())
+                            .modelAttribute("ticket", ticketDTO)
+                            .build()
+            );
+        }
+        return troubleTicketService.updateTrouble(ticketDTO,id).flatMap(trouble -> {
+            log.info("trouble updated: " + trouble.toString());
+            return Mono.just(Rendering.redirectTo("/admin/troubles").build());
         });
     }
 }

@@ -15,15 +15,21 @@ public class RoleDataTransferObject {
     private String name;
     @NotBlank(message = "Поле не может быть пустым")
     private String description;
-    private Role.Authority[] authorities = new Role.Authority[6];
+    private Role.Authority[] authorities = new Role.Authority[Role.Authority.values().length];
 
     public RoleDataTransferObject(Role role){
         setId(role.getId());
         setName(role.getName());
         setDescription(role.getDescription());
         List<Role.Authority> authList = role.getAuthorities().stream().toList();
-        for(int i=0; i<authList.size(); i++){
-            authorities[i] = authList.get(i);
+        int num = 0;
+        for(Role.Authority authority : Role.Authority.values()){
+            for(int i=0; i<authList.size(); i++){
+                if(authority.getName().equals(authList.get(i).getName())){
+                    authorities[num] = authority;
+                }
+            }
+            num++;
         }
     }
 }
