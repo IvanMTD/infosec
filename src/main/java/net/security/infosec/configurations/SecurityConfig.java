@@ -29,7 +29,7 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.csrfTokenRequestHandler(requestHandler))
                 .httpBasic(Customizer.withDefaults())
-                .authorizeExchange(auth -> auth.pathMatchers("/login").permitAll().anyExchange().authenticated())
+                .authorizeExchange(auth -> auth.pathMatchers("/login").permitAll().anyExchange().permitAll())
                 .formLogin(loginSpec -> loginSpec.loginPage("/login"))
                 .logout(logoutSpec -> logoutSpec.logoutSuccessHandler(handler))
                 .build();
