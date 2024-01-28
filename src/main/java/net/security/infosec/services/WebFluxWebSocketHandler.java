@@ -19,10 +19,10 @@ public class WebFluxWebSocketHandler implements WebSocketHandler {
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
-        Flux<WebSocketMessage> stringFlux = session.receive()
-                .map(WebSocketMessage::getPayloadAsText)
-                .map(String::toUpperCase)
-                .map(session::textMessage);
-        return session.send(stringFlux);
+
+        Flux<WebSocketMessage> messageFlux = session.receive()
+                .flatMap(webSocketMessage -> Mono.just(webSocketMessage.getPayloadAsText()))
+                .flatMap(payload -> Mono.just(session.textMessage(payload + " hello!")));
+        return session.send(messageFlux);
     }
 }
