@@ -2,16 +2,16 @@
   <form th:method="POST" th:action="@{/admin/category/add}" th:object="${ticket}">
       <ul>
           <li>
-              <label for="name">name: </label>
+              <label for="name">название: </label>
               <input type="text" id="name" th:field="*{name}">
               <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color: red"></span>
           </li>
           <li>
-              <label for="description">description: </label>
+              <label for="description">описание: </label>
               <input type="text" id="description" th:field="*{description}">
               <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red"></span>
           </li>
-          <li><input type="submit"value="submit"></li>
+          <li><input type="submit"value="сохранить"></li>
       </ul>
   </form>
 </div>

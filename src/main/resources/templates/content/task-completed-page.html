@@ -12,19 +12,19 @@
                 </select>
             </li>
             <li>
-                <label for="title">title: </label>
+                <label for="title">ФИО пользователя которому оказывалась помощь: </label>
                 <br>
                 <input type="text" id="title" th:field="*{title}">
                 <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}" style="color: red"></span>
             </li>
             <li>
-                <label for="description">description: </label>
+                <label for="description">Описание проблемы: </label>
                 <br>
                 <textarea type="text" id="description" th:field="*{description}" cols="30" rows="5"></textarea>
                 <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red"></span>
             </li>
             <li>
-                <input type="submit" value="submit">
+                <input type="submit" value="зарегистрировать">
             </li>
             <script th:inline="javascript">
                 function setupTrouble(){

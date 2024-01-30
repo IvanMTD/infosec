@@ -262,6 +262,7 @@ public class AdminController {
                 Rendering.view("template")
                         .modelAttribute("title","Troubles page")
                         .modelAttribute("index","troubles-page")
+                        .modelAttribute("categories", troubleTicketService.getAllCategories())
                         .modelAttribute("troubles", troubleTicketService.getAllTrouble())
                         .build()
         );

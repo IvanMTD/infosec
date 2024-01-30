@@ -1,14 +1,14 @@
 <div>
     <form th:method="POST" th:action="@{/admin/role/add}" th:object="${role}">
-        <label for="name">name: </label>
+        <label for="name">название: </label>
         <input type="text" id="name" th:field="*{name}">
         <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color: red"></span>
         <br>
-        <label for="description">description: </label>
+        <label for="description">описание: </label>
         <input type="text" id="description" th:field="*{description}">
         <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red"></span>
         <br>
-        <label>permission: </label>
+        <label>разрешения: </label>
         <div style="border: solid 1px black; padding: 5px; margin: 5px">
             <div th:each="authority, stat : ${authorities}">
                 <label th:for="${stat.index}" th:text="${authority.getName()}">name</label>
@@ -16,6 +16,6 @@
             </div>
         </div>
         <br>
-        <input type="submit" value="submit">
+        <input type="submit" value="сохранить">
     </form>
 </div>

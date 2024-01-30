@@ -1,11 +1,11 @@
 <div>
     <ul>
-        <li><a th:href="@{/admin/role/reg}">create role</a></li>
+        <li><a th:href="@{/admin/role/reg}">создать роль</a></li>
     </ul>
     <form th:method="GET" th:action="@{/admin/role/edit}">
         <select id="select" name="select">
             <option th:each="role : ${roles}" th:text="${role.getName()}" th:value="${role.getId()}"></option>
         </select>
-        <input type="submit" value="edit">
+        <input type="submit" value="редактировать">
     </form>
 </div>

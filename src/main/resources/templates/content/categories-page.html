@@ -1,13 +1,13 @@
 <div>
   <ul>
-    <li><a th:href="@{/admin/category/reg}">create category</a></li>
+    <li><a th:href="@{/admin/category/reg}">создать категорию</a></li>
   </ul>
   <form th:method="GET" id="form">
     <select id="select" name="select">
       <option th:each="category : ${categories}" th:text="${category.getName()}" th:value="${category.getId()}"></option>
     </select>
-    <input type="submit" value="edit" onclick="editUser()">
-    <input type="submit" value="delete" onclick="deleteUser()" disabled>
+    <input type="submit" value="редактировать" onclick="editUser()">
+    <input type="submit" value="удалить" onclick="deleteUser()" disabled>
   </form>
   <script>
     function editUser(){
