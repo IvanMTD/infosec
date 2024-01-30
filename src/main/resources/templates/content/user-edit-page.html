@@ -2,22 +2,22 @@
     <form th:method="POST" th:action="@{/admin/user/update/{id}(id=${implementer.getId()})}" th:object="${implementer}">
         <ul>
             <li>
-                <label for="firstname">имя: </label>
+                <label for="firstname">РёРјСЏ: </label>
                 <input type="text" id="firstname" th:field="*{firstname}">
                 <span th:if="${#fields.hasErrors('firstname')}" th:errors="*{firstname}" style="color: red"></span>
             </li>
             <li>
-                <label for="middlename">отчество: </label>
+                <label for="middlename">РѕС‚С‡РµСЃС‚РІРѕ: </label>
                 <input type="text" id="middlename" th:field="*{middleName}">
                 <span th:if="${#fields.hasErrors('middleName')}" th:errors="*{middleName}" style="color: red"></span>
             </li>
             <li>
-                <label for="lastname">фамилия: </label>
+                <label for="lastname">С„Р°РјРёР»РёСЏ: </label>
                 <input type="text" id="lastname" th:field="*{lastname}">
                 <span th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}" style="color: red"></span>
             </li>
             <li>
-                <label for="position">должность: </label>
+                <label for="position">РґРѕР»Р¶РЅРѕСЃС‚СЊ: </label>
                 <input type="text" id="position" th:field="*{officePosition}">
                 <span th:if="${#fields.hasErrors('officePosition')}" th:errors="*{officePosition}" style="color: red"></span>
             </li>
@@ -27,7 +27,7 @@
                 </select>
             </li>
             <li>
-                <input type="submit" value="обновить">
+                <input type="submit" value="РѕР±РЅРѕРІРёС‚СЊ">
             </li>
         </ul>
     </form>

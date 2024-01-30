@@ -1,11 +1,11 @@
 <div>
     <ul>
-        <li th:if="${categories.size() > 0}"><a th:href="@{/admin/trouble/reg}">создать вид проблемы</a></li>
+        <li th:if="${categories.size() > 0}"><a th:href="@{/admin/trouble/reg}">СЃРѕР·РґР°С‚СЊ РІРёРґ РїСЂРѕР±Р»РµРјС‹</a></li>
     </ul>
     <form th:method="GET" th:action="@{/admin/trouble/edit}">
         <select id="select" name="select">
             <option th:each="trouble : ${troubles}" th:text="${trouble.getName()}" th:value="${trouble.getId()}"></option>
         </select>
-        <input type="submit" value="редактировать">
+        <input type="submit" value="СЂРµРґР°РєС‚РёСЂРѕРІР°С‚СЊ">
     </form>
 </div>

@@ -10,11 +10,11 @@
     </parent>
     <groupId>net.security</groupId>
     <artifactId>infosec</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>infosec</name>
     <description>infosec</description>
     <properties>
-        <java.version>21</java.version>
+        <java.version>17</java.version>
     </properties>
     <dependencies>
         <dependency>

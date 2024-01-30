@@ -1,20 +1,20 @@
 <div>
-  <ul>
-    <li><a th:href="@{/admin/category/reg}">создать категорию</a></li>
-  </ul>
-  <form th:method="GET" id="form">
-    <select id="select" name="select">
-      <option th:each="category : ${categories}" th:text="${category.getName()}" th:value="${category.getId()}"></option>
-    </select>
-    <input type="submit" value="редактировать" onclick="editUser()">
-    <input type="submit" value="удалить" onclick="deleteUser()" disabled>
-  </form>
-  <script>
-    function editUser(){
-      document.getElementById('form').setAttribute('action','/admin/category/edit')
-    }
-    function deleteUser(){
-      document.getElementById('form').setAttribute('action','/admin/category/delete')
-    }
-  </script>
+    <ul>
+        <li><a th:href="@{/admin/category/reg}">СЃРѕР·РґР°С‚СЊ РєР°С‚РµРіРѕСЂРёСЋ</a></li>
+    </ul>
+    <form th:method="GET" id="form">
+        <select id="select" name="select">
+            <option th:each="category : ${categories}" th:text="${category.getName()}" th:value="${category.getId()}"></option>
+        </select>
+        <input type="submit" value="СЂРµРґР°РєС‚РёСЂРѕРІР°С‚СЊ" onclick="editUser()">
+        <input type="submit" value="СѓРґР°Р»РёС‚СЊ" onclick="deleteUser()" disabled>
+    </form>
+    <script>
+        function editUser(){
+            document.getElementById('form').setAttribute('action','/admin/category/edit')
+        }
+        function deleteUser(){
+            document.getElementById('form').setAttribute('action','/admin/category/delete')
+        }
+    </script>
 </div>

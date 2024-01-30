@@ -2,14 +2,15 @@
   <form th:method="POST" th:action="@{/login}">
     <ul>
       <li>
-        <label for="username">электронная почта: </label>
+        <label for="username">электронная почта: </label><br>
         <input placeholder="somebody@example.ru" type="email" name="username" id="username">
       </li>
       <li>
-        <label for="password">пароль: </label>
+        <label for="password">пароль: </label><br>
         <input placeholder="пароль" type="password" name="password" id="password">
       </li>
       <li>
+        <br>
         <input type="submit" value="вход">
       </li>
     </ul>

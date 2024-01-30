@@ -1,17 +1,17 @@
 <div>
-  <form th:method="POST" th:action="@{/admin/category/update/{id}(id=${ticket.getId()})}" th:object="${ticket}">
-    <ul>
-      <li>
-        <label for="name">название: </label><br>
-        <input type="text" id="name" th:field="*{name}">
-        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color: red"></span>
-      </li>
-      <li>
-        <label for="description">описание: </label><br>
-        <textarea type="text" id="description" th:field="*{description}" rows="10" cols="50"></textarea>
-        <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red"></span>
-      </li>
-      <li><input type="submit"value="обновить"></li>
-    </ul>
-  </form>
+    <form th:method="POST" th:action="@{/admin/category/update/{id}(id=${ticket.getId()})}" th:object="${ticket}">
+        <ul>
+            <li>
+                <label for="name">РЅР°Р·РІР°РЅРёРµ: </label><br>
+                <input type="text" id="name" th:field="*{name}">
+                <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color: red"></span>
+            </li>
+            <li>
+                <label for="description">РѕРїРёСЃР°РЅРёРµ: </label><br>
+                <textarea type="text" id="description" th:field="*{description}" rows="10" cols="50"></textarea>
+                <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red"></span>
+            </li>
+            <li><input type="submit"value="РѕР±РЅРѕРІРёС‚СЊ"></li>
+        </ul>
+    </form>
 </div>

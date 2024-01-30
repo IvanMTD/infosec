@@ -2,12 +2,12 @@
     <form th:method="POST" th:action="@{/admin/trouble/add}" th:object="${ticket}">
         <ul>
             <li>
-                <label for="name">название: </label>
+                <label for="name">РЅР°Р·РІР°РЅРёРµ: </label>
                 <input type="text" id="name" th:field="*{name}">
                 <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color: red"></span>
             </li>
             <li>
-                <label for="description">описание: </label>
+                <label for="description">РѕРїРёСЃР°РЅРёРµ: </label>
                 <input type="text" id="description" th:field="*{description}">
                 <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red"></span>
             </li>
@@ -16,7 +16,7 @@
                     <option th:each="category : ${categories}" th:text="${category.getName()}" th:value="${category.getId()}"></option>
                 </select>
             </li>
-            <li><input type="submit" value="сохранить"></li>
+            <li><input type="submit" value="СЃРѕС…СЂР°РЅРёС‚СЊ"></li>
         </ul>
     </form>
 </div>

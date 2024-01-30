@@ -1,8 +1,9 @@
 <div>
   <form id="logoutForm" method="post" th:action="@{/logout}"></form>
   <ul>
-    <li><a th:href="@{/}">главная</a></li>
-    <li><a id="logout" href="#" onclick="document.getElementById('logoutForm').submit()">выход</a></li>
-    <li><p th:text="'Авторизованный пользователь: ' + ${userName}"></p></li>
+    <li><a th:href="@{/}">РіР»Р°РІРЅР°СЏ</a></li>
+    <li><a id="logout" href="#" onclick="document.getElementById('logoutForm').submit()">РІС‹С…РѕРґ</a></li>
+    <li><p th:text="'РђРІС‚РѕСЂРёР·РѕРІР°РЅРЅС‹Р№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ: ' + ${userName}"></p></li>
   </ul>
+  <hr>
 </div>
