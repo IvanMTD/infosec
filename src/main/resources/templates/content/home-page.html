@@ -1,6 +1,6 @@
 <div>
     <ul>
-        <li><a th:href="@{/admin}">администрирование</a></li>
+        <li th:if="${admin}"><a th:href="@{/admin}">администрирование</a></li>
         <li><a th:href="@{/task}">задачи</a></li>
     </ul>
 </div>
