@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -63,6 +65,31 @@ public class RoleService {
         return roleRepository.findById(impl.getRoleId()).flatMap(role -> {
             role.addImplementer(impl);
             return roleRepository.save(role);
+        });
+    }
+
+    /**
+     * СЛУЖЕБНЫЕ ФУНКЦИИ
+     */
+
+    public Mono<Boolean> isAdmin(Role role){
+        return roleRepository.findById(role.getId()).flatMap(r -> {
+            if(r.getAuthorities().size() == Role.Authority.values().length){
+                return Mono.just(true);
+            }else{
+                return Mono.just(false);
+            }
+        });
+    }
+
+    public Mono<Boolean> isManager(int roleId){
+        return roleRepository.findById(roleId).flatMap(r -> {
+            List<Role.Authority> authList = Arrays.asList(Role.Authority.CREATE,Role.Authority.READ, Role.Authority.DELETE, Role.Authority.UPDATE, Role.Authority.SELF, Role.Authority.ALL);
+            if(authList.stream().allMatch(a -> r.getAuthorities().stream().anyMatch(a2 -> a2.equals(a)))){
+                return Mono.just(true);
+            }else{
+                return Mono.just(false);
+            }
         });
     }
 }

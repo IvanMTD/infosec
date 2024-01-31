@@ -38,9 +38,10 @@ public class Role {
         UPDATE("Обновлять"),
         DELETE("Удалять"),
         ALL("Все"),
-        SELF("Свои");
+        SELF("Свои"),
+        SERVICE("Служебные");
 
-        private String name;
+        private final String name;
 
         Authority(String name){
             this.name = name;

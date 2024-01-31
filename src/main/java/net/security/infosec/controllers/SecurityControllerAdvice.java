@@ -2,6 +2,7 @@ package net.security.infosec.controllers;
 
 import lombok.RequiredArgsConstructor;
 import net.security.infosec.models.Implementer;
+import net.security.infosec.models.Role;
 import net.security.infosec.services.RoleService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.reactive.result.view.CsrfRequestDataValueProcessor;
@@ -22,7 +23,7 @@ public class SecurityControllerAdvice {
     }
 
     @ModelAttribute(name = "userName")
-    Mono<String> userName(@AuthenticationPrincipal Implementer implementer){
+    public Mono<String> userName(@AuthenticationPrincipal Implementer implementer){
         if(implementer != null){
             return Mono.just(implementer.getFullName());
         }else{
@@ -30,18 +31,12 @@ public class SecurityControllerAdvice {
         }
     }
 
-    @ModelAttribute(name = "admin")
-    Mono<Boolean> isAdmin(@AuthenticationPrincipal Implementer implementer){
-        if(implementer != null){
-            return roleService.getRoleById(implementer.getId()).flatMap(role -> {
-                if(role.getAuthorities().size() == 6){
-                    return Mono.just(true);
-                }else{
-                    return Mono.just(false);
-                }
-            });
+    @ModelAttribute(name = "manager")
+    public Mono<Boolean> isManager(@AuthenticationPrincipal Implementer implementer){
+        if(implementer != null) {
+            return roleService.isManager(implementer.getRoleId());
         }else{
-            return Mono.empty();
+            return Mono.just(false);
         }
     }
 }
