@@ -3,15 +3,14 @@
         google.load("visualization", "1", {packages:["corechart"]});
         google.setOnLoadCallback(drawChart);
         function drawChart() {
-
             var implementers = [[${implementers}]]
             var dataArray = new Array();
             dataArray[0] = ['Имя исполнителя','Количество выполненных заявок'];
             for(var i=0; i<implementers.length; i++){
                 dataArray[i+1] = [implementers[i].fullName,implementers[i].taskIds.length]
             }
-
             var data = google.visualization.arrayToDataTable(dataArray,false);
+
             var options = {
                 title: 'Процент выполненных работ сотрудниками',
                 is3D: false,
@@ -30,21 +29,15 @@
         google.charts.setOnLoadCallback(drawChart);
 
         function drawChart() {
-            let chartTitle = [[${chartTitle}]];
-            console.log(chartTitle)
+            let chartTitle = [[${categoryTitle}]];
             let tableTitle = [];
             tableTitle[0] = 'Дата';
             for(let i=0; i<chartTitle.length; i++){
                 tableTitle[i+1] = chartTitle[i].name;
             }
-            console.log(tableTitle)
-
-            let chartList = [[${chart}]];
-            console.log(chartList)
-
+            let chartList = [[${categoryChart}]];
             let dataArray = [];
             dataArray[0] = tableTitle;
-
             for(let i=0; i<chartList.length; i++){
                 let arrayStroke = [];
                 arrayStroke[0] = chartList[i].localDate;
@@ -54,9 +47,6 @@
                 }
                 dataArray[i+1] = arrayStroke;
             }
-
-            console.log(dataArray)
-
             let data = google.visualization.arrayToDataTable(dataArray, false);
 
             let options = {
@@ -76,24 +66,18 @@
 <div style="display: inline-block; border: solid 1px black; margin: 1vh">
     <script th:inline="javascript">
         google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(drawChart);
+        google.charts.setOnLoadCallback(drawVisualization);
 
-        function drawChart() {
-            let chartTitle = [[${chartTitle}]];
-            console.log(chartTitle)
+        function drawVisualization() {
+            let chartTitle = [[${troubleTitle}]];
             let tableTitle = [];
             tableTitle[0] = 'Дата';
             for(let i=0; i<chartTitle.length; i++){
                 tableTitle[i+1] = chartTitle[i].name;
             }
-            console.log(tableTitle)
-
-            let chartList = [[${chart}]];
-            console.log(chartList)
-
+            let chartList = [[${troubleChart}]];
             let dataArray = [];
             dataArray[0] = tableTitle;
-
             for(let i=0; i<chartList.length; i++){
                 let arrayStroke = [];
                 arrayStroke[0] = chartList[i].localDate;
@@ -103,18 +87,17 @@
                 }
                 dataArray[i+1] = arrayStroke;
             }
-
-            console.log(dataArray)
-
             let data = google.visualization.arrayToDataTable(dataArray, false);
 
             var options = {
-                title: 'Выполненных работ по датам',
-                hAxis: {title: 'Даты',  titleTextStyle: {color: '#333'}},
-                vAxis: {minValue: 0}
+                title : 'Детализация',
+                vAxis: {title: 'Количество выполненных заявок'},
+                hAxis: {title: 'Даты'},
+                seriesType: 'bars',
+                /*series: {5: {type: 'line'}}*/
             };
 
-            var chart = new google.visualization.AreaChart(document.getElementById('chart_div2'));
+            var chart = new google.visualization.ComboChart(document.getElementById('chart_div2'));
             chart.draw(data, options);
         }
     </script>

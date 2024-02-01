@@ -49,7 +49,7 @@ public class TaskController {
     @GetMapping("/stat")
     public Mono<Rendering> taskStatPage(){
 
-        Flux<ChartDTO> chartFlux = taskService.getAll().collectList().flatMapMany(tasks -> {
+        Flux<ChartDTO> chartCategoryFlux = taskService.getAll().collectList().flatMapMany(tasks -> {
             Set<LocalDate> localDates = new HashSet<>();
             for(Task task : tasks){
                 localDates.add(task.getExecuteDate());
@@ -72,7 +72,20 @@ public class TaskController {
                 }
                 return Mono.just(chart);
             }));
-            /*return troubleTicketService.getAllTrouble().collectList().flatMap(troubles -> taskService.getTasksByLocalDate(localDate).collectList().flatMap(tasks -> {
+        });
+
+        Flux<ChartDTO> chartTroubleFlux = taskService.getAll().collectList().flatMapMany(tasks -> {
+            Set<LocalDate> localDates = new HashSet<>();
+            for(Task task : tasks){
+                localDates.add(task.getExecuteDate());
+            }
+            List<LocalDate> dates = new ArrayList<>(localDates);
+            dates = dates.stream().sorted(Comparator.comparing(LocalDate::getDayOfYear)).collect(Collectors.toList());
+            return Flux.fromIterable(dates);
+        }).flatMapSequential(localDate -> {
+            ChartDTO chart = new ChartDTO();
+            chart.setLocalDate(localDate);
+            return troubleTicketService.getAllTrouble().collectList().flatMap(troubles -> taskService.getTasksByLocalDate(localDate).collectList().flatMap(tasks -> {
                for(Trouble trouble : troubles){
                    int tCount = 0;
                    for(Task task : tasks){
@@ -83,7 +96,7 @@ public class TaskController {
                    chart.addTaskOnTrouble(tCount);
                }
                return Mono.just(chart);
-            }));*/
+            }));
         });
 
         return Mono.just(
@@ -91,9 +104,10 @@ public class TaskController {
                         .modelAttribute("title","Task statistic page")
                         .modelAttribute("index","task-graph-page")
                         .modelAttribute("implementers", implementerService.getAll())
-                        //.modelAttribute("chartTitle", troubleTicketService.getAllTrouble())
-                        .modelAttribute("chartTitle", troubleTicketService.getAllCategories())
-                        .modelAttribute("chart", chartFlux)
+                        .modelAttribute("categoryTitle", troubleTicketService.getAllCategories())
+                        .modelAttribute("categoryChart", chartCategoryFlux)
+                        .modelAttribute("troubleTitle", troubleTicketService.getAllTrouble())
+                        .modelAttribute("troubleChart", chartTroubleFlux)
                         .build()
         );
     }
