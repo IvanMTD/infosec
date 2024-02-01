@@ -55,7 +55,7 @@ public class TaskController {
                 localDates.add(task.getExecuteDate());
             }
             List<LocalDate> dates = new ArrayList<>(localDates);
-            dates = dates.stream().sorted(Comparator.comparing(LocalDate::getDayOfMonth)).collect(Collectors.toList());
+            dates = dates.stream().sorted(Comparator.comparing(LocalDate::getDayOfYear)).collect(Collectors.toList());
             return Flux.fromIterable(dates);
         }).flatMapSequential(localDate -> {
             ChartDTO chart = new ChartDTO();
