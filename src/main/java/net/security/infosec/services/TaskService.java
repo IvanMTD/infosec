@@ -30,13 +30,26 @@ public class TaskService {
         LocalDate localDate = LocalDate.now();
         boolean over = false;
         while (!over){
-            System.out.println(localDate.getDayOfWeek());
             if(localDate.getDayOfWeek() == DayOfWeek.SUNDAY){
                 over = true;
             }else{
                 localDate = localDate.minusDays(1);
             }
         }
+        return taskRepository.findTasksByExecuteDateAfter(localDate);
+    }
+
+    public Flux<Task> getMonth() {
+        LocalDate localDate = LocalDate.now();
+        boolean over = false;
+        while (!over){
+            if(localDate.getDayOfMonth() == 1){
+                over = true;
+            }else{
+                localDate = localDate.minusDays(1);
+            }
+        }
+        localDate = localDate.minusDays(1);
         return taskRepository.findTasksByExecuteDateAfter(localDate);
     }
 

@@ -1,3 +1,8 @@
+<div>
+    <button><a th:href="@{/task/chart/week}" style="color: black; text-decoration: none">неделя</a></button>
+    <button><a th:href="@{/task/chart/month}" style="color: black; text-decoration: none">месяц</a></button>
+    <button disabled><a href="#" style="color: black; text-decoration: none">год</a></button>
+</div>
 <div style="display: inline-block; border: solid 1px black; margin: 1vh">
     <script th:inline="javascript">
         google.load("visualization", "1", {packages:["corechart"]});
@@ -83,7 +88,12 @@
                 arrayStroke[0] = chartList[i].localDate;
                 let tasks = chartList[i].taskOnTrouble;
                 for(let j=0; j<tasks.length; j++){
-                    arrayStroke[j+1] = tasks[j];
+                    if(tasks[j] === 0){
+                        console.log(tasks[j] + ' ' + j)
+                        arrayStroke[j+1] = 0;
+                    }else{
+                        arrayStroke[j+1] = tasks[j];
+                    }
                 }
                 dataArray[i+1] = arrayStroke;
             }

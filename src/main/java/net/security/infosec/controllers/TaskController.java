@@ -46,10 +46,10 @@ public class TaskController {
         );
     }
 
-    @GetMapping("/stat")
-    public Mono<Rendering> taskStatPage(){
+    @GetMapping("/chart/week")
+    public Mono<Rendering> taskChartWeek(){
 
-        Flux<ChartDTO> chartCategoryFlux = taskService.getAll().collectList().flatMapMany(tasks -> {
+        Flux<ChartDTO> chartCategoryFlux = taskService.getWeek().collectList().flatMapMany(tasks -> {
             Set<LocalDate> localDates = new HashSet<>();
             for(Task task : tasks){
                 localDates.add(task.getExecuteDate());
@@ -74,7 +74,7 @@ public class TaskController {
             }));
         });
 
-        Flux<ChartDTO> chartTroubleFlux = taskService.getAll().collectList().flatMapMany(tasks -> {
+        Flux<ChartDTO> chartTroubleFlux = taskService.getWeek().collectList().flatMapMany(tasks -> {
             Set<LocalDate> localDates = new HashSet<>();
             for(Task task : tasks){
                 localDates.add(task.getExecuteDate());
@@ -99,11 +99,107 @@ public class TaskController {
             }));
         });
 
+        Flux<Implementer> impl = implementerService.getAll().flatMap(implementer -> {
+            Implementer i = new Implementer();
+            i.setLastname(implementer.getLastname());
+            i.setFirstname(implementer.getFirstname());
+            i.setMiddleName(implementer.getMiddleName());
+            return taskService.getWeek().collectList().flatMap(list -> {
+                for(Task task : list){
+                    if(implementer.getTaskIds().stream().anyMatch(taskIds -> taskIds == task.getId())){
+                        i.addTask(task);
+                    }
+                }
+                return Mono.just(i);
+            });
+        });
+
         return Mono.just(
                 Rendering.view("template")
                         .modelAttribute("title","Task statistic page")
                         .modelAttribute("index","task-graph-page")
-                        .modelAttribute("implementers", implementerService.getAll())
+                        .modelAttribute("implementers", impl)
+                        .modelAttribute("categoryTitle", troubleTicketService.getAllCategories())
+                        .modelAttribute("categoryChart", chartCategoryFlux)
+                        .modelAttribute("troubleTitle", troubleTicketService.getAllTrouble())
+                        .modelAttribute("troubleChart", chartTroubleFlux)
+                        .build()
+        );
+    }
+
+    @GetMapping("/chart/month")
+    public Mono<Rendering> taskChartMonth(){
+
+        Flux<ChartDTO> chartCategoryFlux = taskService.getMonth().collectList().flatMapMany(tasks -> {
+            Set<LocalDate> localDates = new HashSet<>();
+            for(Task task : tasks){
+                localDates.add(task.getExecuteDate());
+            }
+            List<LocalDate> dates = new ArrayList<>(localDates);
+            dates = dates.stream().sorted(Comparator.comparing(LocalDate::getDayOfYear)).collect(Collectors.toList());
+            return Flux.fromIterable(dates);
+        }).flatMapSequential(localDate -> {
+            ChartDTO chart = new ChartDTO();
+            chart.setLocalDate(localDate);
+            return troubleTicketService.getAllCategories().collectList().flatMap(categories -> taskService.getTasksByLocalDate(localDate).collectList().flatMap(tasks -> {
+                for(Category category : categories){
+                    int tCount = 0;
+                    for(Task task : tasks){
+                        if(category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())){
+                            tCount++;
+                        }
+                    }
+                    chart.addTaskOnTrouble(tCount);
+                }
+                return Mono.just(chart);
+            }));
+        });
+
+        Flux<ChartDTO> chartTroubleFlux = taskService.getMonth().collectList().flatMapMany(tasks -> {
+            Set<LocalDate> localDates = new HashSet<>();
+            for(Task task : tasks){
+                localDates.add(task.getExecuteDate());
+            }
+            List<LocalDate> dates = new ArrayList<>(localDates);
+            dates = dates.stream().sorted(Comparator.comparing(LocalDate::getDayOfYear)).collect(Collectors.toList());
+            return Flux.fromIterable(dates);
+        }).flatMapSequential(localDate -> {
+            ChartDTO chart = new ChartDTO();
+            chart.setLocalDate(localDate);
+            return troubleTicketService.getAllTrouble().collectList().flatMap(troubles -> taskService.getTasksByLocalDate(localDate).collectList().flatMap(tasks -> {
+                for(Trouble trouble : troubles){
+                    int tCount = 0;
+                    for(Task task : tasks){
+                        if(task.getTroubleId() == trouble.getId()) {
+                            tCount++;
+                        }
+                    }
+                    chart.addTaskOnTrouble(tCount);
+                }
+                return Mono.just(chart);
+            }));
+        });
+
+        Flux<Implementer> impl = implementerService.getAll().flatMap(implementer -> {
+            Implementer i = new Implementer();
+            i.setLastname(implementer.getLastname());
+            i.setFirstname(implementer.getFirstname());
+            i.setMiddleName(implementer.getMiddleName());
+            return taskService.getMonth().collectList().flatMap(list -> {
+                for(Task task : list){
+                    if(implementer.getTaskIds().stream().anyMatch(taskIds -> taskIds == task.getId())){
+                        i.addTask(task);
+                    }
+                }
+                return Mono.just(i);
+            });
+        });
+
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Task statistic page")
+                        .modelAttribute("index","task-graph-page")
+                        .modelAttribute("implementers", impl)
                         .modelAttribute("categoryTitle", troubleTicketService.getAllCategories())
                         .modelAttribute("categoryChart", chartCategoryFlux)
                         .modelAttribute("troubleTitle", troubleTicketService.getAllTrouble())
