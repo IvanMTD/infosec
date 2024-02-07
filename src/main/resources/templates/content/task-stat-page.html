@@ -1,19 +1,60 @@
 <div>
-    <div style="margin: 5px; padding: 5px; border:solid 1px black">
-        <ul>
-            <li><a th:href="@{/task/stat/all}">Показать за все время</a></li>
-            <li><a th:href="@{/task/stat/week}">Показать за все неделю</a></li>
-        </ul>
+    <div style="display: inline-block; float:left; width: 100%">
+        <div style="float: left; width: 50%; padding: 1vh">
+            <div style="display: block">
+                <h4>Сводка</h4>
+                <p><b>Всего выполнено: </b><span th:text="${stats.size()}"></span></p>
+            </div>
+        </div>
+        <div style="float: right; width: 50%; padding: 1vh">
+            <script th:inline="javascript">
+                google.charts.load("current", {packages:["corechart"]});
+                google.charts.setOnLoadCallback(drawChart);
+                function drawChart() {
+
+                    let charts = [[${charts}]]
+                    console.log(charts)
+                    let dataArray = [];
+                    dataArray[0] = ['Категория','Количество выполненных заявок'];
+                    for(let i=0; i<charts.length; i++){
+                        dataArray[i+1] = [charts[i].title, charts[i].taskCount];
+                    }
+                    let data = google.visualization.arrayToDataTable(dataArray,false);
+
+                    /*var data = google.visualization.arrayToDataTable([
+                        ['Task', 'Hours per Day'],
+                        ['Work',     11],
+                        ['Eat',      2],
+                        ['Commute',  2],
+                        ['Watch TV', 2],
+                        ['Sleep',    7]
+                    ]);*/
+
+                    let count = [[${stats.size()}]]
+                    let options = {
+                        title: 'Выполненные заявки за ' + count + ' дней',
+                        pieHole: 0.4,
+                    };
+
+                    let chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+                    chart.draw(data, options);
+                }
+            </script>
+            <div id="donutchart" style="width: 900px; height: 500px;"></div>
+        </div>
     </div>
     <div style="margin: 5px; padding: 5px; border:solid 1px black">
-        <p>Всего выполнено: <a th:href="@{/task/stat/all}"><span th:text="${stats.size()}"></span></a></p>
+        <button><a th:href="@{/task/stat/week}" style="color: black; text-decoration: none">неделя</a></button>
+        <button><a th:href="@{/task/stat/month}" style="color: black; text-decoration: none">месяц</a></button>
+        <button disabled><a href="#" style="color: black; text-decoration: none">год</a></button>
+        <button><a th:href="@{/task/stat/all}" style="color: black; text-decoration: none">все время</a></button>
     </div>
     <div th:each="stat : ${stats}" style="margin: 5px; padding: 5px; border: solid 1px black">
-        <p th:text="'Категория: ' + ${stat.getCategory().getName()}"></p>
-        <p th:text="'Вид проблемы: ' + ${stat.getTrouble().getName()}"></p>
-        <p th:text="'Исполнитель: ' + ${stat.getImplementer().getFullName()}"></p>
-        <p th:text="'Заголовок:' + ${stat.getTask().getTitle()}"></p>
-        <p th:text="${stat.getTask().getDescription()}"></p>
-        <p th:text="'Дата выполнения: ' + ${stat.getTask().getExecuteDate()}"></p>
+        <p><b>Исполнитель: </b><span th:text="${stat.getImplementer().getFullName()}"></span></p>
+        <p><b>Категория: </b><span th:text="${stat.getCategory().getName()}"></span></p>
+        <p><b>Вид задачи: </b><span th:text="${stat.getTrouble().getName()}"></span></p>
+        <p><b>ФИО(кто обращался) или Основная задача: </b><span th:text="${stat.getTask().getTitle()}"></span></p>
+        <p><b>Что сделано: </b><span th:text="${stat.getTask().getDescription()}"></span></p>
+        <p><b>Дата исполнения: </b><span th:text="${stat.getTask().getDate()}"></span></p>
     </div>
 </div>

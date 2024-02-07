@@ -6,6 +6,9 @@ import net.security.infosec.dto.TaskDataTransferObject;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 @Data
 @RequiredArgsConstructor
@@ -38,5 +41,11 @@ public class Task {
 
     public void addImplementer(Implementer implementer){
         implementerId = implementer.getId();
+    }
+
+    public String getDate(){
+        Locale russian = Locale.forLanguageTag("ru-RU");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        return executeDate.getDayOfWeek().getDisplayName(TextStyle.FULL, russian) + " " + formatter.format(executeDate);
     }
 }

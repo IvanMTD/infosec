@@ -48,6 +48,20 @@ public class TaskController {
 
     @GetMapping("/chart/week")
     public Mono<Rendering> taskChartWeek(){
+        Flux<Implementer> impl = implementerService.getAll().flatMap(implementer -> {
+            Implementer i = new Implementer();
+            i.setLastname(implementer.getLastname());
+            i.setFirstname(implementer.getFirstname());
+            i.setMiddleName(implementer.getMiddleName());
+            return taskService.getWeek().collectList().flatMap(list -> {
+                for(Task task : list){
+                    if(implementer.getTaskIds().stream().anyMatch(taskIds -> taskIds == task.getId())){
+                        i.addTask(task);
+                    }
+                }
+                return Mono.just(i);
+            });
+        });
 
         Flux<ChartDTO> chartCategoryFlux = taskService.getWeek().collectList().flatMapMany(tasks -> {
             Set<LocalDate> localDates = new HashSet<>();
@@ -99,21 +113,6 @@ public class TaskController {
             }));
         });
 
-        Flux<Implementer> impl = implementerService.getAll().flatMap(implementer -> {
-            Implementer i = new Implementer();
-            i.setLastname(implementer.getLastname());
-            i.setFirstname(implementer.getFirstname());
-            i.setMiddleName(implementer.getMiddleName());
-            return taskService.getWeek().collectList().flatMap(list -> {
-                for(Task task : list){
-                    if(implementer.getTaskIds().stream().anyMatch(taskIds -> taskIds == task.getId())){
-                        i.addTask(task);
-                    }
-                }
-                return Mono.just(i);
-            });
-        });
-
         return Mono.just(
                 Rendering.view("template")
                         .modelAttribute("title","Task statistic page")
@@ -129,6 +128,21 @@ public class TaskController {
 
     @GetMapping("/chart/month")
     public Mono<Rendering> taskChartMonth(){
+
+        Flux<Implementer> impl = implementerService.getAll().flatMap(implementer -> {
+            Implementer i = new Implementer();
+            i.setLastname(implementer.getLastname());
+            i.setFirstname(implementer.getFirstname());
+            i.setMiddleName(implementer.getMiddleName());
+            return taskService.getMonth().collectList().flatMap(list -> {
+                for(Task task : list){
+                    if(implementer.getTaskIds().stream().anyMatch(taskIds -> taskIds == task.getId())){
+                        i.addTask(task);
+                    }
+                }
+                return Mono.just(i);
+            });
+        });
 
         Flux<ChartDTO> chartCategoryFlux = taskService.getMonth().collectList().flatMapMany(tasks -> {
             Set<LocalDate> localDates = new HashSet<>();
@@ -180,21 +194,6 @@ public class TaskController {
             }));
         });
 
-        Flux<Implementer> impl = implementerService.getAll().flatMap(implementer -> {
-            Implementer i = new Implementer();
-            i.setLastname(implementer.getLastname());
-            i.setFirstname(implementer.getFirstname());
-            i.setMiddleName(implementer.getMiddleName());
-            return taskService.getMonth().collectList().flatMap(list -> {
-                for(Task task : list){
-                    if(implementer.getTaskIds().stream().anyMatch(taskIds -> taskIds == task.getId())){
-                        i.addTask(task);
-                    }
-                }
-                return Mono.just(i);
-            });
-        });
-
         return Mono.just(
                 Rendering.view("template")
                         .modelAttribute("title","Task statistic page")
@@ -208,38 +207,33 @@ public class TaskController {
         );
     }
 
-    @GetMapping("/stat/all")
-    public Mono<Rendering> taskStatAll(){
-        return Mono.just(
-                Rendering.view("template")
-                        .modelAttribute("title","Task statistic")
-                        .modelAttribute("index","task-stat-page")
-                        .modelAttribute("stats",
-                                taskService.getAll().flatMap(task -> {
-                                    StatDataTransferObject stat = new StatDataTransferObject();
-                                    stat.setTask(task);
-                                    return implementerService.getUserById(stat.getTask().getImplementerId()).flatMap(implementer -> {
-                                        stat.setImplementer(implementer);
-                                        return troubleTicketService.getTaskTrouble(stat.getTask()).flatMap(trouble -> {
-                                            stat.setTrouble(trouble);
-                                            return troubleTicketService.getTroubleCategory(stat.getTrouble()).flatMap(category -> {
-                                                stat.setCategory(category);
-                                                return Mono.just(stat);
-                                            });
-                                        });
-                                    });
-                                })
-                        )
-                        .build()
-        );
-    }
-
     @GetMapping("/stat/week")
     public Mono<Rendering> taskStatWeek(){
+
+        Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
+            ChartDTO chart = new ChartDTO();
+            chart.setTitle(category.getName());
+            chart.setCId(category.getId());
+            return taskService.getWeek().collectList().flatMap(week -> {
+                int count = 0;
+                for(Task task : week){
+                    if(category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())){
+                        count++;
+                    }
+                }
+                chart.setTaskCount(count);
+                return Mono.just(chart);
+            });
+        }).collectList().flatMapMany(l -> {
+            l = l.stream().sorted(Comparator.comparing(ChartDTO::getCId)).collect(Collectors.toList());
+            return Flux.fromIterable(l);
+        }).flatMapSequential(Mono::just);
+
         return Mono.just(
                 Rendering.view("template")
                         .modelAttribute("title","Task statistic")
                         .modelAttribute("index","task-stat-page")
+                        .modelAttribute("charts",chartFlux)
                         .modelAttribute("stats",
                                 taskService.getWeek().flatMap(task -> {
                                     StatDataTransferObject stat = new StatDataTransferObject();
@@ -254,6 +248,109 @@ public class TaskController {
                                             });
                                         });
                                     });
+                                }).collectList().flatMap(list -> {
+                                    list = list.stream().sorted(Comparator.comparing(l -> l.getTask().getExecuteDate().getDayOfWeek())).collect(Collectors.toList());
+                                    return Mono.just(list);
+                                })
+                        )
+                        .build()
+        );
+    }
+
+    @GetMapping("/stat/month")
+    public Mono<Rendering> taskStatMonth(){
+
+        Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
+            ChartDTO chart = new ChartDTO();
+            chart.setTitle(category.getName());
+            chart.setCId(category.getId());
+            return taskService.getMonth().collectList().flatMap(month -> {
+                int count = 0;
+                for(Task task : month){
+                    if(category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())){
+                        count++;
+                    }
+                }
+                chart.setTaskCount(count);
+                return Mono.just(chart);
+            });
+        }).collectList().flatMapMany(l -> {
+            l = l.stream().sorted(Comparator.comparing(ChartDTO::getCId)).collect(Collectors.toList());
+            return Flux.fromIterable(l);
+        }).flatMapSequential(Mono::just);
+
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Task statistic")
+                        .modelAttribute("index","task-stat-page")
+                        .modelAttribute("charts",chartFlux)
+                        .modelAttribute("stats",
+                                taskService.getMonth().flatMap(task -> {
+                                    StatDataTransferObject stat = new StatDataTransferObject();
+                                    stat.setTask(task);
+                                    return implementerService.getUserById(stat.getTask().getImplementerId()).flatMap(implementer -> {
+                                        stat.setImplementer(implementer);
+                                        return troubleTicketService.getTaskTrouble(stat.getTask()).flatMap(trouble -> {
+                                            stat.setTrouble(trouble);
+                                            return troubleTicketService.getTroubleCategory(stat.getTrouble()).flatMap(category -> {
+                                                stat.setCategory(category);
+                                                return Mono.just(stat);
+                                            });
+                                        });
+                                    });
+                                }).collectList().flatMap(list -> {
+                                    list = list.stream().sorted(Comparator.comparing(l -> l.getTask().getExecuteDate().getDayOfMonth())).collect(Collectors.toList());
+                                    return Mono.just(list);
+                                })
+                        )
+                        .build()
+        );
+    }
+
+    @GetMapping("/stat/all")
+    public Mono<Rendering> taskStatAll(){
+
+        Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
+            ChartDTO chart = new ChartDTO();
+            chart.setTitle(category.getName());
+            chart.setCId(category.getId());
+            return taskService.getAll().collectList().flatMap(all -> {
+                int count = 0;
+                for(Task task : all){
+                    if(category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())){
+                        count++;
+                    }
+                }
+                chart.setTaskCount(count);
+                return Mono.just(chart);
+            });
+        }).collectList().flatMapMany(l -> {
+            l = l.stream().sorted(Comparator.comparing(ChartDTO::getCId)).collect(Collectors.toList());
+            return Flux.fromIterable(l);
+        }).flatMapSequential(Mono::just);
+
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Task statistic")
+                        .modelAttribute("index","task-stat-page")
+                        .modelAttribute("charts",chartFlux)
+                        .modelAttribute("stats",
+                                taskService.getAll().flatMap(task -> {
+                                    StatDataTransferObject stat = new StatDataTransferObject();
+                                    stat.setTask(task);
+                                    return implementerService.getUserById(stat.getTask().getImplementerId()).flatMap(implementer -> {
+                                        stat.setImplementer(implementer);
+                                        return troubleTicketService.getTaskTrouble(stat.getTask()).flatMap(trouble -> {
+                                            stat.setTrouble(trouble);
+                                            return troubleTicketService.getTroubleCategory(stat.getTrouble()).flatMap(category -> {
+                                                stat.setCategory(category);
+                                                return Mono.just(stat);
+                                            });
+                                        });
+                                    });
+                                }).collectList().flatMap(list -> {
+                                    list = list.stream().sorted(Comparator.comparing(l -> l.getTask().getExecuteDate().getDayOfYear())).collect(Collectors.toList());
+                                    return Mono.just(list);
                                 })
                         )
                         .build()

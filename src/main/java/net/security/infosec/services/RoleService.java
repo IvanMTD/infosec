@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Service
+@Service("RoleService")
 @RequiredArgsConstructor
 public class RoleService {
     private final RoleRepository roleRepository;
@@ -72,8 +72,8 @@ public class RoleService {
      * СЛУЖЕБНЫЕ ФУНКЦИИ
      */
 
-    public Mono<Boolean> isAdmin(Role role){
-        return roleRepository.findById(role.getId()).flatMap(r -> {
+    public Mono<Boolean> isAdmin(int roleId){
+        return roleRepository.findById(roleId).flatMap(r -> {
             if(r.getAuthorities().size() == Role.Authority.values().length){
                 return Mono.just(true);
             }else{

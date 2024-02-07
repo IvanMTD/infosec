@@ -12,7 +12,7 @@
                 </select>
             </li>
             <li>
-                <label for="title">ФИО пользователя которому оказывалась помощь: </label>
+                <label for="title">ФИО пользователя или Общее название задачи: </label>
                 <br>
                 <input type="text" id="title" th:field="*{title}">
                 <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}" style="color: red"></span>

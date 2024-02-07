@@ -45,7 +45,7 @@
             dataArray[0] = tableTitle;
             for(let i=0; i<chartList.length; i++){
                 let arrayStroke = [];
-                arrayStroke[0] = chartList[i].localDate;
+                arrayStroke[0] = chartList[i].date;
                 let tasks = chartList[i].taskOnTrouble;
                 for(let j=0; j<tasks.length; j++){
                     arrayStroke[j+1] = tasks[j];
@@ -85,11 +85,10 @@
             dataArray[0] = tableTitle;
             for(let i=0; i<chartList.length; i++){
                 let arrayStroke = [];
-                arrayStroke[0] = chartList[i].localDate;
+                arrayStroke[0] = chartList[i].date;
                 let tasks = chartList[i].taskOnTrouble;
                 for(let j=0; j<tasks.length; j++){
                     if(tasks[j] === 0){
-                        console.log(tasks[j] + ' ' + j)
                         arrayStroke[j+1] = 0;
                     }else{
                         arrayStroke[j+1] = tasks[j];
@@ -99,7 +98,8 @@
             }
             let data = google.visualization.arrayToDataTable(dataArray, false);
 
-            var options = {
+            //var options = generateSeriesOptions(5,chartTitle.length);  // Генерирует опции для всех серий начиная с пятой
+            let options = {
                 title : 'Детализация',
                 vAxis: {title: 'Количество выполненных заявок'},
                 hAxis: {title: 'Даты'},
@@ -107,9 +107,27 @@
                 /*series: {5: {type: 'line'}}*/
             };
 
-            var chart = new google.visualization.ComboChart(document.getElementById('chart_div2'));
+            let chart = new google.visualization.ComboChart(document.getElementById('chart_div2'));
             chart.draw(data, options);
         }
+        function generateSeriesOptions(startIndex,count) {
+            var options = {
+                title : 'Детализация',
+                vAxis: {title: 'Количество выполненных заявок'},
+                hAxis: {title: 'Даты'},
+                seriesType: 'bars',
+                series: {}
+            };
+
+            console.log(startIndex + ' ' + count);
+            for (var i = startIndex; i < count; i++) {
+                console.log(i)
+                options.series[i] = {type: 'line'};
+            }
+
+            return options;
+        }
+
     </script>
     <div id="chart_div2" style="width: 1726px; height: 500px;"></div>
 </div>
