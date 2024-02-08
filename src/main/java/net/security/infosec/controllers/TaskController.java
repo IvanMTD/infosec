@@ -214,6 +214,7 @@ public class TaskController {
             ChartDTO chart = new ChartDTO();
             chart.setTitle(category.getName());
             chart.setCId(category.getId());
+            chart.setStatus("неделю");
             return taskService.getWeek().collectList().flatMap(week -> {
                 int count = 0;
                 for(Task task : week){
@@ -264,6 +265,7 @@ public class TaskController {
             ChartDTO chart = new ChartDTO();
             chart.setTitle(category.getName());
             chart.setCId(category.getId());
+            chart.setStatus("месяц");
             return taskService.getMonth().collectList().flatMap(month -> {
                 int count = 0;
                 for(Task task : month){
@@ -314,6 +316,7 @@ public class TaskController {
             ChartDTO chart = new ChartDTO();
             chart.setTitle(category.getName());
             chart.setCId(category.getId());
+            chart.setStatus("все время");
             return taskService.getAll().collectList().flatMap(all -> {
                 int count = 0;
                 for(Task task : all){
