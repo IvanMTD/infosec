@@ -79,8 +79,6 @@ public class TroubleTicketService {
     }
 
     public Mono<Trouble> updateTrouble(TicketDataTransferObject ticketDTO, int id) {
-        return troubleRepository.findById(id).flatMap(trouble -> {
-            return troubleRepository.save(trouble.update(ticketDTO));
-        });
+        return troubleRepository.findById(id).flatMap(trouble -> troubleRepository.save(trouble.update(ticketDTO)));
     }
 }
