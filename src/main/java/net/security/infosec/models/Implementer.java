@@ -41,6 +41,15 @@ public class Implementer implements UserDetails {
         setRoleId(dto.getRoleId());
     }
 
+    public Implementer update(ImplementerDataTransferObject implementerDTO) {
+        setFirstname(implementerDTO.getFirstname());
+        setMiddleName(implementerDTO.getMiddleName());
+        setLastname(implementerDTO.getLastname());
+        setOfficePosition(implementerDTO.getOfficePosition());
+        setRoleId(implementerDTO.getRoleId());
+        return this;
+    }
+
     public void addTask(Task task){
         taskIds.add(task.getId());
     }
@@ -77,14 +86,5 @@ public class Implementer implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public Implementer update(ImplementerDataTransferObject implementerDTO) {
-        setFirstname(implementerDTO.getFirstname());
-        setMiddleName(implementerDTO.getMiddleName());
-        setLastname(implementerDTO.getLastname());
-        setOfficePosition(implementerDTO.getOfficePosition());
-        setRoleId(implementerDTO.getRoleId());
-        return this;
     }
 }
