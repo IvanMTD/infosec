@@ -3,7 +3,6 @@ package net.security.infosec.controllers;
 import lombok.RequiredArgsConstructor;
 import net.security.infosec.models.Implementer;
 import net.security.infosec.models.Role;
-import net.security.infosec.services.RoleService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.reactive.result.view.CsrfRequestDataValueProcessor;
 import org.springframework.security.web.server.csrf.CsrfToken;
@@ -15,7 +14,6 @@ import reactor.core.publisher.Mono;
 @ControllerAdvice
 @RequiredArgsConstructor
 public class SecurityControllerAdvice {
-    private final RoleService roleService;
     @ModelAttribute
     Mono<CsrfToken> csrfToken(ServerWebExchange exchange) {
         Mono<CsrfToken> csrfToken = exchange.getAttribute(CsrfToken.class.getName());
@@ -31,10 +29,62 @@ public class SecurityControllerAdvice {
         }
     }
 
+    @ModelAttribute(name = "auth")
+    public Boolean isAuthenticate(@AuthenticationPrincipal Implementer implementer){
+        if(implementer != null){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    @ModelAttribute(name = "admin")
+    public Mono<Boolean> isAdmin(@AuthenticationPrincipal Implementer implementer){
+        if(implementer != null){
+            if(implementer.getRole().equals(Role.ADMIN)){
+                return Mono.just(true);
+            }else{
+                return Mono.just(false);
+            }
+        }else{
+            return Mono.just(false);
+        }
+    }
+
+    @ModelAttribute(name = "director")
+    public Mono<Boolean> isDirector(@AuthenticationPrincipal Implementer implementer){
+        if(implementer != null){
+            if(implementer.getRole().equals(Role.DIRECTOR)){
+                return Mono.just(true);
+            }else{
+                return Mono.just(false);
+            }
+        }else{
+            return Mono.just(false);
+        }
+    }
+
     @ModelAttribute(name = "manager")
     public Mono<Boolean> isManager(@AuthenticationPrincipal Implementer implementer){
-        if(implementer != null) {
-            return roleService.isManager(implementer.getRoleId());
+        if(implementer != null){
+            if(implementer.getRole().equals(Role.MANAGER)){
+                return Mono.just(true);
+            }else{
+                return Mono.just(false);
+            }
+        }else{
+            return Mono.just(false);
+        }
+    }
+
+    @ModelAttribute(name = "worker")
+    public Mono<Boolean> isWorker(@AuthenticationPrincipal Implementer implementer){
+        if(implementer != null){
+            if(implementer.getRole().equals(Role.WORKER)){
+                return Mono.just(true);
+            }else{
+                return Mono.just(false);
+            }
         }else{
             return Mono.just(false);
         }

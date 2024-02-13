@@ -13,6 +13,7 @@ import net.security.infosec.models.Trouble;
 import net.security.infosec.services.ImplementerService;
 import net.security.infosec.services.TaskService;
 import net.security.infosec.services.TroubleTicketService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -42,6 +43,57 @@ public class TaskController {
                 Rendering.view("template")
                         .modelAttribute("title","Task page")
                         .modelAttribute("index","task-page")
+                        .build()
+        );
+    }
+
+    @GetMapping("/info")
+    @PreAuthorize("hasAnyRole('WORKER','MANAGER','ADMIN')")
+    public Mono<Rendering> getInfo(@AuthenticationPrincipal Implementer implementer){
+        Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
+            ChartDTO chart = new ChartDTO();
+            chart.setTitle(category.getName());
+            chart.setCId(category.getId());
+            chart.setStatus("все время");
+            return implementerService.getUserById(implementer.getId()).flatMap(impl -> taskService.getImplementerTasks(impl).collectList().flatMap(tasks -> {
+                int count = 0;
+                for(Task task : tasks){
+                    if(category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())){
+                        count++;
+                    }
+                }
+                chart.setTaskCount(count);
+                return Mono.just(chart);
+            }));
+        }).collectList().flatMapMany(l -> {
+            l = l.stream().sorted(Comparator.comparing(ChartDTO::getCId)).collect(Collectors.toList());
+            return Flux.fromIterable(l);
+        }).flatMapSequential(Mono::just);
+
+        Mono<List<StatDataTransferObject>> statsFlux = taskService.getAll().flatMap(task -> {
+            StatDataTransferObject stat = new StatDataTransferObject();
+            stat.setTask(task);
+            return implementerService.getUserById(stat.getTask().getImplementerId()).flatMap(impl -> {
+                stat.setImplementer(impl);
+                return troubleTicketService.getTaskTrouble(stat.getTask()).flatMap(trouble -> {
+                    stat.setTrouble(trouble);
+                    return troubleTicketService.getTroubleCategory(stat.getTrouble()).flatMap(category -> {
+                        stat.setCategory(category);
+                        return Mono.just(stat);
+                    });
+                });
+            });
+        }).collectList().flatMap(list -> {
+            list = list.stream().sorted(Comparator.comparing(l -> l.getTask().getExecuteDate().getDayOfYear())).collect(Collectors.toList());
+            return Mono.just(list);
+        });
+
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","My task info")
+                        .modelAttribute("index","task-info-page")
+                        .modelAttribute("charts", chartFlux)
+                        .modelAttribute("stats", statsFlux)
                         .build()
         );
     }

@@ -1,6 +1,6 @@
 <div>
     <ul>
-        <li th:if="${categories.size() > 0}"><a th:href="@{/admin/trouble/reg}">создать вид проблемы</a></li>
+        <li th:if="${categories.size() > 0}"><a th:href="@{/admin/trouble/reg}">создать раздел</a></li>
     </ul>
     <form th:method="GET" th:action="@{/admin/trouble/edit}">
         <select id="select" name="select">

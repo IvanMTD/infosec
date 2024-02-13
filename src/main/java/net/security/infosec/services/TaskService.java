@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +45,20 @@ public class TaskService {
         boolean over = false;
         while (!over){
             if(localDate.getDayOfMonth() == 1){
+                over = true;
+            }else{
+                localDate = localDate.minusDays(1);
+            }
+        }
+        localDate = localDate.minusDays(1);
+        return taskRepository.findTasksByExecuteDateAfter(localDate);
+    }
+
+    public Flux<Task> getYear() {
+        LocalDate localDate = LocalDate.now();
+        boolean over = false;
+        while (!over){
+            if(localDate.getDayOfYear() == 1){
                 over = true;
             }else{
                 localDate = localDate.minusDays(1);

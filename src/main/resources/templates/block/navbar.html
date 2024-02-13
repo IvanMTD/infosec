@@ -1,8 +1,59 @@
-<div>
-  <form id="logoutForm" method="post" th:action="@{/logout}"></form>
-  <ul>
-    <li><a th:href="@{/}">главная</a></li>
-    <li><a id="logout" href="#" onclick="document.getElementById('logoutForm').submit()">выход</a></li>
-    <li><p th:text="'Авторизованный пользователь: ' + ${userName}"></p></li>
-  </ul>
+<div class="container-fluid text-bg-dark">
+    <div class="row">
+        <div class="col">
+            <ul class="nav">
+                <li class="nav-item">
+                    <div class="btn-group">
+                        <a th:href="@{/}" class="nav-link active link-light" aria-expanded="false">
+                            Главная
+                        </a>
+                    </div>
+                </li>
+                <li class="nav-item" th:if="${worker} or ${manager} or ${admin}">
+                    <div class="btn-group">
+                        <a href="#" class="nav-link active dropdown-toggle link-light" data-bs-toggle="dropdown" aria-expanded="false">
+                            Задачи
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" th:href="@{/task/new/reg}">Закрыть</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" th:href="@{/task/info}">Выполненные</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item" th:if="${manager} or ${direcotr} or ${admin}">
+                    <div class="btn-group">
+                        <a href="#" class="nav-link active dropdown-toggle link-light" data-bs-toggle="dropdown" aria-expanded="false">
+                            Action
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Separated link</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="col">
+            <ul class="nav justify-content-end">
+                <li class="nav-item" th:if="${admin}">
+                    <div class="btn-group">
+                        <a href="#" class="nav-link active dropdown-toggle link-light" data-bs-toggle="dropdown" aria-expanded="false">
+                            Админка
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" th:href="@{/admin/users}">Пользователи</a></li>
+                            <li><a class="dropdown-item" th:href="@{/admin/categories}">Категории</a></li>
+                            <li><a class="dropdown-item" th:href="@{/admin/troubles}">Разделы</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item disabled" href="#">Удаление</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>

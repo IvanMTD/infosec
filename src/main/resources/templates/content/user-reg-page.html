@@ -37,8 +37,8 @@
                 <span th:if="${#fields.hasErrors('officePosition')}" th:errors="*{officePosition}" style="color: red"></span>
             </li>
             <li>
-                <select th:field="*{roleId}">
-                    <option th:each="r : ${roles}" th:text="${r.getName()}" th:value="${r.getId()}"></option>
+                <select th:field="*{role}">
+                    <option th:each="r : ${roles}" th:text="${r.getTitle()}" th:value="${r}"></option>
                 </select>
             </li>
             <li>

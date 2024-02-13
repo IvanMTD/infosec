@@ -5,11 +5,10 @@ import lombok.RequiredArgsConstructor;
 import net.security.infosec.dto.ImplementerDataTransferObject;
 import org.springframework.data.annotation.Id;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @RequiredArgsConstructor
@@ -25,11 +24,11 @@ public class Implementer implements UserDetails {
     private String middleName;
     private String lastname;
     private String officePosition;
+    private Role role;
     /**
      * Связные модели
      */
     private Set<Integer> taskIds = new HashSet<>();
-    private int roleId;
 
     public Implementer(ImplementerDataTransferObject dto){
         setEmail(dto.getEmail());
@@ -38,7 +37,7 @@ public class Implementer implements UserDetails {
         setMiddleName(dto.getMiddleName());
         setLastname(dto.getLastname());
         setOfficePosition(dto.getOfficePosition());
-        setRoleId(dto.getRoleId());
+        setRole(dto.getRole());
     }
 
     public Implementer update(ImplementerDataTransferObject implementerDTO) {
@@ -46,7 +45,7 @@ public class Implementer implements UserDetails {
         setMiddleName(implementerDTO.getMiddleName());
         setLastname(implementerDTO.getLastname());
         setOfficePosition(implementerDTO.getOfficePosition());
-        setRoleId(implementerDTO.getRoleId());
+        setRole(implementerDTO.getRole());
         return this;
     }
 
@@ -60,7 +59,9 @@ public class Implementer implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return new HashSet<>();
+        List<GrantedAuthority> list = new ArrayList<>();
+        list.add(new SimpleGrantedAuthority("ROLE_" + getRole().toString()));
+        return list;
     }
 
     @Override

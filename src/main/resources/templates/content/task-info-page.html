@@ -1,0 +1,38 @@
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-6">
+
+        </div>
+        <div class="col-6">
+            <script th:inline="javascript">
+                google.charts.load("current", {packages:["corechart"]});
+                google.charts.setOnLoadCallback(drawChart);
+                function drawChart() {
+                    let charts = [[${charts}]]
+                    console.log(charts)
+                    let dataArray = [];
+                    dataArray[0] = ['Категория','Количество выполненных заявок'];
+                    for(let i=0; i<charts.length; i++){
+                        dataArray[i+1] = [charts[i].title, charts[i].taskCount];
+                    }
+                    let data = google.visualization.arrayToDataTable(dataArray,false);
+
+                    let options = {
+                        /*is3D: true,*/
+                        title: 'Выполненные заявки за ' + charts[0].status,
+                        pieHole: 0.4,
+                    };
+
+                    let chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+                    chart.draw(data, options);
+                }
+            </script>
+            <div id="donutchart" style="width: 100%; height: 500px"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+
+        </div>
+    </div>
+</div>

@@ -4,12 +4,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.security.infosec.dto.ImplementerDataTransferObject;
-import net.security.infosec.dto.RoleDataTransferObject;
 import net.security.infosec.dto.TicketDataTransferObject;
 import net.security.infosec.models.Role;
 import net.security.infosec.services.ImplementerService;
-import net.security.infosec.services.RoleService;
 import net.security.infosec.services.TroubleTicketService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -21,12 +20,11 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @RequestMapping("/admin")
 public class AdminController {
-
-    private final RoleService roleService;
     private final ImplementerService implementerService;
     private final TroubleTicketService troubleTicketService;
 
     @GetMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> adminPage(){
         return Mono.just(
                 Rendering.view("template")
@@ -36,79 +34,8 @@ public class AdminController {
         );
     }
 
-    @GetMapping("/roles")
-    public Mono<Rendering> rolesPage(){
-        return Mono.just(
-                Rendering.view("template")
-                        .modelAttribute("title","Roles page")
-                        .modelAttribute("index","roles-page")
-                        .modelAttribute("roles", roleService.getAll())
-                        .build()
-        );
-    }
-
-    @GetMapping("/role/reg")
-    public Mono<Rendering> roleReg(){
-        return Mono.just(
-                Rendering.view("template")
-                        .modelAttribute("title","Role registration")
-                        .modelAttribute("index","role-reg-page")
-                        .modelAttribute("authorities", Role.Authority.values())
-                        .modelAttribute("role", new RoleDataTransferObject())
-                        .build()
-        );
-    }
-
-    @PostMapping("/role/add")
-    public Mono<Rendering> roleAdd(@ModelAttribute(name = "role") @Valid RoleDataTransferObject role, Errors errors){
-        if(errors.hasErrors()){
-            return Mono.just(
-                    Rendering.view("template")
-                            .modelAttribute("title","Role registration")
-                            .modelAttribute("index","role-reg-page")
-                            .modelAttribute("authorities", Role.Authority.values())
-                            .modelAttribute("role", role)
-                            .build()
-            );
-        }
-
-        return roleService.saveRole(role).flatMap(r -> {
-            log.info("saved role data: " + r.toString());
-            return Mono.just(Rendering.redirectTo("/admin/roles").build());
-        });
-    }
-
-    @GetMapping("/role/edit")
-    public Mono<Rendering> roleEdit(@RequestParam(name = "select") int id){
-        return Mono.just(
-                Rendering.view("template")
-                        .modelAttribute("title","Role edit page")
-                        .modelAttribute("index","role-edit-page")
-                        .modelAttribute("role", roleService.getRoleDTOById(id))
-                        .modelAttribute("authorities", Role.Authority.values())
-                        .build()
-        );
-    }
-
-    @PostMapping("/role/update/{id}")
-    public Mono<Rendering> roleUpdate(@ModelAttribute(name = "role") @Valid RoleDataTransferObject role, Errors errors, @PathVariable(name = "id") int id){
-        if(errors.hasErrors()){
-            return Mono.just(
-                    Rendering.view("template")
-                            .modelAttribute("title","Role edit page")
-                            .modelAttribute("index","role-edit-page")
-                            .modelAttribute("role", role)
-                            .modelAttribute("authorities", Role.Authority.values())
-                            .build()
-            );
-        }
-        return roleService.updateRole(role, id).flatMap(r -> {
-            log.info("updated role data: " + r.toString());
-            return Mono.just(Rendering.redirectTo("/admin/roles").build());
-        });
-    }
-
     @GetMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> usersPage(){
         return Mono.just(
                 Rendering.view("template")
@@ -120,25 +47,27 @@ public class AdminController {
     }
 
     @GetMapping("/user/reg")
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> userReg(){
         return Mono.just(
                 Rendering.view("template")
                         .modelAttribute("title","User registration")
                         .modelAttribute("index","user-reg-page")
-                        .modelAttribute("roles", roleService.getAll())
+                        .modelAttribute("roles", Role.values())
                         .modelAttribute("implementer", new ImplementerDataTransferObject())
                         .build()
         );
     }
 
     @PostMapping("/user/add")
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> userAdd(@ModelAttribute(name = "implementer") @Valid ImplementerDataTransferObject implementer, Errors errors){
         if(errors.hasErrors()){
             return Mono.just(
                     Rendering.view("template")
                             .modelAttribute("title","User registration")
                             .modelAttribute("index","user-reg-page")
-                            .modelAttribute("roles", roleService.getAll())
+                            .modelAttribute("roles", Role.values())
                             .modelAttribute("implementer", implementer)
                             .build()
             );
@@ -146,26 +75,25 @@ public class AdminController {
 
         return implementerService.saveImplementer(implementer).flatMap(impl -> {
             log.info("user saved: " + impl.toString());
-            return Mono.just(impl);
-        }).flatMap(roleService::addImplementerIdToRole).flatMap(role -> {
-            log.info("role updated: " + role.toString());
             return Mono.just(Rendering.redirectTo("/admin").build());
         });
     }
 
     @GetMapping("/user/edit")
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> userEdit(@RequestParam(name = "select") int id){
         return Mono.just(
                 Rendering.view("template")
                         .modelAttribute("title","User edit page")
                         .modelAttribute("index","user-edit-page")
                         .modelAttribute("implementer", implementerService.getUserDtoById(id))
-                        .modelAttribute("roles", roleService.getAll())
+                        .modelAttribute("roles", Role.values())
                         .build()
         );
     }
 
     @PostMapping("/user/update/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> userUpdate(@ModelAttribute(name = "implementer") @Valid ImplementerDataTransferObject implementerDTO, Errors errors, @PathVariable(name = "id") int id){
         if(errors.hasFieldErrors("firstname") || errors.hasFieldErrors("middleName") || errors.hasFieldErrors("lastname") || errors.hasFieldErrors("officePosition")){
             return Mono.just(
@@ -173,7 +101,7 @@ public class AdminController {
                             .modelAttribute("title","User edit page")
                             .modelAttribute("index","user-edit-page")
                             .modelAttribute("implementer", implementerDTO)
-                            .modelAttribute("roles", roleService.getAll())
+                            .modelAttribute("roles", Role.values())
                             .build()
             );
         }
@@ -190,6 +118,7 @@ public class AdminController {
     }*/
 
     @GetMapping("/categories")
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> categoriesPage(){
         return Mono.just(
                 Rendering.view("template")
@@ -201,6 +130,7 @@ public class AdminController {
     }
 
     @GetMapping("/category/reg")
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> categoryReg(){
         return Mono.just(
                 Rendering.view("template")
@@ -212,6 +142,7 @@ public class AdminController {
     }
 
     @PostMapping("/category/add")
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> categoryAdd(@ModelAttribute(name = "ticket") @Valid TicketDataTransferObject ticket, Errors errors){
         if(errors.hasErrors()){
             return Mono.just(
@@ -229,6 +160,7 @@ public class AdminController {
     }
 
     @GetMapping("/category/edit")
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> categoryEdit(@RequestParam(name = "select") int id){
         return Mono.just(
                 Rendering.view("template")
@@ -240,6 +172,7 @@ public class AdminController {
     }
 
     @PostMapping("/category/update/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> categoryUpdate(@ModelAttribute(name = "ticket") @Valid TicketDataTransferObject ticketDTO, Errors errors, @PathVariable(name = "id") int id){
         if(errors.hasErrors()){
             return Mono.just(
@@ -257,6 +190,7 @@ public class AdminController {
     }
 
     @GetMapping("/troubles")
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> troublesPage(){
         return Mono.just(
                 Rendering.view("template")
@@ -269,6 +203,7 @@ public class AdminController {
     }
 
     @GetMapping("/trouble/reg")
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> troubleReg(){
         return Mono.just(
                 Rendering.view("template")
@@ -281,6 +216,7 @@ public class AdminController {
     }
 
     @PostMapping("/trouble/add")
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> troubleAdd(@ModelAttribute(name = "ticket") @Valid TicketDataTransferObject ticket, Errors errors){
         if(errors.hasErrors()){
             return Mono.just(
@@ -299,6 +235,7 @@ public class AdminController {
     }
 
     @GetMapping("/trouble/edit")
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> troubleEdit(@RequestParam(name = "select") int id){
         return Mono.just(
                 Rendering.view("template")
@@ -311,6 +248,7 @@ public class AdminController {
     }
 
     @PostMapping("/trouble/update/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> troubleUpdate(@ModelAttribute(name = "ticket") @Valid TicketDataTransferObject ticketDTO, Errors errors, @PathVariable(name = "id") int id){
         if(errors.hasErrors()){
             return Mono.just(
