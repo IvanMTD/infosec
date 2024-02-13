@@ -2,6 +2,7 @@ package net.security.infosec.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.security.infosec.dto.CategoryDTO;
 import net.security.infosec.dto.TicketDataTransferObject;
 import net.security.infosec.dto.TroubleTicketDataTransferObject;
 import net.security.infosec.models.Category;
@@ -9,9 +10,12 @@ import net.security.infosec.models.Task;
 import net.security.infosec.models.Trouble;
 import net.security.infosec.repositories.CategoryRepository;
 import net.security.infosec.repositories.TroubleRepository;
+import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -80,5 +84,9 @@ public class TroubleTicketService {
 
     public Mono<Trouble> updateTrouble(TicketDataTransferObject ticketDTO, int id) {
         return troubleRepository.findById(id).flatMap(trouble -> troubleRepository.save(trouble.update(ticketDTO)));
+    }
+
+    public Flux<Trouble> getTroubleByIds(Set<Integer> troubleIds) {
+        return troubleRepository.findAllByIdIn(troubleIds);
     }
 }

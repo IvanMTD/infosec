@@ -18,7 +18,6 @@ public class Category {
     private String description;
 
     private Set<Integer> troubleIds = new HashSet<>();
-    private Set<Integer> taskIds = new HashSet<>();
 
     public Category(TicketDataTransferObject dto) {
         setName(dto.getName());
@@ -27,10 +26,6 @@ public class Category {
 
     public void addTrouble(Trouble trouble){
         troubleIds.add(trouble.getId());
-    }
-
-    public void addTask(Task task){
-        taskIds.add(task.getId());
     }
 
     public Category update(TicketDataTransferObject ticketDTO) {

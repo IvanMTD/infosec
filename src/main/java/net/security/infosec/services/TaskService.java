@@ -27,6 +27,65 @@ public class TaskService {
         return taskRepository.findAll();
     }
 
+    public Flux<Task> getImplementerTasksForWeek(Implementer implementer) {
+        LocalDate localDate = LocalDate.now();
+        boolean over = false;
+        while (!over){
+            if(localDate.getDayOfWeek() == DayOfWeek.SUNDAY){
+                over = true;
+            }else{
+                localDate = localDate.minusDays(1);
+            }
+        }
+        return taskRepository.findTasksByExecuteDateAfter(localDate).flatMap(task -> {
+            if(task.getImplementerId() == implementer.getId()){
+                return Mono.just(task);
+            }else{
+                return Mono.empty();
+            }
+        });
+    }
+
+    public Flux<Task> getImplementerTasksForMonth(Implementer implementer) {
+        LocalDate localDate = LocalDate.now();
+        boolean over = false;
+        while (!over){
+            if(localDate.getDayOfMonth() == 1){
+                over = true;
+            }else{
+                localDate = localDate.minusDays(1);
+            }
+        }
+        localDate = localDate.minusDays(1);
+        return taskRepository.findTasksByExecuteDateAfter(localDate).flatMap(task -> {
+            if(task.getImplementerId() == implementer.getId()){
+                return Mono.just(task);
+            }else{
+                return Mono.empty();
+            }
+        });
+    }
+
+    public Flux<Task> getImplementerTasksForYear(Implementer implementer) {
+        LocalDate localDate = LocalDate.now();
+        boolean over = false;
+        while (!over){
+            if(localDate.getDayOfYear() == 1){
+                over = true;
+            }else{
+                localDate = localDate.minusDays(1);
+            }
+        }
+        localDate = localDate.minusDays(1);
+        return taskRepository.findTasksByExecuteDateAfter(localDate).flatMap(task -> {
+            if(task.getImplementerId() == implementer.getId()){
+                return Mono.just(task);
+            }else{
+                return Mono.empty();
+            }
+        });
+    }
+
     public Flux<Task> getWeek() {
         LocalDate localDate = LocalDate.now();
         boolean over = false;

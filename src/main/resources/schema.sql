@@ -25,8 +25,7 @@ create table if not exists category(
     name text,
     description text,
 
-    trouble_ids integer[],
-    task_ids integer[]
+    trouble_ids integer[]
 );
 
 create table if not exists trouble(

@@ -1,7 +1,34 @@
 <div class="container-fluid py-4">
     <div class="row">
+        <div class="col">
+            <a class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);"  th:href="@{/task/info/week}">
+                <i class="bi bi-calendar3-week" style="font-size: 20px"></i>
+                Неделя
+            </a>
+            <a class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);" th:href="@{/task/info/month}">
+                <i class="bi bi-calendar3" style="font-size: 20px"></i>
+                Месяц
+            </a>
+            <a class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);" th:href="@{/task/info/year}">
+                <i class="bi bi-calendar2-check" style="font-size: 20px"></i>
+                Год
+            </a>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-6">
-
+            <ul class="list-group py-5">
+                <li class="list-group-item active" aria-current="true" th:text="'Показатели: ' + ${userName}"></li>
+                <li class="list-group-item" th:text="'Общее количество заявок: ' + ${taskList.size()}"></li>
+                <li class="list-group-item active" aria-current="true">Детализация</li>
+                <div th:each="st : ${statistics}">
+                    <div th:each="tr : ${st.getTroubles()}">
+                        <div th:if="${tr.getTasks().size() != 0}">
+                            <li class="list-group-item" th:text="${st.getTitle()} + ' - ' + ${tr.getTitle()} + ': ' + ${tr.getTasks().size()}"></li>
+                        </div>
+                    </div>
+                </div>
+            </ul>
         </div>
         <div class="col-6">
             <script th:inline="javascript">
@@ -19,7 +46,7 @@
 
                     let options = {
                         /*is3D: true,*/
-                        title: 'Выполненные заявки за ' + charts[0].status,
+                        title: 'Выполнено за ' + charts[0].status,
                         pieHole: 0.4,
                     };
 
@@ -32,7 +59,71 @@
     </div>
     <div class="row">
         <div class="col">
-
+            <div class="accordion" id="accordion">
+                <div class="row text-center py-5" th:if="${statistics.size() == 0}">
+                    <hr>
+                    <span>Отсутствуют группы обратитесь к Администратору</span>
+                </div>
+                <div th:if="${statistics.size() != 0}">
+                    <div class="accordion-item" th:each="stat, s : ${statistics}">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" th:id="'id' + ${s.index}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse" aria-expanded="true" aria-controls="collapse">
+                                <span th:text="${stat.getTitle()}"></span>
+                            </button>
+                        </h2>
+                        <div th:id="'collapse' + ${s.index}" class="accordion-collapse collapse" data-bs-parent="#accordion">
+                            <div class="accordion-body">
+                                <div class="accordion" th:id="'accordion' + ${s.index}">
+                                    <div class="row text-center py-5" th:if="${stat.getTroubles.size() == 0}">
+                                        <span>Отсутствуют задачи в группе обратитесь к Администратору</span>
+                                    </div>
+                                    <div th:if="${stat.getTroubles.size() != 0}">
+                                        <div class="accordion-item" th:each="trouble, s2 : ${stat.getTroubles()}">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button" th:id="'id' + ${s.index} + ${s2.index}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse" aria-expanded="true" aria-controls="collapse">
+                                                    <span th:text="${trouble.getTitle()} + ' - Заявок:  ' + ${trouble.getTasks().size()}"></span>
+                                                </button>
+                                            </h2>
+                                            <div th:id="'collapse' + ${s.index} + ${s2.index}" class="accordion-collapse collapse" data-bs-parent="#accordion">
+                                                <div class="accordion-body">
+                                                    <div th:if="${trouble.getTasks().size() == 0}">
+                                                        <p class="text-center">Нет выполненных заявок</p>
+                                                    </div>
+                                                    <div th:if="${trouble.getTasks().size() != 0}">
+                                                        <div class="card" th:each="task : ${trouble.getTasks()}">
+                                                            <h5 class="card-header" th:text="'Исполнитель: ' + ${task.getUsername()}"></h5>
+                                                            <div class="card-body">
+                                                                <h5 class="card-title" th:text="'Пользователь или Описание: ' + ${task.getTitle()}"></h5>
+                                                                <p class="card-text" th:text="${task.getContent()}"></p>
+                                                                <p class="card-text" th:text="${task.getDate()}"></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script th:inline="javascript">
+                                                if([[${s2.index}]] == 0){
+                                                    document.getElementById('collapse' + [[${s.index}]] + [[${s2.index}]]).setAttribute('class','accordion-collapse collapse show');
+                                                }
+                                                document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('data-bs-target','#collapse' + [[${s.index}]]  + [[${s2.index}]]);
+                                                document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('aria-controls','collapse' + [[${s.index}]]  + [[${s2.index}]]);
+                                                document.getElementById('collapse' + [[${s.index}]] + [[${s2.index}]]).setAttribute('data-bs-parent','#accordion' + [[${s.index}]]);
+                                            </script>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <script th:inline="javascript">
+                            if([[${s.index}]] == 0){
+                                document.getElementById('collapse' + [[${s.index}]]).setAttribute('class','accordion-collapse collapse show');
+                            }
+                            document.getElementById('id' + [[${s.index}]]).setAttribute('data-bs-target','#collapse' + [[${s.index}]]);
+                            document.getElementById('id' + [[${s.index}]]).setAttribute('aria-controls','collapse' + [[${s.index}]]);
+                        </script>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
