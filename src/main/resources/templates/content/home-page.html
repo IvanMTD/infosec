@@ -2,6 +2,48 @@
     <div class="row">
         <div class="col">
             <script th:inline="javascript">
+                google.charts.load('current', {'packages':['corechart']});
+                google.charts.setOnLoadCallback(drawChart);
+
+                function drawChart() {
+                    let chartTitle = [[${categoryTitle}]];
+                    let tableTitle = [];
+                    tableTitle[0] = 'Дата';
+                    for(let i=0; i<chartTitle.length; i++){
+                        tableTitle[i+1] = chartTitle[i].name;
+                    }
+                    let chartList = [[${categoryChart}]];
+                    let dataArray = [];
+                    dataArray[0] = tableTitle;
+                    for(let i=0; i<chartList.length; i++){
+                        let arrayStroke = [];
+                        arrayStroke[0] = chartList[i].date;
+                        let tasks = chartList[i].taskOnTrouble;
+                        for(let j=0; j<tasks.length; j++){
+                            arrayStroke[j+1] = tasks[j];
+                        }
+                        dataArray[i+1] = arrayStroke;
+                    }
+                    let data = google.visualization.arrayToDataTable(dataArray, false);
+
+                    let options = {
+                        title: 'Выполненные заявки по датам',
+                        vAxis: {title: 'Всего выполнено заявок'},
+                        isStacked: true,
+                        legend: 'none'
+                    };
+
+                    let chart = new google.visualization.SteppedAreaChart(document.getElementById('chart_div'));
+
+                    chart.draw(data, options);
+                }
+            </script>
+            <div id="chart_div" style="width: 100%; height: 500px;"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <script th:inline="javascript">
                 google.charts.load('current', {'packages': ['corechart']});
                 google.charts.setOnLoadCallback(drawVisualization);
 
@@ -35,6 +77,7 @@
                     let options = {
                         title: 'Работы выполненные в ' + year + ' году',
                         curveType: 'function',
+                        is3D: true,
                         legend: {position: 'bottom'}
                     };
 
@@ -61,14 +104,6 @@
                 }
             </script>
             <div id="all-task" style="width: 100%; height: 500px"></div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-6">
-
-        </div>
-        <div class="col-6">
-
         </div>
     </div>
 </div>

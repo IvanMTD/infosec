@@ -1,47 +1,58 @@
-<div>
-    <form th:method="POST" th:action="@{/task/new/add}" th:object="${task}">
-        <ul>
-            <li>
-                <select id="select" onchange="setupTrouble()">
-                    <option th:each="ticket, stat : ${troubleTickets}" th:text="${ticket.getCategoryName()}" th:value="${ticket.getCategoryId()}"></option>
-                </select>
-            </li>
-            <li>
-                <select id="trouble_select" th:field="*{troubleId}">
-                    <option th:each="trouble : ${troubleTickets[0].getTroubles()}" th:text="${trouble.getName()}" th:value="${trouble.getId()}"></option>
-                </select>
-            </li>
-            <li>
-                <label for="title">ФИО пользователя или Общее название задачи: </label>
-                <br>
-                <input type="text" id="title" th:field="*{title}">
-                <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}" style="color: red"></span>
-            </li>
-            <li>
-                <label for="description">Описание проблемы: </label>
-                <br>
-                <textarea type="text" id="description" th:field="*{description}" cols="30" rows="5"></textarea>
-                <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red"></span>
-            </li>
-            <li>
-                <input type="submit" value="зарегистрировать">
-            </li>
-            <script th:inline="javascript">
-                function setupTrouble(){
-                    let categoryId = document.getElementById("select").value;
-                    let tickets = [[${troubleTickets}]];
-                    for(let i=0; i<tickets.length; i++){
-                        if(tickets[i].categoryId == categoryId){
-                            $('#trouble_select').html('');
-                            tickets[i].troubles.forEach((trouble) => {
-                                $('#trouble_select').append('' +
-                                    '<option value="' + trouble.id + '">' + trouble.name + '</option>' +
-                                    '')
-                            })
+<div class="container">
+    <div class="row py-5">
+        <div class="col"></div>
+        <div class="col-6">
+            <form th:method="POST" th:action="@{/task/new/add}" th:object="${task}">
+                <ul class="list-group">
+                    <li class="list-group-item active" aria-current="true">
+                        <span th:text="'Исполнитель ' + ${userName}"></span>
+                    </li>
+                    <li class="list-group-item">
+                        <select class="form-select" aria-label="Default select example" id="select" onchange="setupTrouble()">
+                            <option th:each="ticket, stat : ${troubleTickets}" th:text="${ticket.getCategoryName()}" th:value="${ticket.getCategoryId()}"></option>
+                        </select>
+                    </li>
+                    <li class="list-group-item">
+                        <select class="form-select" aria-label="Default select example" id="trouble_select" th:field="*{troubleId}">
+                            <option th:each="trouble : ${troubleTickets[0].getTroubles()}" th:text="${trouble.getName()}" th:value="${trouble.getId()}"></option>
+                        </select>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="InputGroup-sizing-default">ФИО или Общее название</span>
+                            <input type="text" class="form-control" id="title" th:field="*{title}">
+                        </div>
+                        <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}" style="color: red"></span>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="mb-3">
+                            <label for="exampleFormControlTextarea1" class="form-label">Описание проблемы</label>
+                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="5" th:field="*{description}"></textarea>
+                        </div>
+                        <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red"></span>
+                    </li>
+                    <li class="list-group-item">
+                        <input class="btn btn-primary" type="submit" value="зарегистрировать">
+                    </li>
+                    <script th:inline="javascript">
+                        function setupTrouble(){
+                            let categoryId = document.getElementById("select").value;
+                            let tickets = [[${troubleTickets}]];
+                            for(let i=0; i<tickets.length; i++){
+                                if(tickets[i].categoryId == categoryId){
+                                    $('#trouble_select').html('');
+                                    tickets[i].troubles.forEach((trouble) => {
+                                        $('#trouble_select').append('' +
+                                            '<option value="' + trouble.id + '">' + trouble.name + '</option>' +
+                                            '')
+                                    })
+                                }
+                            }
                         }
-                    }
-                }
-            </script>
-        </ul>
-    </form>
+                    </script>
+                </ul>
+            </form>
+        </div>
+        <div class="col"></div>
+    </div>
 </div>

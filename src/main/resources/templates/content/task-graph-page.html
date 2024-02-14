@@ -9,7 +9,7 @@
         google.setOnLoadCallback(drawChart);
         function drawChart() {
             var implementers = [[${implementers}]]
-            var dataArray = new Array();
+            var dataArray = [];
             dataArray[0] = ['Имя исполнителя','Количество выполненных заявок'];
             for(var i=0; i<implementers.length; i++){
                 dataArray[i+1] = [implementers[i].fullName,implementers[i].taskIds.length]

@@ -2,6 +2,7 @@ package net.security.infosec.controllers;
 
 import lombok.RequiredArgsConstructor;
 import net.security.infosec.dto.ChartDTO;
+import net.security.infosec.models.Category;
 import net.security.infosec.models.Task;
 import net.security.infosec.models.Trouble;
 import net.security.infosec.services.TaskService;
@@ -24,6 +25,31 @@ public class HomeController {
     private final TaskService taskService;
     @GetMapping("/")
     public Mono<Rendering> homePage(){
+        Flux<ChartDTO> chartCategoryFlux = taskService.getYear().collectList().flatMapMany(tasks -> {
+            Set<LocalDate> localDates = new HashSet<>();
+            for(Task task : tasks){
+                localDates.add(task.getExecuteDate());
+            }
+            List<LocalDate> dates = new ArrayList<>(localDates);
+            dates = dates.stream().sorted(Comparator.comparing(LocalDate::getDayOfYear)).collect(Collectors.toList());
+            return Flux.fromIterable(dates);
+        }).flatMapSequential(localDate -> {
+            ChartDTO chart = new ChartDTO();
+            chart.setLocalDate(localDate);
+            return troubleTicketService.getAllCategories().collectList().flatMap(categories -> taskService.getTasksByLocalDate(localDate).collectList().flatMap(tasks -> {
+                for(Category category : categories){
+                    int tCount = 0;
+                    for(Task task : tasks){
+                        if(category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())){
+                            tCount++;
+                        }
+                    }
+                    chart.addTaskOnTrouble(tCount);
+                }
+                return Mono.just(chart);
+            }));
+        });
+
         Flux<ChartDTO> chartTroubleFlux = taskService.getYear().collectList().flatMapMany(tasks -> {
             Set<LocalDate> localDates = new HashSet<>();
             for(Task task : tasks){
@@ -53,6 +79,8 @@ public class HomeController {
                 Rendering.view("template")
                         .modelAttribute("index","home-page")
                         .modelAttribute("title","Home Page")
+                        .modelAttribute("categoryTitle", troubleTicketService.getAllCategories())
+                        .modelAttribute("categoryChart", chartCategoryFlux)
                         .modelAttribute("troubleTitle", troubleTicketService.getAllTrouble())
                         .modelAttribute("troubleChart", chartTroubleFlux)
                         .modelAttribute("year", LocalDate.now().getYear())
