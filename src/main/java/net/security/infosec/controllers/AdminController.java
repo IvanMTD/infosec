@@ -42,11 +42,13 @@ public class AdminController {
                         .modelAttribute("title","Users page")
                         .modelAttribute("index","users-page")
                         .modelAttribute("users", implementerService.getAll())
+                        .modelAttribute("implementer", new ImplementerDataTransferObject())
+                        .modelAttribute("roles",Role.values())
                         .build()
         );
     }
 
-    @GetMapping("/user/reg")
+    /*@GetMapping("/user/reg")
     @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> userReg(){
         return Mono.just(
@@ -57,7 +59,7 @@ public class AdminController {
                         .modelAttribute("implementer", new ImplementerDataTransferObject())
                         .build()
         );
-    }
+    }*/
 
     @PostMapping("/user/add")
     @PreAuthorize("hasRole('ADMIN')")
@@ -65,17 +67,18 @@ public class AdminController {
         if(errors.hasErrors()){
             return Mono.just(
                     Rendering.view("template")
-                            .modelAttribute("title","User registration")
-                            .modelAttribute("index","user-reg-page")
-                            .modelAttribute("roles", Role.values())
+                            .modelAttribute("title","Users page")
+                            .modelAttribute("index","users-page")
+                            .modelAttribute("users", implementerService.getAll())
                             .modelAttribute("implementer", implementer)
+                            .modelAttribute("roles",Role.values())
                             .build()
             );
         }
 
         return implementerService.saveImplementer(implementer).flatMap(impl -> {
             log.info("user saved: " + impl.toString());
-            return Mono.just(Rendering.redirectTo("/admin").build());
+            return Mono.just(Rendering.redirectTo("/admin/users").build());
         });
     }
 
