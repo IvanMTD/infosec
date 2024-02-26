@@ -116,7 +116,13 @@
                         </div>
                         <script th:inline="javascript">
                             if([[${s.index}]] == 0){
+                                document.getElementById('id' + [[${s.index}]]).setAttribute('class','accordion-button');
+                                document.getElementById('id' + [[${s.index}]]).setAttribute('arial-expend','true');
                                 document.getElementById('collapse' + [[${s.index}]]).setAttribute('class','accordion-collapse collapse show');
+                            }else{
+                                document.getElementById('id' + [[${s.index}]]).setAttribute('class','accordion-button collapsed');
+                                document.getElementById('id' + [[${s.index}]]).setAttribute('arial-expend','false');
+                                document.getElementById('collapse' + [[${s.index}]]).setAttribute('class','accordion-collapse collapse');
                             }
                             document.getElementById('id' + [[${s.index}]]).setAttribute('data-bs-target','#collapse' + [[${s.index}]]);
                             document.getElementById('id' + [[${s.index}]]).setAttribute('aria-controls','collapse' + [[${s.index}]]);
