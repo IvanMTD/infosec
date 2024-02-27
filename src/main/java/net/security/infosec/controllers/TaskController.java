@@ -298,7 +298,7 @@ public class TaskController {
     @GetMapping("/stat/week/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN','DIRECTOR','MANAGER')")
     public Mono<Rendering> taskStatWeek(@PathVariable(name = "userId") int userId){
-        if(userId == -1) {
+        if(userId == 0) {
             Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
                 ChartDTO chart = new ChartDTO();
                 chart.setTitle(category.getName());
@@ -346,6 +346,7 @@ public class TaskController {
                                 }
                             }
                         }
+                        categoryDTO.reconstruct();
                         return Mono.just(categoryDTO);
                     });
                 }));
@@ -360,6 +361,7 @@ public class TaskController {
                             .modelAttribute("taskList", taskService.getWeek())
                             .modelAttribute("dates", new DateDTO())
                             .modelAttribute("users", implementerService.getAll())
+                            .modelAttribute("userId",userId)
                             .build()
             );
         }else{
@@ -406,6 +408,7 @@ public class TaskController {
                                 }
                             }
                         }
+                        categoryDTO.reconstruct();
                         return Mono.just(categoryDTO);
                     }));
                 });
@@ -420,6 +423,7 @@ public class TaskController {
                             .modelAttribute("taskList", implementerService.getUserById(userId).flatMapMany(implementer -> taskService.getImplementerTasksForWeek(implementer)))
                             .modelAttribute("dates", new DateDTO())
                             .modelAttribute("users", implementerService.getAll())
+                            .modelAttribute("userId",userId)
                             .build()
             );
         }
@@ -428,7 +432,7 @@ public class TaskController {
     @GetMapping("/stat/month/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN','DIRECTOR','MANAGER')")
     public Mono<Rendering> taskStatMonth(@PathVariable(name = "userId") int userId){
-        if(userId == -1) {
+        if(userId == 0) {
             Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
                 ChartDTO chart = new ChartDTO();
                 chart.setTitle(category.getName());
@@ -476,6 +480,7 @@ public class TaskController {
                                 }
                             }
                         }
+                        categoryDTO.reconstruct();
                         return Mono.just(categoryDTO);
                     });
                 }));
@@ -490,6 +495,7 @@ public class TaskController {
                             .modelAttribute("taskList", taskService.getMonth())
                             .modelAttribute("dates", new DateDTO())
                             .modelAttribute("users", implementerService.getAll())
+                            .modelAttribute("userId",userId)
                             .build()
             );
         }else{
@@ -536,6 +542,7 @@ public class TaskController {
                                 }
                             }
                         }
+                        categoryDTO.reconstruct();
                         return Mono.just(categoryDTO);
                     }));
                 });
@@ -550,6 +557,7 @@ public class TaskController {
                             .modelAttribute("taskList", implementerService.getUserById(userId).flatMapMany(implementer -> taskService.getImplementerTasksForMonth(implementer)))
                             .modelAttribute("dates", new DateDTO())
                             .modelAttribute("users", implementerService.getAll())
+                            .modelAttribute("userId",userId)
                             .build()
             );
         }
@@ -558,7 +566,7 @@ public class TaskController {
     @GetMapping("/stat/year/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN','DIRECTOR','MANAGER')")
     public Mono<Rendering> taskStatYear(@PathVariable(name = "userId") int userId){
-        if(userId == -1) {
+        if(userId == 0) {
             Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
                 ChartDTO chart = new ChartDTO();
                 chart.setTitle(category.getName());
@@ -606,6 +614,7 @@ public class TaskController {
                                 }
                             }
                         }
+                        categoryDTO.reconstruct();
                         return Mono.just(categoryDTO);
                     });
                 }));
@@ -620,6 +629,7 @@ public class TaskController {
                             .modelAttribute("taskList", taskService.getYear())
                             .modelAttribute("dates", new DateDTO())
                             .modelAttribute("users", implementerService.getAll())
+                            .modelAttribute("userId",userId)
                             .build()
             );
         }else{
@@ -666,6 +676,7 @@ public class TaskController {
                                 }
                             }
                         }
+                        categoryDTO.reconstruct();
                         return Mono.just(categoryDTO);
                     }));
                 });
@@ -680,6 +691,7 @@ public class TaskController {
                             .modelAttribute("taskList", implementerService.getUserById(userId).flatMapMany(implementer -> taskService.getImplementerTasksForYear(implementer)))
                             .modelAttribute("dates", new DateDTO())
                             .modelAttribute("users", implementerService.getAll())
+                            .modelAttribute("userId",userId)
                             .build()
             );
         }
@@ -687,8 +699,24 @@ public class TaskController {
 
     @PostMapping("/stat/date/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN','DIRECTOR','MANAGER')")
-    public Mono<Rendering> viewStatFromDate(@PathVariable(name = "userId") int userId, @ModelAttribute(name = "dates") DateDTO dateDTO){
-        if(userId == -1) {
+    public Mono<Rendering> viewStatFromDate(@PathVariable(name = "userId") int userId, @ModelAttribute(name = "dates") @Valid DateDTO dateDTO, Errors errors){
+        if(userId == 0) {
+
+            if(errors.hasErrors()){
+                return Mono.just(
+                        Rendering.view("template")
+                                .modelAttribute("title", "My task info")
+                                .modelAttribute("index", "task-stat-page")
+                                .modelAttribute("charts", Flux.empty())
+                                .modelAttribute("statistics", Flux.empty())
+                                .modelAttribute("taskList", Flux.empty())
+                                .modelAttribute("dates", dateDTO)
+                                .modelAttribute("users", implementerService.getAll())
+                                .modelAttribute("userId",userId)
+                                .build()
+                );
+            }
+
             Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
                 ChartDTO chart = new ChartDTO();
                 chart.setTitle(category.getName());
@@ -736,6 +764,7 @@ public class TaskController {
                                 }
                             }
                         }
+                        categoryDTO.reconstruct();
                         return Mono.just(categoryDTO);
                     });
                 }));
@@ -750,10 +779,26 @@ public class TaskController {
                             .modelAttribute("taskList", taskService.getFromDate(dateDTO))
                             .modelAttribute("dates", new DateDTO())
                             .modelAttribute("users", implementerService.getAll())
+                            .modelAttribute("userId",userId)
                             .build()
             );
         }else{
-            System.out.println(userId);
+
+            if(errors.hasErrors()){
+                return Mono.just(
+                        Rendering.view("template")
+                                .modelAttribute("title","My task info")
+                                .modelAttribute("index","task-stat-page")
+                                .modelAttribute("charts", Flux.empty())
+                                .modelAttribute("statistics",Flux.empty())
+                                .modelAttribute("taskList", Flux.empty())
+                                .modelAttribute("dates", dateDTO)
+                                .modelAttribute("users", implementerService.getAll())
+                                .modelAttribute("userId",userId)
+                                .build()
+                );
+            }
+
             Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
                 ChartDTO chart = new ChartDTO();
                 chart.setTitle(category.getName());
@@ -797,6 +842,7 @@ public class TaskController {
                                 }
                             }
                         }
+                        categoryDTO.reconstruct();
                         return Mono.just(categoryDTO);
                     }));
                 });
@@ -811,6 +857,7 @@ public class TaskController {
                             .modelAttribute("taskList", implementerService.getUserById(userId).flatMapMany(implementer -> taskService.getImplementerTasksForDates(implementer, dateDTO)))
                             .modelAttribute("dates", new DateDTO())
                             .modelAttribute("users", implementerService.getAll())
+                            .modelAttribute("userId",userId)
                             .build()
             );
         }

@@ -1,37 +1,44 @@
 <div class="container-fluid py-4">
     <div class="row py-5">
         <div class="col-4">
-            <select name="select" class="form-select" aria-label="Default select example" onchange="setupLinks(this.value)">
-                <option value="-1">Все</option>
+            <select id="my-select" class="form-select" aria-label="Default select example" onchange="setupLinks(this.value)">
+                <option value="0">Все</option>
                 <option th:each="user : ${users}" th:value="${user.getId()}" th:text="${user.getFullName()}" th:if="${user.getRole().getTitle()} != 'Администратор' AND ${user.getRole().getTitle()} != 'Контролирующий'"></option>
             </select>
+            <script th:inline="javascript">
+                for(let i=0; i<[[${users}]].length; i++){
+                    if([[${users}]][i].id == [[${userId}]]){
+                        document.getElementById('my-select').value = [[${users}]][i].id;
+                    }
+                }
+            </script>
         </div>
         <div class="col-8"></div>
     </div>
     <div class="row">
         <div class="col">
-            <a id="week" class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);"  th:href="@{/task/stat/week/-1}">
+            <a id="week" class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);"  th:href="@{/task/stat/week/{userId}(userId=${userId})}">
                 <i class="bi bi-calendar3-week" style="font-size: 20px"></i>
                 Неделя
             </a>
-            <a id="month" class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);" th:href="@{/task/stat/month/-1}">
+            <a id="month" class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);" th:href="@{/task/stat/month/{userId}(userId=${userId})}">
                 <i class="bi bi-calendar3" style="font-size: 20px"></i>
                 Месяц
             </a>
-            <a id="year" class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);" th:href="@{/task/stat/year/-1}">
+            <a id="year" class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);" th:href="@{/task/stat/year/{userId}(userId=${userId})}">
                 <i class="bi bi-calendar2-check" style="font-size: 20px"></i>
                 Год
             </a>
             <a href="#">
-                <form id="date" class="row g-3" th:method="POST" th:action="@{/task/stat/date/-1}" style="display: inline-flex; margin-left: 1vh; border: solid 1px lightgray; border-radius: 20px" th:object="${dates}">
+                <form id="date" class="row g-3" th:method="POST" th:action="@{/task/stat/date/{userId}(userId=${userId})}" style="display: inline-flex; margin-left: 1vh; border: solid 1px lightgray; border-radius: 20px" th:object="${dates}">
                     <div class="col-auto">
                         <i class="bi bi-calendar" style="font-size: 20px"></i>
                     </div>
                     <div class="col-auto">
-                        <input type="date" class="form-control" th:field="*{begin}">
+                        <input type="date" class="form-control" th:field="*{begin}"> <span th:if="${#fields.hasErrors('begin')}" th:errors="*{begin}" style="color: red"></span>
                     </div>
                     <div class="col-auto">
-                        <input type="date" class="form-control" th:field="*{end}">
+                        <input type="date" class="form-control" th:field="*{end}"><span th:if="${#fields.hasErrors('end')}" th:errors="*{end}" style="color: red"></span>
                     </div>
                     <div class="col-auto">
                         <button type="submit" class="btn btn-primary mb-3">Показать</button>
@@ -98,7 +105,7 @@
                     <span>Отсутствуют группы обратитесь к Администратору</span>
                 </div>
                 <div th:if="${statistics.size() != 0}">
-                    <div class="accordion-item" th:each="stat, s : ${statistics}">
+                    <div class="accordion-item" th:each="stat, s : ${statistics}" th:if="${stat.isShow}">
                         <h2 class="accordion-header">
                             <button class="accordion-button" th:id="'id-' + ${s.index}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse" aria-expanded="true" aria-controls="collapse">
                                 <span th:text="${stat.getTitle()}"></span>
@@ -111,7 +118,7 @@
                                         <span>Отсутствуют задачи в группе обратитесь к Администратору</span>
                                     </div>
                                     <div th:if="${stat.getTroubles.size() != 0}">
-                                        <div class="accordion-item" th:each="trouble, s2 : ${stat.getTroubles()}">
+                                        <div class="accordion-item" th:each="trouble, s2 : ${stat.getTroubles()}" th:if="${trouble.isShow()}">
                                             <h2 class="accordion-header">
                                                 <button class="accordion-button" th:id="'id' + ${s.index} + ${s2.index}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse" aria-expanded="true" aria-controls="collapse">
                                                     <span th:text="${trouble.getTitle()} + ' - Заявок:  ' + ${trouble.getTasks().size()}"></span>

@@ -11,6 +11,7 @@ public class TroubleDTO {
     private String title;
     private String description;
     private List<TaskDTO> tasks = new ArrayList<>();
+    private boolean show = true;
 
     public void addTask(TaskDTO task){
         tasks.add(task);
