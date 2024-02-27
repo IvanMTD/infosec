@@ -29,6 +29,7 @@ public class Trouble {
     public Trouble update(TicketDataTransferObject ticketDTO) {
         setName(ticketDTO.getName());
         setDescription(ticketDTO.getDescription());
+        setCategoryId(ticketDTO.getCategoryId());
         return this;
     }
 }

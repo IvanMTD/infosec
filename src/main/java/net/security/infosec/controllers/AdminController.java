@@ -3,9 +3,12 @@ package net.security.infosec.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.security.infosec.dto.CategoryDTO;
 import net.security.infosec.dto.ImplementerDataTransferObject;
 import net.security.infosec.dto.TicketDataTransferObject;
+import net.security.infosec.dto.TroubleDTO;
 import net.security.infosec.models.Role;
+import net.security.infosec.models.Trouble;
 import net.security.infosec.services.ImplementerService;
 import net.security.infosec.services.TroubleTicketService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,7 +16,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.result.view.Rendering;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -120,6 +127,40 @@ public class AdminController {
         return implementerService.deleteImplementerById(id).then(Mono.just(Rendering.redirectTo("/admin/users").build()));
     }*/
 
+    @GetMapping("/works")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Rendering> worksPage(){
+
+        Flux<CategoryDTO> categoryFlux = troubleTicketService.getAllCategories().flatMap(category -> {
+            CategoryDTO categoryDTO = new CategoryDTO();
+            categoryDTO.setId(category.getId());
+            categoryDTO.setTitle(category.getName());
+            categoryDTO.setDescription(category.getDescription());
+            return troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(tl -> {
+                List<TroubleDTO> troubleDTOList = new ArrayList<>();
+                for(Trouble trouble : tl){
+                    TroubleDTO troubleDTO = new TroubleDTO();
+                    troubleDTO.setId(trouble.getId());
+                    troubleDTO.setTitle(trouble.getName());
+                    troubleDTO.setDescription(trouble.getDescription());
+                    troubleDTOList.add(troubleDTO);
+                }
+                categoryDTO.setTroubles(troubleDTOList);
+                return Mono.just(categoryDTO);
+            });
+        });
+
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Works page")
+                        .modelAttribute("index","works-page")
+                        .modelAttribute("categories", categoryFlux)
+                        .modelAttribute("ticket", new TicketDataTransferObject())
+                        .modelAttribute("categories2", troubleTicketService.getAllCategories())
+                        .build()
+        );
+    }
+
     @GetMapping("/categories")
     @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> categoriesPage(){
@@ -158,13 +199,13 @@ public class AdminController {
         }
         return troubleTicketService.saveCategory(ticket).flatMap(category -> {
             log.info("Category saved: " + category.toString());
-            return Mono.just(Rendering.redirectTo("/admin").build());
+            return Mono.just(Rendering.redirectTo("/admin/works").build());
         });
     }
 
-    @GetMapping("/category/edit")
+    @GetMapping("/category/edit/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public Mono<Rendering> categoryEdit(@RequestParam(name = "select") int id){
+    public Mono<Rendering> categoryEdit(@PathVariable(name = "id") int id){
         return Mono.just(
                 Rendering.view("template")
                         .modelAttribute("title","Category edit page")
@@ -188,7 +229,7 @@ public class AdminController {
         }
         return troubleTicketService.updateCategory(ticketDTO,id).flatMap(category -> {
             log.info("category updated: " + category.toString());
-            return Mono.just(Rendering.redirectTo("/admin/categories").build());
+            return Mono.just(Rendering.redirectTo("/admin/works").build());
         });
     }
 
@@ -233,13 +274,13 @@ public class AdminController {
         }
         return troubleTicketService.saveTroubleInCategory(ticket).flatMap(category -> {
             log.info("Trouble added to category " + category.getName() + " and now: " + category);
-            return Mono.just(Rendering.redirectTo("/admin").build());
+            return Mono.just(Rendering.redirectTo("/admin/works").build());
         });
     }
 
-    @GetMapping("/trouble/edit")
+    @GetMapping("/trouble/edit/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public Mono<Rendering> troubleEdit(@RequestParam(name = "select") int id){
+    public Mono<Rendering> troubleEdit(@PathVariable(name = "id") int id){
         return Mono.just(
                 Rendering.view("template")
                         .modelAttribute("title","Trouble edit page")
@@ -263,9 +304,13 @@ public class AdminController {
                             .build()
             );
         }
+
         return troubleTicketService.updateTrouble(ticketDTO,id).flatMap(trouble -> {
-            log.info("trouble updated: " + trouble.toString());
-            return Mono.just(Rendering.redirectTo("/admin/troubles").build());
+            log.info("saved " + trouble.toString());
+            return troubleTicketService.redirectTroubleInCategory(trouble).flatMap(category -> {
+                log.info("redirect trouble in category");
+                return Mono.just(Rendering.redirectTo("/admin/works").build());
+            });
         });
     }
 }

@@ -1,6 +1,7 @@
 package net.security.infosec.services;
 
 import lombok.RequiredArgsConstructor;
+import net.security.infosec.dto.DateDTO;
 import net.security.infosec.dto.TaskDataTransferObject;
 import net.security.infosec.models.Implementer;
 import net.security.infosec.models.Task;
@@ -86,6 +87,16 @@ public class TaskService {
         });
     }
 
+    public Flux<Task> getImplementerTasksForDates(Implementer implementer, DateDTO dateDTO) {
+        return taskRepository.findAllByExecuteDateBetween(dateDTO.getBegin(), dateDTO.getEnd()).flatMap(task -> {
+            if(task.getImplementerId() == implementer.getId()){
+                return Mono.just(task);
+            }else{
+                return Mono.empty();
+            }
+        });
+    }
+
     public Flux<Task> getWeek() {
         LocalDate localDate = LocalDate.now();
         boolean over = false;
@@ -125,6 +136,10 @@ public class TaskService {
         }
         localDate = localDate.minusDays(1);
         return taskRepository.findTasksByExecuteDateAfter(localDate);
+    }
+
+    public Flux<Task> getFromDate(DateDTO dateDTO) {
+        return taskRepository.findAllByExecuteDateBetween(dateDTO.getBegin(), dateDTO.getEnd());
     }
 
     public Flux<Task> getImplementerTasks(Implementer implementer) {

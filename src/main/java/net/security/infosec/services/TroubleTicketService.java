@@ -12,6 +12,7 @@ import net.security.infosec.repositories.CategoryRepository;
 import net.security.infosec.repositories.TroubleRepository;
 import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -88,5 +89,15 @@ public class TroubleTicketService {
 
     public Flux<Trouble> getTroubleByIds(Set<Integer> troubleIds) {
         return troubleRepository.findAllByIdIn(troubleIds);
+    }
+
+    public Mono<Category> redirectTroubleInCategory(Trouble trouble) {
+        return categoryRepository.findCategoryWhereTroubleIdIn(trouble.getId()).flatMap(category -> {
+            category.getTroubleIds().remove(trouble.getId());
+            return categoryRepository.save(category);
+        }).flatMap(category -> categoryRepository.findById(trouble.getCategoryId()).flatMap(cat -> {
+            cat.addTrouble(trouble);
+            return categoryRepository.save(cat);
+        }));
     }
 }

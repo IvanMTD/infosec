@@ -1,0 +1,154 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-6">
+            <div class="row">
+                <div class="col py-5">
+                    <div class="card" style="height: 100%">
+                        <div class="card-body" id="my-card">
+                            <h5 class="card-title" th:text="${categories[0].getTitle()}"></h5>
+                            <p class="card-text" th:text="${categories[0].getDescription()}"></p>
+                            <a th:href="@{/admin/category/edit/{id}(id=${categories[0].getId()})}" class="card-link">Редактировать</a>
+                            <a href="#" class="card-link disabled">Удалить</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col py-5">
+                    <div class="card" style="height: 100%">
+                        <div class="card-body" id="my-card-2">
+                            <h5 class="card-title" th:text="${categories[0].getTroubles[0].getTitle()}"></h5>
+                            <p class="card-text" th:text="${categories[0].getTroubles[0].getDescription()}"></p>
+                            <a th:href="@{/admin/trouble/edit/{id}(id=${categories[0].getTroubles[0].getId()})}" class="card-link">Редактировать</a>
+                            <a href="#" class="card-link disabled">Удалить</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <ul class="list-group py-3">
+                        <li class="list-group-item" th:each="category, stat : ${categories}" th:id="${stat.index}" onclick="setActive(this.id)">
+                            <span th:text="${category.getTitle()}"></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col">
+                    <ul class="list-group py-3" id="trouble-list">
+                        <li class="list-group-item" th:each="trouble, stat : ${categories[0].getTroubles()}" th:name="${stat.index}" th:id="'id0' + ${stat.index}" onclick="setTroubleActive(this.id)">
+                            <span th:text="${trouble.getTitle()}"></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <form th:method="POST" th:action="@{/admin/category/add}" th:object="${ticket}">
+                        <ul class="list-group py-5">
+                            <li class="list-group-item active text-center">Добавить категорию</li>
+                            <li class="list-group-item">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text" id="inputGroup-sizing-default">Заголовок</span>
+                                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" th:field="*{name}">
+                                    <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color: red"></span>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="input-group">
+                                    <span class="input-group-text">Описание</span>
+                                    <textarea class="form-control" aria-label="With textarea" th:field="*{description}" rows="10"></textarea>
+                                    <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red"></span>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <input class="btn btn-primary" type="submit"value="Добавить">
+                            </li>
+                        </ul>
+                    </form>
+                </div>
+                <div class="col">
+                    <form th:method="POST" th:action="@{/admin/trouble/add}" th:object="${ticket}">
+                        <ul class="list-group py-5">
+                            <li class="list-group-item active text-center">Добавить раздел</li>
+                            <li class="list-group-item">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text" id="inputGroup-sizing-default">Заголовок</span>
+                                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" th:field="*{name}">
+                                    <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color: red"></span>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="input-group">
+                                    <span class="input-group-text">Описание</span>
+                                    <textarea class="form-control" aria-label="With textarea" th:field="*{description}" rows="10"></textarea>
+                                    <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red"></span>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <select class="form-select"  th:field="*{categoryId}">
+                                    <option th:each="category : ${categories2}" th:text="${category.getName()}" th:value="${category.getId()}"></option>
+                                </select>
+                            </li>
+                            <li class="list-group-item">
+                                <input class="btn btn-primary" type="submit"value="Добавить">
+                            </li>
+                        </ul>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col"></div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    let current = 0;
+    function setActive(id){
+        current = id;
+        for(let i=0; i<[[${categories}]].length; i++){
+            if(i == id){
+                document.getElementById(i).setAttribute('class','list-group-item active');
+                $('#trouble-list').html('');
+                let tl = [[${categories}]][i].troubles;
+                for(let j=0; j<tl.length; j++){
+                    $('#trouble-list').append(
+                        '<li class="list-group-item" name="' + j + '" id="id' + i + j + '" onclick="setTroubleActive(this.id)">\n' +
+                        '   <span>' + tl[j].title + '</span>\n' +
+                        '</li>'
+                    );
+                }
+                $('#my-card').html('');
+                $('#my-card').append(
+                    '<h5 class="card-title">' + [[${categories}]][id].title + '</h5>\n' +
+                    '<p class="card-text">' + [[${categories}]][id].description + '</p>\n' +
+                    '<a href="/admin/category/edit/' + [[${categories}]][id].id + '" class="card-link">Редактировать</a>\n' +
+                    '<a href="#" class="card-link disabled">Удалить</a>'
+                );
+                document.getElementById('id' + current + 0).setAttribute('class','list-group-item active');
+                $('#my-card-2').html('');
+                $('#my-card-2').append(
+                    '<h5 class="card-title">' + [[${categories}]][current].troubles[0].title + '</h5>\n' +
+                    '<p class="card-text">' + [[${categories}]][current].troubles[0].description + '</p>\n' +
+                    '<a href="/admin/trouble/edit/' + [[${categories}]][current].troubles[0].id + '" class="card-link">Редактировать</a>\n' +
+                    '<a href="#" class="card-link disabled">Удалить</a>'
+                );
+            }else{
+                document.getElementById(i).setAttribute('class','list-group-item');
+            }
+        }
+    }
+
+    function setTroubleActive(id){
+        for(let i=0; i<[[${categories}]][current].troubles.length; i++){
+            document.getElementById('id' + current + i).setAttribute('class','list-group-item');
+        }
+        document.getElementById(id).setAttribute('class','list-group-item active');
+        let num = document.getElementById(id).getAttribute('name');
+        $('#my-card-2').html('');
+        $('#my-card-2').append(
+            '<h5 class="card-title">' + [[${categories}]][current].troubles[num].title + '</h5>\n' +
+            '<p class="card-text">' + [[${categories}]][current].troubles[num].description + '</p>\n' +
+            '<a href="/admin/trouble/edit/' + [[${categories}]][current].troubles[num].id + '" class="card-link">Редактировать</a>\n' +
+            '<a href="#" class="card-link disabled">Удалить</a>'
+        );
+    }
+</script>

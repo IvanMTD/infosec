@@ -1,22 +1,35 @@
-<div>
-    <form th:method="POST" th:action="@{/admin/trouble/update/{id}(id=${ticket.getId()})}" th:object="${ticket}">
-        <ul>
-            <li>
-                <label for="name">название: </label><br>
-                <input type="text" id="name" th:field="*{name}">
-                <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color: red"></span>
-            </li>
-            <li>
-                <label for="description">описание: </label><br>
-                <textarea type="text" id="description" th:field="*{description}" cols="50" rows="10"></textarea>
-                <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red"></span>
-            </li>
-            <li>
-                <select th:field="*{categoryId}">
-                    <option th:each="category : ${categories}" th:text="${category.getName()}" th:value="${category.getId()}"></option>
-                </select>
-            </li>
-            <li><input type="submit" value="обновить"></li>
-        </ul>
-    </form>
+<div class="fluid-container">
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-6">
+            <form th:method="POST" th:action="@{/admin/trouble/update/{id}(id=${ticket.getId()})}" th:object="${ticket}">
+                <ul class="list-group py-5">
+                    <li class="list-group-item active text-center">Редактор</li>
+                    <li class="list-group-item">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="inputGroup-sizing-default">Заголовок</span>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" th:field="*{name}">
+                            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color: red"></span>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="input-group">
+                            <span class="input-group-text">Описание</span>
+                            <textarea class="form-control" aria-label="With textarea" th:field="*{description}" rows="10"></textarea>
+                            <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red"></span>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <select class="form-select"  th:field="*{categoryId}">
+                            <option th:each="category : ${categories}" th:text="${category.getName()}" th:value="${category.getId()}"></option>
+                        </select>
+                    </li>
+                    <li class="list-group-item">
+                        <input class="btn btn-primary" type="submit"value="Обновить">
+                    </li>
+                </ul>
+            </form>
+        </div>
+        <div class="col"></div>
+    </div>
 </div>

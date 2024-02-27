@@ -13,6 +13,22 @@
                 <i class="bi bi-calendar2-check" style="font-size: 20px"></i>
                 Год
             </a>
+            <a href="#">
+                <form class="row g-3" th:method="POST" th:action="@{/task/info/date}" style="display: inline-flex; margin-left: 1vh; border: solid 1px lightgray; border-radius: 20px" th:object="${dates}">
+                    <div class="col-auto">
+                        <i class="bi bi-calendar" style="font-size: 20px"></i>
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" class="form-control" th:field="*{begin}">
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" class="form-control" th:field="*{end}">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary mb-3">Показать</button>
+                    </div>
+                </form>
+            </a>
         </div>
     </div>
     <div class="row">
@@ -67,11 +83,11 @@
                 <div th:if="${statistics.size() != 0}">
                     <div class="accordion-item" th:each="stat, s : ${statistics}">
                         <h2 class="accordion-header">
-                            <button class="accordion-button" th:id="'id' + ${s.index}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse" aria-expanded="true" aria-controls="collapse">
+                            <button class="accordion-button" th:id="'id-' + ${s.index}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse" aria-expanded="true" aria-controls="collapse">
                                 <span th:text="${stat.getTitle()}"></span>
                             </button>
                         </h2>
-                        <div th:id="'collapse' + ${s.index}" class="accordion-collapse collapse" data-bs-parent="#accordion">
+                        <div th:id="'collapse-' + ${s.index}" class="accordion-collapse collapse" data-bs-parent="#accordion">
                             <div class="accordion-body">
                                 <div class="accordion" th:id="'accordion' + ${s.index}">
                                     <div class="row text-center py-5" th:if="${stat.getTroubles.size() == 0}">
@@ -103,10 +119,16 @@
                                             </div>
                                             <script th:inline="javascript">
                                                 if([[${s2.index}]] == 0){
+                                                    document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('class','accordion-button');
+                                                    document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('arial-expend','true');
                                                     document.getElementById('collapse' + [[${s.index}]] + [[${s2.index}]]).setAttribute('class','accordion-collapse collapse show');
+                                                }else{
+                                                    document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('class','accordion-button collapsed');
+                                                    document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('arial-expend','false');
+                                                    document.getElementById('collapse' + [[${s.index}]] + [[${s2.index}]]).setAttribute('class','accordion-collapse collapse');
                                                 }
-                                                document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('data-bs-target','#collapse' + [[${s.index}]]  + [[${s2.index}]]);
-                                                document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('aria-controls','collapse' + [[${s.index}]]  + [[${s2.index}]]);
+                                                document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('data-bs-target','#collapse' + [[${s.index}]] + [[${s2.index}]]);
+                                                document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('aria-controls','collapse' + [[${s.index}]] + [[${s2.index}]]);
                                                 document.getElementById('collapse' + [[${s.index}]] + [[${s2.index}]]).setAttribute('data-bs-parent','#accordion' + [[${s.index}]]);
                                             </script>
                                         </div>
@@ -116,10 +138,16 @@
                         </div>
                         <script th:inline="javascript">
                             if([[${s.index}]] == 0){
-                                document.getElementById('collapse' + [[${s.index}]]).setAttribute('class','accordion-collapse collapse show');
+                                document.getElementById('id-' + [[${s.index}]]).setAttribute('class','accordion-button');
+                                document.getElementById('id-' + [[${s.index}]]).setAttribute('arial-expend','true');
+                                document.getElementById('collapse-' + [[${s.index}]]).setAttribute('class','accordion-collapse collapse show');
+                            }else{
+                                document.getElementById('id-' + [[${s.index}]]).setAttribute('class','accordion-button collapsed');
+                                document.getElementById('id-' + [[${s.index}]]).setAttribute('arial-expend','false');
+                                document.getElementById('collapse-' + [[${s.index}]]).setAttribute('class','accordion-collapse collapse');
                             }
-                            document.getElementById('id' + [[${s.index}]]).setAttribute('data-bs-target','#collapse' + [[${s.index}]]);
-                            document.getElementById('id' + [[${s.index}]]).setAttribute('aria-controls','collapse' + [[${s.index}]]);
+                            document.getElementById('id-' + [[${s.index}]]).setAttribute('data-bs-target','#collapse-' + [[${s.index}]]);
+                            document.getElementById('id-' + [[${s.index}]]).setAttribute('aria-controls','collapse' + [[${s.index}]]);
                         </script>
                     </div>
                 </div>

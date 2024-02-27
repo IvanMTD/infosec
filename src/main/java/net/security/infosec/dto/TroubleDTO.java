@@ -9,6 +9,7 @@ import java.util.List;
 public class TroubleDTO {
     private int id;
     private String title;
+    private String description;
     private List<TaskDTO> tasks = new ArrayList<>();
 
     public void addTask(TaskDTO task){
