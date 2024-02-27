@@ -1,20 +1,29 @@
 <div class="container-fluid py-4">
+    <div class="row py-5">
+        <div class="col-4">
+            <select name="select" class="form-select" aria-label="Default select example" onchange="setupLinks(this.value)">
+                <option value="-1">Все</option>
+                <option th:each="user : ${users}" th:value="${user.getId()}" th:text="${user.getFullName()}" th:if="${user.getRole().getTitle()} != 'Администратор' AND ${user.getRole().getTitle()} != 'Контролирующий'"></option>
+            </select>
+        </div>
+        <div class="col-8"></div>
+    </div>
     <div class="row">
         <div class="col">
-            <a class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);"  th:href="@{/task/stat/week}">
+            <a id="week" class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);"  th:href="@{/task/stat/week/-1}">
                 <i class="bi bi-calendar3-week" style="font-size: 20px"></i>
                 Неделя
             </a>
-            <a class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);" th:href="@{/task/stat/month}">
+            <a id="month" class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);" th:href="@{/task/stat/month/-1}">
                 <i class="bi bi-calendar3" style="font-size: 20px"></i>
                 Месяц
             </a>
-            <a class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);" th:href="@{/task/stat/year}">
+            <a id="year" class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);" th:href="@{/task/stat/year/-1}">
                 <i class="bi bi-calendar2-check" style="font-size: 20px"></i>
                 Год
             </a>
             <a href="#">
-                <form class="row g-3" th:method="POST" th:action="@{/task/stat/date}" style="display: inline-flex; margin-left: 1vh; border: solid 1px lightgray; border-radius: 20px" th:object="${dates}">
+                <form id="date" class="row g-3" th:method="POST" th:action="@{/task/stat/date/-1}" style="display: inline-flex; margin-left: 1vh; border: solid 1px lightgray; border-radius: 20px" th:object="${dates}">
                     <div class="col-auto">
                         <i class="bi bi-calendar" style="font-size: 20px"></i>
                     </div>
@@ -31,6 +40,14 @@
             </a>
         </div>
     </div>
+    <script>
+        function setupLinks(id){
+            document.getElementById('week').setAttribute('href','/task/stat/week/' + id)
+            document.getElementById('month').setAttribute('href','/task/stat/month/' + id)
+            document.getElementById('year').setAttribute('href','/task/stat/year/' + id)
+            document.getElementById('date').setAttribute('action','/task/stat/date/' + id)
+        }
+    </script>
     <div class="row">
         <div class="col-6">
             <ul class="list-group py-5">
