@@ -24,6 +24,7 @@ public class ChartDTO {
     private String title;
     private String status;
     private int taskCount;
+    private String description;
 
     public void addTask(Task task){
         tasks.add(task);

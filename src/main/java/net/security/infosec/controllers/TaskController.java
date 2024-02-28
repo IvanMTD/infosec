@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.security.infosec.dto.*;
-import net.security.infosec.models.Category;
 import net.security.infosec.models.Implementer;
 import net.security.infosec.models.Task;
 import net.security.infosec.models.Trouble;
@@ -17,11 +16,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.result.view.Rendering;
-import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,6 +48,7 @@ public class TaskController {
             chart.setTitle(category.getName());
             chart.setCId(category.getId());
             chart.setStatus("неделю");
+            chart.setDescription(category.getDescription());
             return implementerService.getUserById(implementer.getId()).flatMap(impl -> taskService.getImplementerTasksForWeek(impl).collectList().flatMap(tasks -> {
                 int count = 0;
                 for(Task task : tasks){
@@ -115,6 +113,7 @@ public class TaskController {
             chart.setTitle(category.getName());
             chart.setCId(category.getId());
             chart.setStatus("месяц");
+            chart.setDescription(category.getDescription());
             return implementerService.getUserById(implementer.getId()).flatMap(impl -> taskService.getImplementerTasksForMonth(impl).collectList().flatMap(tasks -> {
                 int count = 0;
                 for(Task task : tasks){
@@ -179,6 +178,7 @@ public class TaskController {
             chart.setTitle(category.getName());
             chart.setCId(category.getId());
             chart.setStatus("год");
+            chart.setDescription(category.getDescription());
             return implementerService.getUserById(implementer.getId()).flatMap(impl -> taskService.getImplementerTasksForYear(impl).collectList().flatMap(tasks -> {
                 int count = 0;
                 for(Task task : tasks){
@@ -243,6 +243,7 @@ public class TaskController {
             chart.setTitle(category.getName());
             chart.setCId(category.getId());
             chart.setStatus("период с " + dateDTO.getBegin() + " по " + dateDTO.getEnd());
+            chart.setDescription(category.getDescription());
             return implementerService.getUserById(implementer.getId()).flatMap(impl -> taskService.getImplementerTasksForDates(impl, dateDTO).collectList().flatMap(tasks -> {
                 int count = 0;
                 for (Task task : tasks) {
@@ -308,6 +309,7 @@ public class TaskController {
                 chart.setTitle(category.getName());
                 chart.setCId(category.getId());
                 chart.setStatus("неделю");
+                chart.setDescription(category.getDescription());
                 return taskService.getWeek().collectList().flatMap(week -> {
                     int count = 0;
                     for (Task task : week) {
@@ -374,6 +376,7 @@ public class TaskController {
                 chart.setTitle(category.getName());
                 chart.setCId(category.getId());
                 chart.setStatus("неделю");
+                chart.setDescription(category.getDescription());
                 return implementerService.getUserById(userId).flatMap(impl -> taskService.getImplementerTasksForWeek(impl).collectList().flatMap(tasks -> {
                     int count = 0;
                     for(Task task : tasks){
@@ -442,6 +445,7 @@ public class TaskController {
                 chart.setTitle(category.getName());
                 chart.setCId(category.getId());
                 chart.setStatus("месяц");
+                chart.setDescription(category.getDescription());
                 return taskService.getMonth().collectList().flatMap(month -> {
                     int count = 0;
                     for (Task task : month) {
@@ -508,6 +512,7 @@ public class TaskController {
                 chart.setTitle(category.getName());
                 chart.setCId(category.getId());
                 chart.setStatus("месяц");
+                chart.setDescription(category.getDescription());
                 return implementerService.getUserById(userId).flatMap(impl -> taskService.getImplementerTasksForMonth(impl).collectList().flatMap(tasks -> {
                     int count = 0;
                     for(Task task : tasks){
@@ -576,6 +581,7 @@ public class TaskController {
                 chart.setTitle(category.getName());
                 chart.setCId(category.getId());
                 chart.setStatus("год");
+                chart.setDescription(category.getDescription());
                 return taskService.getYear().collectList().flatMap(year -> {
                     int count = 0;
                     for (Task task : year) {
@@ -642,6 +648,7 @@ public class TaskController {
                 chart.setTitle(category.getName());
                 chart.setCId(category.getId());
                 chart.setStatus("год");
+                chart.setDescription(category.getDescription());
                 return implementerService.getUserById(userId).flatMap(impl -> taskService.getImplementerTasksForYear(impl).collectList().flatMap(tasks -> {
                     int count = 0;
                     for(Task task : tasks){
@@ -726,6 +733,7 @@ public class TaskController {
                 chart.setTitle(category.getName());
                 chart.setCId(category.getId());
                 chart.setStatus("период с " + dateDTO.getBegin() + " по " + dateDTO.getEnd());
+                chart.setDescription(category.getDescription());
                 return taskService.getFromDate(dateDTO).collectList().flatMap(dateTasks -> {
                     int count = 0;
                     for (Task task : dateTasks) {
@@ -808,6 +816,7 @@ public class TaskController {
                 chart.setTitle(category.getName());
                 chart.setCId(category.getId());
                 chart.setStatus("за период с " + dateDTO.getBegin() + " по " + dateDTO.getEnd());
+                chart.setDescription(category.getDescription());
                 return implementerService.getUserById(userId).flatMap(impl -> taskService.getImplementerTasksForDates(impl,dateDTO).collectList().flatMap(tasks -> {
                     int count = 0;
                     for(Task task : tasks){

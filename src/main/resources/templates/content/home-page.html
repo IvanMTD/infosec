@@ -1,4 +1,46 @@
 <div class="container-fluid py-4">
+    <!--<div class="row">
+        <div class="col">
+            <script th:inline="javascript">
+                google.charts.load('current', {'packages':['annotationchart']});
+                google.charts.setOnLoadCallback(drawChart);
+
+                function drawChart() {
+                    let year = [[${year}]];
+                    let chartTitle = [[${categoryTitle}]];
+                    let chartTable = [[${categoryChart}]];
+
+                    let dataTable = new google.visualization.DataTable();
+                    dataTable.addColumn('date','Дата')
+                    for(let i=0; i<chartTitle.length; i++){
+                        dataTable.addColumn('number',chartTitle[i].name);
+                        dataTable.addColumn('string', 'description');
+                        dataTable.addColumn('string', 'count');
+                    }
+                    for(let i=0; i<chartTable.length; i++){
+                        let row = [];
+                        row[0] = new Date(chartTable[i].localDate);
+                        let tasks = chartTable[i].taskOnTrouble;
+                        for(let j=0; j<tasks.length; j++){
+                            row[(j+1) + j + j] = tasks[j];
+                            row[(j+2) + j + j] = chartTitle[j].name + '\n' + chartTitle[j].description + '\n' + 'Всего: ' + tasks[j];
+                            row[(j+3) + j + j] = 'Всего: ' + tasks[j];
+                        }
+                        dataTable.addRows([row]);
+                    }
+
+                    var options = {
+                        displayAnnotations: true,
+                    };
+
+                    var chart = new google.visualization.AnnotationChart(document.getElementById('chart_div'));
+
+                    chart.draw(dataTable, options);
+                }
+            </script>
+            <div id="chart_div" style="margin-left: 0; width: auto; height: 700px;"></div>
+        </div>
+    </div>-->
     <div class="row">
         <div class="col">
             <script th:inline="javascript">
@@ -6,39 +48,52 @@
                 google.charts.setOnLoadCallback(drawChart);
 
                 function drawChart() {
+                    let year = [[${year}]];
                     let chartTitle = [[${categoryTitle}]];
-                    let tableTitle = [];
-                    tableTitle[0] = 'Дата';
+                    let chartTable = [[${categoryChart}]];
+
+                    let dataTable = new google.visualization.DataTable();
+                    dataTable.addColumn('string','дата')
                     for(let i=0; i<chartTitle.length; i++){
-                        tableTitle[i+1] = chartTitle[i].name;
+                        dataTable.addColumn('number',chartTitle[i].name);
+                        dataTable.addColumn({type: 'string', role: 'tooltip'});
                     }
-                    let chartList = [[${categoryChart}]];
-                    let dataArray = [];
-                    dataArray[0] = tableTitle;
-                    for(let i=0; i<chartList.length; i++){
-                        let arrayStroke = [];
-                        arrayStroke[0] = chartList[i].date;
-                        let tasks = chartList[i].taskOnTrouble;
+                    for(let i=0; i<chartTable.length; i++){
+                        let row = [];
+                        row[0] = chartTable[i].date;
+                        let tasks = chartTable[i].taskOnTrouble;
                         for(let j=0; j<tasks.length; j++){
-                            arrayStroke[j+1] = tasks[j];
+                            row[(j+1) + j] = tasks[j];
+                            row[(j+2) + j] = chartTitle[j].name + '\n' + chartTitle[j].description + '\n' + 'Всего: ' + tasks[j];
                         }
-                        dataArray[i+1] = arrayStroke;
+                        dataTable.addRows([row]);
                     }
-                    let data = google.visualization.arrayToDataTable(dataArray, false);
 
                     let options = {
-                        title: 'Выполненные заявки по датам',
-                        vAxis: {title: 'Всего выполнено заявок'},
-                        isStacked: true,
-                        legend: 'none'
+                        title: 'Категории работ выполненные в ' + year + ' году',
+                        connectSteps: false,
+                        vAxis: {title: 'Общее количество выполненных задач'},
+                        isStacked: false,
+                        colors:
+                            ['#4b7c98', '#da3333', '#f3610a', '#448a44',
+                            '#46638f', '#66448d', '#8f6644','#8c8842',
+                            '#458d74', '#ba0ae2', '#479647', '#0000FF',
+                            '#F0F000', '#F00000', '#000F00', '#00000F'],
+                        legend: {position: 'top'}
                     };
 
-                    let chart = new google.visualization.SteppedAreaChart(document.getElementById('chart_div'));
+                    /*var options = {
+                        legend: { position: 'top' },
+                        connectSteps: false,
+                        colors: ['#4374E0', '#53A8FB', '#F1CA3A', '#E49307'],
+                        isStacked: true,
+                    };*/
 
-                    chart.draw(data, options);
+                    let chart = new google.visualization.SteppedAreaChart(document.getElementById('category_chart'));
+                    chart.draw(dataTable, options);
                 }
             </script>
-            <div id="chart_div" style="width: 100%; height: 500px;"></div>
+            <div id="category_chart" style="width: 100%; height: 700px;"></div>
         </div>
     </div>
     <div class="row">
@@ -49,61 +104,39 @@
 
                 function drawVisualization() {
                     let year = [[${year}]];
-                    let chartTitle = [[${troubleTitle}]];
-                    let tableTitle = [];
-                    tableTitle[0] = 'Дата';
-                    for (let i = 0; i < chartTitle.length; i++) {
-                        tableTitle[i + 1] = chartTitle[i].name;
-                    }
-                    let chartList = [[${troubleChart}]];
-                    let dataArray = [];
-                    dataArray[0] = tableTitle;
-                    for (let i = 0; i < chartList.length; i++) {
-                        let arrayStroke = [];
-                        arrayStroke[0] = chartList[i].date;
-                        let tasks = chartList[i].taskOnTrouble;
-                        for (let j = 0; j < tasks.length; j++) {
-                            if (tasks[j] === 0) {
-                                arrayStroke[j + 1] = 0;
-                            } else {
-                                arrayStroke[j + 1] = tasks[j];
-                            }
-                        }
-                        dataArray[i + 1] = arrayStroke;
-                    }
-                    let data = google.visualization.arrayToDataTable(dataArray, false);
+                    let chartTitle = [[${troubleTitle}]]; console.log(chartTitle);
+                    let chartTable = [[${troubleChart}]]; console.log(chartTable);
 
-                    //var options = generateSeriesOptions(5,chartTitle.length);  // Генерирует опции для всех серий начиная с пятой
+                    let dataTable = new google.visualization.DataTable();
+                    dataTable.addColumn('string','дата')
+                    for(let i=0; i<chartTitle.length; i++){
+                        dataTable.addColumn('number',chartTitle[i].name);
+                        dataTable.addColumn({type: 'string', role: 'tooltip'});
+                    }
+                    for(let i=0; i<chartTable.length; i++){
+                        let row = [];
+                        row[0] = chartTable[i].date;
+                        let tasks = chartTable[i].taskOnTrouble;
+                        for(let j=0; j<tasks.length; j++){
+                            row[(j+1) + j] = tasks[j];
+                            row[(j+2) + j] = chartTitle[j].name + '\n' + chartTitle[j].description + '\n' + 'Всего: ' + tasks[j];
+                        }
+                        dataTable.addRows([row]);
+                    }
+
                     let options = {
                         title: 'Работы выполненные в ' + year + ' году',
                         curveType: 'function',
                         is3D: true,
+                        lineWidth: 3,
                         legend: {position: 'bottom'}
                     };
 
-                    let chart = new google.visualization.ComboChart(document.getElementById('all-task'));
-                    chart.draw(data, options);
-                }
-
-                function generateSeriesOptions(startIndex, count) {
-                    var options = {
-                        title: 'Детализация',
-                        vAxis: {title: 'Количество выполненных заявок'},
-                        hAxis: {title: 'Даты'},
-                        seriesType: 'bars',
-                        series: {}
-                    };
-
-                    console.log(startIndex + ' ' + count);
-                    for (var i = startIndex; i < count; i++) {
-                        console.log(i)
-                        options.series[i] = {type: 'line'};
-                    }
-
-                    return options;
+                    let chart = new google.visualization.ComboChart(document.getElementById('task-chart'));
+                    chart.draw(dataTable, options);
                 }
             </script>
-            <div id="all-task" style="width: 100%; height: 500px"></div>
+            <div id="task-chart" style="width: 100%; height: 700px"></div>
         </div>
     </div>
 </div>
