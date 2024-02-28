@@ -1,14 +1,24 @@
 package net.security.infosec.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.security.infosec.dto.ChartDTO;
+import net.security.infosec.dto.PasswordDTO;
 import net.security.infosec.models.Category;
+import net.security.infosec.models.Implementer;
 import net.security.infosec.models.Task;
 import net.security.infosec.models.Trouble;
+import net.security.infosec.services.ImplementerService;
 import net.security.infosec.services.TaskService;
 import net.security.infosec.services.TroubleTicketService;
+import net.security.infosec.validations.PasswordValidation;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,12 +27,16 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class HomeController {
 
     private final TroubleTicketService troubleTicketService;
     private final TaskService taskService;
+    private final ImplementerService implementerService;
+
+    private final PasswordValidation passwordValidation;
     @GetMapping("/")
     public Mono<Rendering> homePage(){
         Flux<ChartDTO> chartCategoryFlux = taskService.getYear().collectList().flatMapMany(tasks -> {
@@ -96,5 +110,37 @@ public class HomeController {
                         .modelAttribute("index","login-page")
                         .build()
         );
+    }
+
+    @GetMapping("/profile")
+    public Mono<Rendering> profilePage(@AuthenticationPrincipal Implementer implementer){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Profile page")
+                        .modelAttribute("index","profile-page")
+                        .modelAttribute("user", implementer)
+                        .modelAttribute("pass", new PasswordDTO())
+                        .build()
+        );
+    }
+
+    @PostMapping("/password/change")
+    public Mono<Rendering> changePassword(@AuthenticationPrincipal Implementer implementer, @ModelAttribute(name = "pass") @Valid PasswordDTO passwordDTO, Errors errors){
+        passwordValidation.checkOldPassword(passwordDTO,errors,implementer);
+        passwordValidation.validate(passwordDTO,errors);
+        if(errors.hasErrors()){
+            return Mono.just(
+                    Rendering.view("template")
+                            .modelAttribute("title","Profile page")
+                            .modelAttribute("index","profile-page")
+                            .modelAttribute("user", implementer)
+                            .modelAttribute("pass", passwordDTO)
+                            .build()
+            );
+        }
+        return implementerService.updateUserPassword(implementer.getId(), passwordDTO).flatMap(impl -> {
+            log.info("user password updated! " + impl.getPassword());
+            return Mono.just(Rendering.redirectTo("/profile").build());
+        });
     }
 }

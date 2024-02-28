@@ -2,6 +2,7 @@ package net.security.infosec.services;
 
 import lombok.RequiredArgsConstructor;
 import net.security.infosec.dto.ImplementerDataTransferObject;
+import net.security.infosec.dto.PasswordDTO;
 import net.security.infosec.models.Implementer;
 import net.security.infosec.models.Task;
 import net.security.infosec.repositories.ImplementerRepository;
@@ -55,5 +56,12 @@ public class ImplementerService implements ReactiveUserDetailsService {
 
     public Mono<Void> deleteImplementerById(int id) {
         return implementerRepository.findById(id).flatMap(implementerRepository::delete);
+    }
+
+    public Mono<Implementer> updateUserPassword(int userId, PasswordDTO passwordDTO) {
+        return implementerRepository.findById(userId).flatMap(implementer -> {
+            implementer.setPassword(encoder.encode(passwordDTO.getNewPassword()));
+            return implementerRepository.save(implementer);
+        });
     }
 }

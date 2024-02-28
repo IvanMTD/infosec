@@ -81,7 +81,7 @@
                     <span>Отсутствуют группы обратитесь к Администратору</span>
                 </div>
                 <div th:if="${statistics.size() != 0}">
-                    <div class="accordion-item" th:each="stat, s : ${statistics}">
+                    <div class="accordion-item" th:each="stat, s : ${statistics}" th:if="${stat.isShow}">
                         <h2 class="accordion-header">
                             <button class="accordion-button" th:id="'id-' + ${s.index}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse" aria-expanded="true" aria-controls="collapse">
                                 <span th:text="${stat.getTitle()}"></span>
@@ -94,7 +94,7 @@
                                         <span>Отсутствуют задачи в группе обратитесь к Администратору</span>
                                     </div>
                                     <div th:if="${stat.getTroubles.size() != 0}">
-                                        <div class="accordion-item" th:each="trouble, s2 : ${stat.getTroubles()}">
+                                        <div class="accordion-item" th:each="trouble, s2 : ${stat.getTroubles()}" th:if="${trouble.isShow}">
                                             <h2 class="accordion-header">
                                                 <button class="accordion-button" th:id="'id' + ${s.index} + ${s2.index}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse" aria-expanded="true" aria-controls="collapse">
                                                     <span th:text="${trouble.getTitle()} + ' - Заявок:  ' + ${trouble.getTasks().size()}"></span>

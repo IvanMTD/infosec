@@ -89,6 +89,7 @@ public class TaskController {
                             }
                         }
                     }
+                    categoryDTO.reconstruct();
                     return Mono.just(categoryDTO);
                 });
             });
@@ -152,6 +153,7 @@ public class TaskController {
                             }
                         }
                     }
+                    categoryDTO.reconstruct();
                     return Mono.just(categoryDTO);
                 });
             });
@@ -215,6 +217,7 @@ public class TaskController {
                             }
                         }
                     }
+                    categoryDTO.reconstruct();
                     return Mono.just(categoryDTO);
                 });
             });
@@ -278,6 +281,7 @@ public class TaskController {
                             }
                         }
                     }
+                    categoryDTO.reconstruct();
                     return Mono.just(categoryDTO);
                 });
             });

@@ -1,0 +1,99 @@
+<div class="fluid-container">
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-6">
+            <ul class="list-group py-5">
+                <li class="list-group-item active text-center" aria-current="true">
+                    <h4>Профиль пользователя</h4>
+                </li>
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-3" style="background: whitesmoke">
+                            <span>Почта (Логин)</span>
+                        </div>
+                        <div class="col-9">
+                            <span th:text="${user.getEmail()}"></span>
+                        </div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-3" style="background: whitesmoke">
+                            <span>Фамилия</span>
+                        </div>
+                        <div class="col-9">
+                            <span th:text="${user.getLastname()}"></span>
+                        </div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-3" style="background: whitesmoke">
+                            <span>Имя</span>
+                        </div>
+                        <div class="col-9">
+                            <span th:text="${user.getFirstname()}"></span>
+                        </div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-3" style="background: whitesmoke">
+                            <span>Отчество</span>
+                        </div>
+                        <div class="col-9">
+                            <span th:text="${user.getMiddleName()}"></span>
+                        </div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-3" style="background: whitesmoke">
+                            <span>Должность</span>
+                        </div>
+                        <div class="col-9">
+                            <span th:text="${user.getOfficePosition()}"></span>
+                        </div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-3" style="background: whitesmoke">
+                            <span>Текущая роль</span>
+                        </div>
+                        <div class="col-9">
+                            <span th:text="${user.getRole().getTitle()}"></span>
+                        </div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-3" style="background: whitesmoke">
+                            <span>Сменить пароль</span>
+                        </div>
+                        <div class="col-9">
+                            <form class="row g-3" th:method="POST" th:action="@{/password/change}" th:object="${pass}">
+                                <div class="col-3">
+                                    <input type="password" class="form-control" placeholder="Старый пароль" th:field="*{oldPassword}">
+                                    <span th:if="${#fields.hasErrors('oldPassword')}" th:errors="*{oldPassword}" style="color: red"></span>
+                                </div>
+                                <div class="col-3">
+                                    <input type="password" class="form-control" placeholder="Новый пароль" th:field="*{newPassword}">
+                                    <span th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}" style="color: red"></span>
+                                </div>
+                                <div class="col-3">
+                                    <input type="password" class="form-control" placeholder="Еще раз новый" th:field="*{newConfirm}">
+                                    <span th:if="${#fields.hasErrors('newConfirm')}" th:errors="*{newConfirm}" style="color: red"></span>
+                                </div>
+                                <div class="col-3">
+                                    <input type="submit" class="btn btn-primary mb-3" value="Сменить">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="col"></div>
+    </div>
+</div>
