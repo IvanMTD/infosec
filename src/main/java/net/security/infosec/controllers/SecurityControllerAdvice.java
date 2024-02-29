@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+
 @ControllerAdvice
 @RequiredArgsConstructor
 public class SecurityControllerAdvice {
@@ -88,5 +90,10 @@ public class SecurityControllerAdvice {
         }else{
             return Mono.just(false);
         }
+    }
+
+    @ModelAttribute(name = "current_year")
+    public Mono<Integer> year(){
+        return Mono.just(LocalDate.now().getYear());
     }
 }
