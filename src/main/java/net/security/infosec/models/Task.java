@@ -32,7 +32,11 @@ public class Task {
         setDescription(dto.getDescription());
         setTroubleId(dto.getTroubleId());
         setImplementerId(dto.getImplementerId());
-        setExecuteDate(LocalDate.now());
+        if(dto.getExecuteDate() != null){
+            setExecuteDate(dto.getExecuteDate());
+        }else{
+            setExecuteDate(LocalDate.now());
+        }
     }
 
     public void addTrouble(Trouble trouble){

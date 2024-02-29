@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @RequiredArgsConstructor
 public class TaskDataTransferObject {
@@ -13,4 +15,5 @@ public class TaskDataTransferObject {
     private String description;
     private int troubleId;
     private int implementerId;
+    private LocalDate executeDate = LocalDate.now();
 }

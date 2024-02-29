@@ -19,6 +19,7 @@ import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -900,7 +901,9 @@ public class TaskController {
                             .build()
             );
         }
+
         task.setImplementerId(implementer.getId());
+
         return taskService.saveTask(task).flatMap(t -> {
             log.info("task saved: " + t.toString());
             return implementerService.updateImplementerTask(implementer, t);
