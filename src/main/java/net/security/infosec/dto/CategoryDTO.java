@@ -1,17 +1,28 @@
 package net.security.infosec.dto;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import net.security.infosec.models.Category;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
+@NoArgsConstructor
 public class CategoryDTO {
     private int id;
     private String title;
     private String description;
     private boolean show = true;
     private List<TroubleDTO> troubles = new ArrayList<>();
+
+    public CategoryDTO(Category category){
+        setId(category.getId());
+        setTitle(category.getName());
+        setDescription(category.getDescription());
+    }
 
     public void addTrouble(TroubleDTO trouble){
         troubles.add(trouble);
@@ -29,5 +40,12 @@ public class CategoryDTO {
         if(count == 0){
             show = false;
         }
+    }
+
+    public void doSort(){
+        for(TroubleDTO troubleDTO : troubles){
+            troubleDTO.sortTasks();
+        }
+        troubles = troubles.stream().sorted(Comparator.comparing(TroubleDTO::getTitle)).collect(Collectors.toList());
     }
 }

@@ -3,6 +3,7 @@ package net.security.infosec.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.security.infosec.dto.CategoryDTO;
+import net.security.infosec.dto.TaskDTO;
 import net.security.infosec.dto.TicketDataTransferObject;
 import net.security.infosec.dto.TroubleTicketDataTransferObject;
 import net.security.infosec.models.Category;
@@ -16,7 +17,9 @@ import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Comparator;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -51,10 +54,14 @@ public class TroubleTicketService {
             dto.setCategoryName(category.getName());
             dto.setCategoryDescription(category.getDescription());
             return troubleRepository.findAllByIdIn(category.getTroubleIds()).collectList().flatMap(l -> {
+                l = l.stream().sorted(Comparator.comparing(Trouble::getName)).collect(Collectors.toList());
                 dto.setTroubles(l);
                 return Mono.just(dto);
             });
-        });
+        }).collectList().flatMapMany(l -> {
+            l = l.stream().sorted(Comparator.comparing(TroubleTicketDataTransferObject::getCategoryName)).collect(Collectors.toList());
+            return Flux.fromIterable(l);
+        }).flatMapSequential(Mono::just);
     }
 
     public Mono<Trouble> getTaskTrouble(Task task) {
@@ -99,5 +106,13 @@ public class TroubleTicketService {
             cat.addTrouble(trouble);
             return categoryRepository.save(cat);
         }));
+    }
+
+    public Mono<Trouble> getTroubleById(int troubleId) {
+        return troubleRepository.findById(troubleId);
+    }
+
+    public Mono<Category> getCategoryById(int categoryId) {
+        return categoryRepository.findById(categoryId);
     }
 }

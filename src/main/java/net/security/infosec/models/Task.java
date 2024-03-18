@@ -2,6 +2,7 @@ package net.security.infosec.models;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import net.security.infosec.dto.TaskDTO;
 import net.security.infosec.dto.TaskDataTransferObject;
 import org.springframework.data.annotation.Id;
 
@@ -51,5 +52,13 @@ public class Task {
         Locale russian = Locale.forLanguageTag("ru-RU");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         return executeDate.getDayOfWeek().getDisplayName(TextStyle.FULL, russian) + " " + formatter.format(executeDate);
+    }
+
+    public void update(TaskDTO taskDTO) {
+        setTitle(taskDTO.getTitle());
+        setDescription(taskDTO.getContent());
+        setExecuteDate(taskDTO.getPlacedAt());
+        setTroubleId(taskDTO.getTroubleId());
+        setImplementerId(taskDTO.getImplementerId());
     }
 }

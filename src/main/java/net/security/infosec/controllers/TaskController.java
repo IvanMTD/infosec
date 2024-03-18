@@ -19,7 +19,6 @@ import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -80,6 +79,7 @@ public class TaskController {
                         for(Task task : tasks){
                             if(task.getTroubleId() == troubleDTO.getId()){
                                 TaskDTO taskDTO = new TaskDTO();
+                                    taskDTO.setId(task.getId());
                                 taskDTO.setTitle(task.getTitle());
                                 taskDTO.setContent(task.getDescription());
                                 taskDTO.setUsername(implementer.getFullName());
@@ -89,10 +89,14 @@ public class TaskController {
                         }
                     }
                     categoryDTO.reconstruct();
+                    categoryDTO.doSort();
                     return Mono.just(categoryDTO);
                 });
             });
-        });
+        }).collectList().flatMapMany(l -> {
+            l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
+            return Flux.fromIterable(l);
+        }).flatMapSequential(Mono::just);
 
         return Mono.just(
                 Rendering.view("template")
@@ -145,6 +149,7 @@ public class TaskController {
                         for(Task task : tasks){
                             if(task.getTroubleId() == troubleDTO.getId()){
                                 TaskDTO taskDTO = new TaskDTO();
+                                    taskDTO.setId(task.getId());
                                 taskDTO.setTitle(task.getTitle());
                                 taskDTO.setContent(task.getDescription());
                                 taskDTO.setUsername(implementer.getFullName());
@@ -154,10 +159,14 @@ public class TaskController {
                         }
                     }
                     categoryDTO.reconstruct();
+                    categoryDTO.doSort();
                     return Mono.just(categoryDTO);
                 });
             });
-        });
+        }).collectList().flatMapMany(l -> {
+            l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
+            return Flux.fromIterable(l);
+        }).flatMapSequential(Mono::just);
 
         return Mono.just(
                 Rendering.view("template")
@@ -210,6 +219,7 @@ public class TaskController {
                         for(Task task : tasks){
                             if(task.getTroubleId() == troubleDTO.getId()){
                                 TaskDTO taskDTO = new TaskDTO();
+                                    taskDTO.setId(task.getId());
                                 taskDTO.setTitle(task.getTitle());
                                 taskDTO.setContent(task.getDescription());
                                 taskDTO.setUsername(implementer.getFullName());
@@ -219,10 +229,14 @@ public class TaskController {
                         }
                     }
                     categoryDTO.reconstruct();
+                    categoryDTO.doSort();
                     return Mono.just(categoryDTO);
                 });
             });
-        });
+        }).collectList().flatMapMany(l -> {
+            l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
+            return Flux.fromIterable(l);
+        }).flatMapSequential(Mono::just);
 
         return Mono.just(
                 Rendering.view("template")
@@ -275,6 +289,7 @@ public class TaskController {
                         for (Task task : tasks) {
                             if (task.getTroubleId() == troubleDTO.getId()) {
                                 TaskDTO taskDTO = new TaskDTO();
+                                    taskDTO.setId(task.getId());
                                 taskDTO.setTitle(task.getTitle());
                                 taskDTO.setContent(task.getDescription());
                                 taskDTO.setUsername(implementer.getFullName());
@@ -284,10 +299,14 @@ public class TaskController {
                         }
                     }
                     categoryDTO.reconstruct();
+                    categoryDTO.doSort();
                     return Mono.just(categoryDTO);
                 });
             });
-        });
+        }).collectList().flatMapMany(l -> {
+            l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
+            return Flux.fromIterable(l);
+        }).flatMapSequential(Mono::just);
 
         return Mono.just(
                 Rendering.view("template")
@@ -341,6 +360,7 @@ public class TaskController {
                             for (Task task : tasks) {
                                 if (task.getTroubleId() == troubleDTO.getId()) {
                                     TaskDTO taskDTO = new TaskDTO();
+                                    taskDTO.setId(task.getId());
                                     taskDTO.setTitle(task.getTitle());
                                     taskDTO.setContent(task.getDescription());
                                     taskDTO.setPlacedAt(task.getExecuteDate());
@@ -354,10 +374,14 @@ public class TaskController {
                             }
                         }
                         categoryDTO.reconstruct();
+                        categoryDTO.doSort();
                         return Mono.just(categoryDTO);
                     });
                 }));
-            });
+            }).collectList().flatMapMany(l -> {
+                l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
+                return Flux.fromIterable(l);
+            }).flatMapSequential(Mono::just);
 
             return Mono.just(
                     Rendering.view("template")
@@ -408,6 +432,7 @@ public class TaskController {
                             for(Task task : tasks){
                                 if(task.getTroubleId() == troubleDTO.getId()){
                                     TaskDTO taskDTO = new TaskDTO();
+                                    taskDTO.setId(task.getId());
                                     taskDTO.setTitle(task.getTitle());
                                     taskDTO.setContent(task.getDescription());
                                     taskDTO.setUsername(implementer.getFullName());
@@ -417,10 +442,14 @@ public class TaskController {
                             }
                         }
                         categoryDTO.reconstruct();
+                        categoryDTO.doSort();
                         return Mono.just(categoryDTO);
                     }));
                 });
-            });
+            }).collectList().flatMapMany(l -> {
+                l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
+                return Flux.fromIterable(l);
+            }).flatMapSequential(Mono::just);
 
             return Mono.just(
                     Rendering.view("template")
@@ -477,6 +506,7 @@ public class TaskController {
                             for (Task task : tasks) {
                                 if (task.getTroubleId() == troubleDTO.getId()) {
                                     TaskDTO taskDTO = new TaskDTO();
+                                    taskDTO.setId(task.getId());
                                     taskDTO.setTitle(task.getTitle());
                                     taskDTO.setContent(task.getDescription());
                                     taskDTO.setPlacedAt(task.getExecuteDate());
@@ -490,10 +520,14 @@ public class TaskController {
                             }
                         }
                         categoryDTO.reconstruct();
+                        categoryDTO.doSort();
                         return Mono.just(categoryDTO);
                     });
                 }));
-            });
+            }).collectList().flatMapMany(l -> {
+                l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
+                return Flux.fromIterable(l);
+            }).flatMapSequential(Mono::just);
 
             return Mono.just(
                     Rendering.view("template")
@@ -544,6 +578,7 @@ public class TaskController {
                             for(Task task : tasks){
                                 if(task.getTroubleId() == troubleDTO.getId()){
                                     TaskDTO taskDTO = new TaskDTO();
+                                    taskDTO.setId(task.getId());
                                     taskDTO.setTitle(task.getTitle());
                                     taskDTO.setContent(task.getDescription());
                                     taskDTO.setUsername(implementer.getFullName());
@@ -553,10 +588,14 @@ public class TaskController {
                             }
                         }
                         categoryDTO.reconstruct();
+                        categoryDTO.doSort();
                         return Mono.just(categoryDTO);
                     }));
                 });
-            });
+            }).collectList().flatMapMany(l -> {
+                l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
+                return Flux.fromIterable(l);
+            }).flatMapSequential(Mono::just);
 
             return Mono.just(
                     Rendering.view("template")
@@ -613,6 +652,7 @@ public class TaskController {
                             for (Task task : tasks) {
                                 if (task.getTroubleId() == troubleDTO.getId()) {
                                     TaskDTO taskDTO = new TaskDTO();
+                                    taskDTO.setId(task.getId());
                                     taskDTO.setTitle(task.getTitle());
                                     taskDTO.setContent(task.getDescription());
                                     taskDTO.setPlacedAt(task.getExecuteDate());
@@ -626,10 +666,14 @@ public class TaskController {
                             }
                         }
                         categoryDTO.reconstruct();
+                        categoryDTO.doSort();
                         return Mono.just(categoryDTO);
                     });
                 }));
-            });
+            }).collectList().flatMapMany(l -> {
+                l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
+                return Flux.fromIterable(l);
+            }).flatMapSequential(Mono::just);
 
             return Mono.just(
                     Rendering.view("template")
@@ -680,6 +724,7 @@ public class TaskController {
                             for(Task task : tasks){
                                 if(task.getTroubleId() == troubleDTO.getId()){
                                     TaskDTO taskDTO = new TaskDTO();
+                                    taskDTO.setId(task.getId());
                                     taskDTO.setTitle(task.getTitle());
                                     taskDTO.setContent(task.getDescription());
                                     taskDTO.setUsername(implementer.getFullName());
@@ -689,10 +734,14 @@ public class TaskController {
                             }
                         }
                         categoryDTO.reconstruct();
+                        categoryDTO.doSort();
                         return Mono.just(categoryDTO);
                     }));
                 });
-            });
+            }).collectList().flatMapMany(l -> {
+                l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
+                return Flux.fromIterable(l);
+            }).flatMapSequential(Mono::just);
 
             return Mono.just(
                     Rendering.view("template")
@@ -765,6 +814,7 @@ public class TaskController {
                             for (Task task : tasks) {
                                 if (task.getTroubleId() == troubleDTO.getId()) {
                                     TaskDTO taskDTO = new TaskDTO();
+                                    taskDTO.setId(task.getId());
                                     taskDTO.setTitle(task.getTitle());
                                     taskDTO.setContent(task.getDescription());
                                     taskDTO.setPlacedAt(task.getExecuteDate());
@@ -778,10 +828,14 @@ public class TaskController {
                             }
                         }
                         categoryDTO.reconstruct();
+                        categoryDTO.doSort();
                         return Mono.just(categoryDTO);
                     });
                 }));
-            });
+            }).collectList().flatMapMany(l -> {
+                l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
+                return Flux.fromIterable(l);
+            }).flatMapSequential(Mono::just);
 
             return Mono.just(
                     Rendering.view("template")
@@ -848,6 +902,7 @@ public class TaskController {
                             for(Task task : tasks){
                                 if(task.getTroubleId() == troubleDTO.getId()){
                                     TaskDTO taskDTO = new TaskDTO();
+                                    taskDTO.setId(task.getId());
                                     taskDTO.setTitle(task.getTitle());
                                     taskDTO.setContent(task.getDescription());
                                     taskDTO.setUsername(implementer.getFullName());
@@ -857,10 +912,14 @@ public class TaskController {
                             }
                         }
                         categoryDTO.reconstruct();
+                        categoryDTO.doSort();
                         return Mono.just(categoryDTO);
                     }));
                 });
-            });
+            }).collectList().flatMapMany(l -> {
+                l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
+                return Flux.fromIterable(l);
+            }).flatMapSequential(Mono::just);
 
             return Mono.just(
                     Rendering.view("template")
@@ -913,4 +972,52 @@ public class TaskController {
         });
     }
 
+    @GetMapping("/{tid}/edit")
+    @PreAuthorize("hasAnyRole('MANAGER','ADMIN')")
+    public Mono<Rendering> taskEditPage(@PathVariable int tid){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Task edit page")
+                        .modelAttribute("index","task-edit-page")
+                        .modelAttribute("task",
+                                taskService.getTaskDTO(tid).flatMap(taskDTO -> troubleTicketService.getTroubleById(taskDTO.getTroubleId()).flatMap(trouble -> {
+                                    TroubleDTO troubleDTO = new TroubleDTO(trouble);
+                                    taskDTO.setTroubleId(trouble.getId());
+                                    taskDTO.setTrouble(troubleDTO);
+                                    return troubleTicketService.getCategoryById(trouble.getCategoryId()).flatMap(category -> {
+                                        CategoryDTO categoryDTO = new CategoryDTO(category);
+                                        taskDTO.setCategoryId(category.getId());
+                                        taskDTO.setCategory(categoryDTO);
+                                        return Mono.just(taskDTO);
+                                    });
+                                }))
+                        )
+                        .modelAttribute("implementers", implementerService.getAll())
+                        .modelAttribute("categories", troubleTicketService.getAllCategories())
+                        .modelAttribute("troubles", troubleTicketService.getAllTrouble())
+                        .build()
+        );
+    }
+
+    @PostMapping("/edit")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    public Mono<Rendering> taskUpdate(@ModelAttribute(name = "task") @Valid TaskDTO taskDTO, Errors errors){
+        if(errors.hasErrors()){
+            return Mono.just(
+                    Rendering.view("template")
+                            .modelAttribute("title","Task edit page")
+                            .modelAttribute("index","task-edit-page")
+                            .modelAttribute("task", taskDTO)
+                            .modelAttribute("implementers", implementerService.getAll())
+                            .modelAttribute("categories", troubleTicketService.getAllCategories())
+                            .modelAttribute("troubles", troubleTicketService.getAllTrouble())
+                            .build()
+            );
+        }
+
+        return taskService.getTaskById(taskDTO.getId()).flatMap(originalTask -> taskService.updateTask(taskDTO).flatMap(task -> implementerService.removeTaskFromImplementer(originalTask).flatMap(implementer -> implementerService.addTaskInImplementer(task).flatMap(impl -> {
+            log.info("SAVED!");
+            return Mono.just(Rendering.redirectTo("/").build());
+        }))));
+    }
 }

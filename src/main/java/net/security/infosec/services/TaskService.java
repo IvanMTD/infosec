@@ -2,12 +2,14 @@ package net.security.infosec.services;
 
 import lombok.RequiredArgsConstructor;
 import net.security.infosec.dto.DateDTO;
+import net.security.infosec.dto.TaskDTO;
 import net.security.infosec.dto.TaskDataTransferObject;
 import net.security.infosec.models.Implementer;
 import net.security.infosec.models.Task;
 import net.security.infosec.repositories.TaskRepository;
 import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -152,5 +154,19 @@ public class TaskService {
 
     public Flux<Task> getTasksByLocalDate(LocalDate localDate) {
         return taskRepository.findTasksByExecuteDate(localDate);
+    }
+
+    public Mono<TaskDTO> getTaskDTO(int tid) {
+        return taskRepository.findById(tid).flatMap(task -> {
+            TaskDTO taskDTO = new TaskDTO(task);
+            return Mono.just(taskDTO);
+        });
+    }
+
+    public Mono<Task> updateTask(TaskDTO taskDTO) {
+        return taskRepository.findById(taskDTO.getId()).flatMap(task -> {
+            task.update(taskDTO);
+            return taskRepository.save(task);
+        });
     }
 }

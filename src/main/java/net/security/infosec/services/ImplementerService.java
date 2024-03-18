@@ -64,4 +64,18 @@ public class ImplementerService implements ReactiveUserDetailsService {
             return implementerRepository.save(implementer);
         });
     }
+
+    public Mono<Implementer> removeTaskFromImplementer(Task originalTask) {
+        return implementerRepository.findById(originalTask.getImplementerId()).flatMap(implementer -> {
+            implementer.getTaskIds().remove(originalTask.getId());
+            return implementerRepository.save(implementer);
+        });
+    }
+
+    public Mono<Implementer> addTaskInImplementer(Task task) {
+        return implementerRepository.findById(task.getImplementerId()).flatMap(implementer -> {
+            implementer.addTask(task);
+            return implementerRepository.save(implementer);
+        });
+    }
 }

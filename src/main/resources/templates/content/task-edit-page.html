@@ -1,0 +1,102 @@
+<div class="container py-5">
+    <div class="row">
+        <div class="col">
+            <h2 class="text-center">
+                <small class="text-body-secondary">
+                    Редактор задач
+                </small>
+            </h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col"></div>
+        <form th:method="POST" th:action="@{/task/edit}" class="col-6" th:object="${task}">
+            <input type="number" th:field="*{id}" hidden>
+            <ul class="list-group py-5">
+                <li class="list-group-item active text-center" aria-current="true"><span class="fs-5">Редактор</span></li>
+                <li class="list-group-item">
+                    <div class="input-group">
+                        <span class="input-group-text">Автор задачи</span>
+                        <select id="implementer" class="form-select" th:field="*{implementerId}">
+                            <option th:each="implementer : ${implementers}" th:value="${implementer.getId()}" th:text="${implementer.getFullName()}"></option>
+                        </select>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="input-group">
+                        <span class="input-group-text">Категории</span>
+                        <select id="category" class="form-select" th:field="*{categoryId}" onchange="setupTrouble2()">
+                            <option th:each="category : ${categories}" th:value="${category.getId()}" th:text="${category.getName()}"></option>
+                        </select>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="input-group">
+                        <span class="input-group-text">Задачи</span>
+                        <select id="trouble" class="form-select" th:field="*{troubleId}">
+
+                        </select>
+                        <script th:inline="javascript">
+                            let categoryId = document.getElementById("category").value;
+                            let tickets = [[${troubles}]];
+                            $('#trouble').empty();
+                            for(let i=0; i<tickets.length; i++){
+                                if(tickets[i].categoryId == categoryId){
+                                    $('#trouble').append(
+                                        '<option value="' + tickets[i].id + '">' + tickets[i].name + '</option>'
+                                    )
+                                }
+                            }
+                            document.getElementById('trouble').value = [[${task}]].troubleId;
+                        </script>
+                    </div>
+                </li>
+                <script th:inline="javascript">
+                    function setupTrouble2(){
+                        let categoryId = document.getElementById("category").value;
+                        let tickets = [[${troubles}]];
+                        $('#trouble').empty();
+                        for(let i=0; i<tickets.length; i++){
+                            if(tickets[i].categoryId == categoryId){
+                                $('#trouble').append(
+                                    '<option value="' + tickets[i].id + '">' + tickets[i].name + '</option>'
+                                )
+                            }
+                        }
+                    }
+                </script>
+                <li class="list-group-item">
+                    <div class="input-group">
+                        <span class="input-group-text">ФИО или Описание задачи</span>
+                        <input type="text" class="form-control" th:field="*{title}">
+                        <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}" style="color: red"></span>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="input-group">
+                        <span class="input-group-text">Описание</span>
+                        <textarea class="form-control" rows="5" th:field="*{content}"></textarea>
+                        <span th:if="${#fields.hasErrors('content')}" th:errors="*{content}" style="color: red"></span>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col">
+                            <div class="input-group">
+                                <span class="input-group-text">Дата выполнения</span>
+                                <input type="date" class="form-control" rows="5" th:field="*{placedAt}">
+                                <span th:if="${#fields.hasErrors('placedAt')}" th:errors="*{placedAt}" style="color: red"></span>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="d-grid">
+                                <button class="btn btn-primary" type="submit">Сохранить</button>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </form>
+        <div class="col"></div>
+    </div>
+</div>

@@ -141,6 +141,7 @@
                                                                 <h5 class="card-title" th:text="'Пользователь или Описание: ' + ${task.getTitle()}"></h5>
                                                                 <p class="card-text" th:text="${task.getContent()}"></p>
                                                                 <p class="card-text" th:text="${task.getDate()}"></p>
+                                                                <a th:href="@{/task/{tid}/edit(tid=${task.getId()})}" class="btn btn-primary" th:if="${manager} or ${admin}">Редактировать</a>
                                                             </div>
                                                         </div>
                                                     </div>
