@@ -37,8 +37,8 @@ public class ImplementerService implements ReactiveUserDetailsService {
         return implementerRepository.findById(id);
     }
 
-    public Mono<Implementer> updateImplementer(ImplementerDataTransferObject implementerDTO, int id) {
-        return implementerRepository.findById(id).flatMap(implementer -> implementerRepository.save(implementer.update(implementerDTO)));
+    public Mono<Implementer> updateImplementer(ImplementerDataTransferObject implementerDTO) {
+        return implementerRepository.findById(implementerDTO.getId()).flatMap(implementer -> implementerRepository.save(implementer.update(implementerDTO)));
     }
 
     public Mono<ImplementerDataTransferObject> getUserDtoById(int id) {

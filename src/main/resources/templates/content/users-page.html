@@ -6,11 +6,18 @@
                 <li class="list-group-item active text-center" aria-current="true"><h3>Пользователи системы</h3></li>
                 <li class="list-group-item" th:each="user : ${users}">
                     <div class="row">
-                        <div class="col">
+                        <div class="col-3">
                             <p th:text="${user.getFullName()}"></p>
                         </div>
-                        <div class="col">
+                        <div class="col-5">
                             <p th:text="${user.getOfficePosition()}"></p>
+                        </div>
+                        <div class="col-3">
+                            <div class="btn-group" role="group">
+                                <a class="btn btn-outline-primary disabled">Просмотр</a>
+                                <a class="btn btn-outline-primary" th:href="@{/admin/user/edit(id=${user.id})}">Редактор</a>
+                                <a class="btn btn-outline-primary disabled">Удалить</a>
+                            </div>
                         </div>
                     </div>
                 </li>

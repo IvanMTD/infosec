@@ -37,10 +37,15 @@ public class ImplementerDataTransferObject {
 
     public ImplementerDataTransferObject(Implementer implementer) {
         setId(implementer.getId());
+        setEmail(implementer.getEmail());
         setFirstname(implementer.getFirstname());
         setMiddleName(implementer.getMiddleName());
         setLastname(implementer.getLastname());
         setOfficePosition(implementer.getOfficePosition());
         setRole(implementer.getRole());
+    }
+
+    public String getFullName(){
+        return lastname + " " + firstname + " " + middleName;
     }
 }

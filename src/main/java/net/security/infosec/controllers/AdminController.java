@@ -91,7 +91,7 @@ public class AdminController {
 
     @GetMapping("/user/edit")
     @PreAuthorize("hasRole('ADMIN')")
-    public Mono<Rendering> userEdit(@RequestParam(name = "select") int id){
+    public Mono<Rendering> userEdit(@RequestParam(name = "id") int id){
         return Mono.just(
                 Rendering.view("template")
                         .modelAttribute("title","User edit page")
@@ -102,9 +102,9 @@ public class AdminController {
         );
     }
 
-    @PostMapping("/user/update/{id}")
+    @PostMapping("/user/update")
     @PreAuthorize("hasRole('ADMIN')")
-    public Mono<Rendering> userUpdate(@ModelAttribute(name = "implementer") @Valid ImplementerDataTransferObject implementerDTO, Errors errors, @PathVariable(name = "id") int id){
+    public Mono<Rendering> userUpdate(@ModelAttribute(name = "implementer") @Valid ImplementerDataTransferObject implementerDTO, Errors errors){
         if(errors.hasFieldErrors("firstname") || errors.hasFieldErrors("middleName") || errors.hasFieldErrors("lastname") || errors.hasFieldErrors("officePosition")){
             return Mono.just(
                     Rendering.view("template")
@@ -115,7 +115,7 @@ public class AdminController {
                             .build()
             );
         }
-        return implementerService.updateImplementer(implementerDTO,id).flatMap(implementer -> {
+        return implementerService.updateImplementer(implementerDTO).flatMap(implementer -> {
             log.info("implementer updated: " + implementer.toString());
             return Mono.just(Rendering.redirectTo("/admin/users").build());
         });

@@ -1,34 +1,59 @@
-<div>
-    <form th:method="POST" th:action="@{/admin/user/update/{id}(id=${implementer.getId()})}" th:object="${implementer}">
-        <ul>
-            <li>
-                <label for="firstname">имя: </label>
-                <input type="text" id="firstname" th:field="*{firstname}">
-                <span th:if="${#fields.hasErrors('firstname')}" th:errors="*{firstname}" style="color: red"></span>
-            </li>
-            <li>
-                <label for="middlename">отчество: </label>
-                <input type="text" id="middlename" th:field="*{middleName}">
-                <span th:if="${#fields.hasErrors('middleName')}" th:errors="*{middleName}" style="color: red"></span>
-            </li>
-            <li>
-                <label for="lastname">фамилия: </label>
-                <input type="text" id="lastname" th:field="*{lastname}">
-                <span th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}" style="color: red"></span>
-            </li>
-            <li>
-                <label for="position">должность: </label>
-                <input type="text" id="position" th:field="*{officePosition}">
-                <span th:if="${#fields.hasErrors('officePosition')}" th:errors="*{officePosition}" style="color: red"></span>
-            </li>
-            <li>
-                <select th:field="*{roleId}">
-                    <option th:each="r : ${roles}" th:text="${r.getName()}" th:value="${r.getId()}"></option>
-                </select>
-            </li>
-            <li>
-                <input type="submit" value="обновить">
-            </li>
-        </ul>
-    </form>
+<div class="container">
+    <div class="row py-5">
+        <div class="col"></div>
+        <div class="col-6">
+            <form th:method="POST" th:action="@{/admin/user/update}" th:object="${implementer}">
+                <input type="number" th:field="*{id}" hidden>
+                <ul class="list-group">
+                    <li class="list-group-item active text-center" aria-current="true">
+                        <h3>Обновить данные пользователя <br> <span th:text="${implementer.fullName}"></span></h3>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="e-mail">Электронная почта</span>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="e-mail" th:field="*{email}">
+                        </div>
+                        <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color: red"></span>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="name">Имя</span>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="name" th:field="*{firstname}">
+                        </div>
+                        <span th:if="${#fields.hasErrors('firstname')}" th:errors="*{firstname}" style="color: red"></span>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="middl">Отчество</span>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="middl" th:field="*{middleName}">
+                        </div>
+                        <span th:if="${#fields.hasErrors('middleName')}" th:errors="*{middleName}" style="color: red"></span>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="last">Фамилия</span>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="last" th:field="*{lastname}">
+                        </div>
+                        <span th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}" style="color: red"></span>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="office">Должность</span>
+                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="office" th:field="*{officePosition}">
+                        </div>
+                        <span th:if="${#fields.hasErrors('officePosition')}" th:errors="*{officePosition}" style="color: red"></span>
+                    </li>
+                    <li class="list-group-item">
+                        <select class="form-select" th:field="*{role}">
+                            <option th:each="r : ${roles}" th:text="${r.getTitle()}" th:value="${r}"></option>
+                        </select>
+                    </li>
+                    <li class="list-group-item">
+                        <input class="btn btn-primary" type="submit" value="Обновить">
+                    </li>
+                </ul>
+            </form>
+        </div>
+        <div class="col"></div>
+    </div>
 </div>
