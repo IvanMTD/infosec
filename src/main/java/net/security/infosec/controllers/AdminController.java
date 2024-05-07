@@ -8,8 +8,10 @@ import net.security.infosec.dto.ImplementerDataTransferObject;
 import net.security.infosec.dto.TicketDataTransferObject;
 import net.security.infosec.dto.TroubleDTO;
 import net.security.infosec.models.Role;
+import net.security.infosec.models.Service;
 import net.security.infosec.models.Trouble;
 import net.security.infosec.services.ImplementerService;
+import net.security.infosec.services.ServiceForService;
 import net.security.infosec.services.TroubleTicketService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -29,6 +31,7 @@ import java.util.List;
 public class AdminController {
     private final ImplementerService implementerService;
     private final TroubleTicketService troubleTicketService;
+    private final ServiceForService serviceForService;
 
     @GetMapping()
     @PreAuthorize("hasRole('ADMIN')")
@@ -159,6 +162,39 @@ public class AdminController {
                         .modelAttribute("categories2", troubleTicketService.getAllCategories())
                         .build()
         );
+    }
+
+    @GetMapping("/services")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Rendering> serviceSettings(){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Service settings")
+                        .modelAttribute("index","service-settings-page")
+                        .modelAttribute("service", new Service())
+                        .modelAttribute("serviceList", serviceForService.getAll())
+                        .build()
+        );
+    }
+
+    @PostMapping("/services")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Rendering> addService(@ModelAttribute(name = "service") @Valid Service service, Errors errors){
+        if(errors.hasErrors()){
+            return Mono.just(
+                    Rendering.view("template")
+                            .modelAttribute("title","Service settings")
+                            .modelAttribute("index","service-settings-page")
+                            .modelAttribute("service", service)
+                            .modelAttribute("serviceList", serviceForService.getAll())
+                            .build()
+            );
+        }else{
+            return serviceForService.create(service).flatMap(saved -> {
+                log.info("service saved [{}]", saved);
+                return Mono.just(Rendering.redirectTo("/admin/services").build());
+            });
+        }
     }
 
     @GetMapping("/categories")
