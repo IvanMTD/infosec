@@ -1,0 +1,32 @@
+<form class="container" th:method="POST" th:action="@{/guide/department/add}" th:object="${department}">
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-6">
+            <div class="row pt-4">
+                <p class="text-center fs-3 text-dark">Добавить структуру</p>
+            </div>
+            <div class="row pt-4 border-start border-4 border-dark">
+                <div class="col">
+                    <div class="form-floating" th:if="${#fields.hasErrors('title')} != true">
+                        <input type="text" class="form-control" id="title" placeholder="title" th:field="*{title}">
+                        <label for="title">Название</label>
+                    </div>
+                    <div class="form-floating" th:if="${#fields.hasErrors('title')}">
+                        <input type="text" class="form-control is-invalid" id="title-error" placeholder="title-error" th:field="*{title}">
+                        <label for="title-error">Название</label>
+                        <small class="text-center text-danger" th:errors="*{title}"></small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row pt-4 border-start border-4 border-dark">
+                <div class="col">
+                    <div class="d-grid gap-2 col-6 mx-auto">
+                        <button class="btn btn-dark" type="submit">Добавить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col"></div>
+    </div>
+</form>

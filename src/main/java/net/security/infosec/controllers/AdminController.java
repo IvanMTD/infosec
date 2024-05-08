@@ -7,12 +7,10 @@ import net.security.infosec.dto.CategoryDTO;
 import net.security.infosec.dto.ImplementerDataTransferObject;
 import net.security.infosec.dto.TicketDataTransferObject;
 import net.security.infosec.dto.TroubleDTO;
+import net.security.infosec.models.Department;
 import net.security.infosec.models.Role;
-import net.security.infosec.models.Service;
 import net.security.infosec.models.Trouble;
-import net.security.infosec.services.ImplementerService;
-import net.security.infosec.services.ServiceForService;
-import net.security.infosec.services.TroubleTicketService;
+import net.security.infosec.services.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -31,7 +29,9 @@ import java.util.List;
 public class AdminController {
     private final ImplementerService implementerService;
     private final TroubleTicketService troubleTicketService;
-    private final ServiceForService serviceForService;
+    private final DepartmentService departmentService;
+    private final DivisionService divisionService;
+    private final EmployeeService employeeService;
 
     @GetMapping()
     @PreAuthorize("hasRole('ADMIN')")
@@ -164,37 +164,28 @@ public class AdminController {
         );
     }
 
-    @GetMapping("/services")
+    @GetMapping("/departments")
     @PreAuthorize("hasRole('ADMIN')")
-    public Mono<Rendering> serviceSettings(){
+    public Mono<Rendering> departmentSettings(){
         return Mono.just(
                 Rendering.view("template")
-                        .modelAttribute("title","Service settings")
-                        .modelAttribute("index","service-settings-page")
-                        .modelAttribute("service", new Service())
-                        .modelAttribute("serviceList", serviceForService.getAll())
+                        .modelAttribute("title","Structures")
+                        .modelAttribute("index","structures-page")
+                        .modelAttribute("departmentList", departmentService.getAll())
                         .build()
         );
     }
 
-    @PostMapping("/services")
+    @GetMapping("/employees")
     @PreAuthorize("hasRole('ADMIN')")
-    public Mono<Rendering> addService(@ModelAttribute(name = "service") @Valid Service service, Errors errors){
-        if(errors.hasErrors()){
-            return Mono.just(
-                    Rendering.view("template")
-                            .modelAttribute("title","Service settings")
-                            .modelAttribute("index","service-settings-page")
-                            .modelAttribute("service", service)
-                            .modelAttribute("serviceList", serviceForService.getAll())
-                            .build()
-            );
-        }else{
-            return serviceForService.create(service).flatMap(saved -> {
-                log.info("service saved [{}]", saved);
-                return Mono.just(Rendering.redirectTo("/admin/services").build());
-            });
-        }
+    public Mono<Rendering> employeeSettings(){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Employees")
+                        .modelAttribute("index", "employees-page")
+                        .modelAttribute("employeeList", employeeService.getAll())
+                        .build()
+        );
     }
 
     @GetMapping("/categories")

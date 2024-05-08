@@ -3,13 +3,14 @@
         <div class="col">
             <ul class="list-group">
                 <li class="list-group-item active text-center" aria-current="true"><span class="fs-4">Управления</span></li>
-                <li class="list-group-item" th:each="s, stat : ${serviceList}">
+                <li class="list-group-item" th:each="d, stat : ${departmentList}">
                     <div class="row">
                         <div class="col">
-                            <p th:text="${s.title}"></p>
+                            <b><p th:text="${d.title}"></p></b>
                         </div>
                         <div class="col-3">
                             <div class="btn-group float-end" role="group" aria-label="Basic example">
+                                <button type="button" class="btn btn-outline-primary"><i class="bi bi-postcard"></i></button>
                                 <button type="button" class="btn btn-outline-primary"><i class="bi bi-pencil"></i></button>
                                 <button type="button" class="btn btn-outline-primary"><i class="bi bi-trash"></i></button>
                             </div>
@@ -19,17 +20,11 @@
             </ul>
         </div>
     </div>
-    <form class="row mt-4" th:method="POST" th:action="@{/admin/services}" th:object="${service}">
-        <div class="col-9">
-            <div class="input-group">
-                <span class="input-group-text">Название управления</span>
-                <input type="text" class="form-control" placeholder="Название" th:field="*{title}">
+    <div class="row pt-4">
+        <div class="col">
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <a class="btn btn-primary" th:href="@{/guide/department/add/form}">Добавить структуру</a>
             </div>
         </div>
-        <div class="col-3">
-            <div class="d-grid gap-2">
-                <button class="btn btn-primary" type="submit">Добавить</button>
-            </div>
-        </div>
-    </form>
+    </div>
 </div>
