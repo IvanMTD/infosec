@@ -2,9 +2,12 @@ package net.security.infosec.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.security.infosec.dto.DepartmentDTO;
 import net.security.infosec.models.Department;
+import net.security.infosec.models.Division;
 import net.security.infosec.repositories.DepartmentRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -26,5 +29,20 @@ public class DepartmentService {
 
     public Mono<Department> create(Department department) {
         return departmentRepository.save(department);
+    }
+
+    public Mono<Long> count() {
+        return departmentRepository.count();
+    }
+
+    public Mono<Department> addDivision(Division saved) {
+        return departmentRepository.findById(saved.getDepartmentId()).flatMap(department -> {
+            department.getDivisionIds().add(saved.getId());
+            return departmentRepository.save(department);
+        });
+    }
+
+    public Mono<Department> getBy(long id) {
+        return departmentRepository.findById(id);
     }
 }

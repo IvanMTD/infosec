@@ -21,8 +21,8 @@ public class Division {
     @Id
     private long id;
     private long departmentId;
-    private long divisionHead;
     @NotBlank(message = "Не может быть пустым")
     private String title;
+    @NotBlank(message = "Не может быть пустым")
     private String description;
 }

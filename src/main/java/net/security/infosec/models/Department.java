@@ -23,9 +23,9 @@ create table if not exists department(
 public class Department {
     @Id
     private long id;
-    private long departmentHead;
     private Set<Long> divisionIds = new HashSet<>();
     @NotBlank(message = "Не может быть пустым")
     private String title;
+    @NotBlank(message = "Не может быть пустым")
     private String description;
 }

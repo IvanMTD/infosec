@@ -103,8 +103,8 @@
                 title : 'Детализация',
                 vAxis: {title: 'Количество выполненных заявок'},
                 hAxis: {title: 'Даты'},
-                seriesType: 'bars',
-                /*series: {5: {type: 'line'}}*/
+                seriesType: 'bars'
+               /* series: {5: {type: 'line'}, 6: {type:'line'}},*/
             };
 
             let chart = new google.visualization.ComboChart(document.getElementById('chart_div2'));
@@ -130,4 +130,34 @@
 
     </script>
     <div id="chart_div2" style="width: 1726px; height: 500px;"></div>
+</div>
+<div style="border: solid 1px black; margin: 1vh">
+    <script th:inline="javascript">
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var dataTable = new google.visualization.DataTable();
+            dataTable.addColumn('string', 'date');
+            dataTable.addColumn('number', 'Sales');
+            // A column for custom tooltip content
+            dataTable.addColumn({type: 'string', role: 'tooltip'});
+            dataTable.addRows([
+                ['2010', 600,'$600K in our first year!'],
+                ['2011', 1500, 'Sunspot activity made this our best year ever!'],
+                ['2012', 800, '$800K in 2012.'],
+                ['2013', 1000, '$1M in sales last year.']
+            ]);
+
+            var options = {
+                title : 'Детализация',
+                vAxis: {title: 'Количество выполненных заявок'},
+                hAxis: {title: 'Даты'},
+                seriesType: 'bars'
+            };
+            var chart = new google.visualization.ComboChart(document.getElementById('chart_div3'));
+            chart.draw(dataTable, options);
+        }
+    </script>
+    <div id="chart_div3" style="width: 1000px; height: 500px;"></div>
 </div>

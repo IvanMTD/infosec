@@ -2,8 +2,8 @@
     <div class="row pt-4">
         <div class="col">
             <ul class="list-group">
-                <li class="list-group-item active text-center" aria-current="true"><span class="fs-4">Структуры</span></li>
-                <li class="list-group-item" th:each="d, stat : ${departmentList}">
+                <li class="list-group-item active text-center" aria-current="true"><span class="fs-4">Подструктуры</span></li>
+                <li class="list-group-item" th:each="d, stat : ${divisionList}">
                     <div class="row">
                         <div class="col">
                             <b><p th:text="${d.title}"></p></b>
@@ -23,7 +23,7 @@
     <div class="row pt-4">
         <div class="col">
             <div class="d-grid gap-2 col-6 mx-auto">
-                <a class="btn btn-primary" th:href="@{/guide/department/add/form}">Добавить структуру</a>
+                <a class="btn btn-primary" th:href="@{/guide/division/add/form}">Добавить подструктуру</a>
             </div>
         </div>
     </div>

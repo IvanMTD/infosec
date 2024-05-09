@@ -102,6 +102,7 @@
                     <div class="form-floating">
                         <select class="form-select" id="departmentId" th:field="*{departmentId}">
                             <option value="0">Отсутствует</option>
+                            <option th:each="department : ${departmentList}" th:value="${department.id}" th:text="${department.title}"></option>
                         </select>
                         <label for="departmentId">Структура</label>
                     </div>
@@ -117,6 +118,44 @@
                     </div>
                 </div>
             </div>
+            <script th:inline="javascript">
+                let departments = [[${departmentList}]];
+                $('#departmentId').on('change', function (){
+                    let department_id = this.value;
+                    let department = null;
+                    for(let i=0; i<departments.length; i++){
+                        if(departments[i].id == department_id){
+                            department = departments[i];
+                            break;
+                        }
+                    }
+
+                    let division = $('#divisionId');
+                    division.empty();
+
+                    if(department_id === 0){
+                        division.append(
+                            '<option value="0">Отсутствует</option>'
+                        );
+                    }else{
+                        if(department != null){
+                            division.append(
+                                '<option value="0">Отсутствует</option>'
+                            );
+                            department.divisions.forEach(function (d){
+                                division.append(
+                                    '<option value="' + d.id + '">' + d.title + '</option>'
+                                );
+                            });
+                        }else{
+                            division.append(
+                                '<option value="0">Отсутствует</option>'
+                            );
+                        }
+                    }
+                });
+            </script>
+
             <div class="row pt-2 pb-2 border-start border-4 border-dark">
                 <div class="col">
                     <div class="form-floating">
@@ -125,6 +164,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="row pt-4 border-start border-4 border-dark">
                 <div class="col">
                     <div class="d-grid gap-2 col-6 mx-auto">

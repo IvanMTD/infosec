@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col"></div>
         <div class="col-6">
-            <div class="row">
+            <div class="row" th:if="${categories.size()} != 0">
                 <div class="col py-5">
                     <div class="card" style="height: 100%">
                         <div class="card-body" id="my-card">
@@ -14,7 +14,7 @@
                     </div>
                 </div>
                 <div class="col py-5">
-                    <div class="card" style="height: 100%">
+                    <div class="card" style="height: 100%" th:if="${categories[0].getTroubles().size()} != 0">
                         <div class="card-body" id="my-card-2">
                             <h5 class="card-title" th:text="${categories[0].getTroubles[0].getTitle()}"></h5>
                             <p class="card-text" th:text="${categories[0].getTroubles[0].getDescription()}"></p>
@@ -24,16 +24,16 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" th:if="${categories.size()} != 0">
                 <div class="col">
                     <ul class="list-group py-3">
-                        <li class="list-group-item" th:each="category, stat : ${categories}" th:id="${stat.index}" onclick="setActive(this.id)">
+                        <li class="list-group-item" th:each="category, stat : ${categories}" th:id="${stat.index}" onclick="setActive(this.id)" style="cursor: pointer;">
                             <span th:text="${category.getTitle()}"></span>
                         </li>
                     </ul>
                 </div>
                 <div class="col">
-                    <ul class="list-group py-3" id="trouble-list">
+                    <ul class="list-group py-3" id="trouble-list" style="cursor: pointer;">
                         <li class="list-group-item" th:each="trouble, stat : ${categories[0].getTroubles()}" th:name="${stat.index}" th:id="'id0' + ${stat.index}" onclick="setTroubleActive(this.id)">
                             <span th:text="${trouble.getTitle()}"></span>
                         </li>

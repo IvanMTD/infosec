@@ -176,6 +176,18 @@ public class AdminController {
         );
     }
 
+    @GetMapping("/divisions")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Rendering> divisionSettings(){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Division")
+                        .modelAttribute("index","divisions-page")
+                        .modelAttribute("divisionList", divisionService.getAll())
+                        .build()
+        );
+    }
+
     @GetMapping("/employees")
     @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> employeeSettings(){
