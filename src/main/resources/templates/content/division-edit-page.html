@@ -1,9 +1,10 @@
-<form class="container" th:method="POST" th:action="@{/guide/division/add}" th:object="${division}">
+<form class="container" th:method="POST" th:action="@{/guide/division/edit}" th:object="${division}">
+    <input type="number" th:field="*{id}" hidden>
     <div class="row">
         <div class="col"></div>
         <div class="col-6">
             <div class="row pt-4">
-                <p class="text-center fs-3 text-dark">Добавить подструктуру</p>
+                <p class="text-center fs-3 text-dark">Редактировать подструктуру</p>
             </div>
             <div class="row pt-4 border-start border-4 border-dark">
                 <div class="col">
@@ -48,11 +49,7 @@
             <div class="row pt-4 border-start border-4 border-dark">
                 <div class="col">
                     <div class="d-grid gap-2 col-6 mx-auto">
-                        <button class="btn btn-dark" type="submit" th:if="${departmentList.size()} == 0" disabled>
-                            Добавьте хотя бы одну структуру
-                        </button>
-                        <button class="btn btn-dark" type="submit" th:if="${departmentList.size()} != 0">Добавить
-                        </button>
+                        <button class="btn btn-dark" type="submit">Обновить</button>
                     </div>
                 </div>
             </div>

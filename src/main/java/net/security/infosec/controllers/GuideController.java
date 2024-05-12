@@ -14,10 +14,7 @@ import net.security.infosec.services.EmployeeService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -78,6 +75,20 @@ public class GuideController {
         }
     }
 
+    @GetMapping("/employee/edit/page")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Rendering> editEmployeePage(@RequestParam(name = "employee") long id){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Employee edit")
+                        .modelAttribute("index","employee-edit-page")
+                        .modelAttribute("employee", employeeService.getBy(id))
+                        .modelAttribute("departmentList",departmentService.getAll())
+                        .modelAttribute("divisionList",divisionService.getAll())
+                        .build()
+        );
+    }
+
     private Flux<DepartmentDTO> getCompleteDepartments(){
         return departmentService.getAll().flatMap(department -> getCompleteDepartment(department.getId()));
     }
@@ -132,6 +143,45 @@ public class GuideController {
         }
     }
 
+    @GetMapping("/division/edit/page")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Rendering> editDivisionPage(@RequestParam(name = "division") long id){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Division edit")
+                        .modelAttribute("index","division-edit-page")
+                        .modelAttribute("division",divisionService.getBy(id))
+                        .modelAttribute("departmentList", departmentService.getAll())
+                        .build()
+        );
+    }
+
+    @PostMapping("/division/edit")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Rendering> editDivision(@ModelAttribute(name = "division") @Valid Division division, Errors errors){
+        if(errors.hasErrors()){
+            return Mono.just(
+                    Rendering.view("template")
+                            .modelAttribute("title","Division edit")
+                            .modelAttribute("index","division-edit-page")
+                            .modelAttribute("division",division)
+                            .modelAttribute("departmentList", departmentService.getAll())
+                            .build()
+            );
+        }else{
+            return divisionService.getBy(division.getId()).flatMap(original -> {
+                log.info("found original division [{}]",original);
+                return divisionService.update(division).flatMap(divisionUpdated -> {
+                    log.info("division updated [{}]",divisionUpdated);
+                    return departmentService.resetDivision(original,division).flatMap(departmentUpdated -> {
+                        log.info("new department updated [{}]",departmentUpdated);
+                        return Mono.just(Rendering.redirectTo("/admin/divisions").build());
+                    });
+                });
+            });
+        }
+    }
+
     @GetMapping("/department/add/form")
     @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> addDepartmentPage(){
@@ -158,6 +208,37 @@ public class GuideController {
         }else{
             return departmentService.create(department).flatMap(saved -> {
                 log.info("structure saved [{}]",saved);
+                return Mono.just(Rendering.redirectTo("/admin/departments").build());
+            });
+        }
+    }
+
+    @GetMapping("/department/edit/page")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Rendering> editDepartmentPage(@RequestParam(name = "department") long id){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","Structure edit")
+                        .modelAttribute("index","structure-edit-page")
+                        .modelAttribute("department",departmentService.getBy(id))
+                        .build()
+        );
+    }
+
+    @PostMapping("/department/edit")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Rendering> editDepartment(@ModelAttribute(name = "department") @Valid Department department, Errors errors){
+        if(errors.hasErrors()){
+            return Mono.just(
+                    Rendering.view("template")
+                            .modelAttribute("title","Structure edit")
+                            .modelAttribute("index","structure-edit-page")
+                            .modelAttribute("department",department)
+                            .build()
+            );
+        }else{
+            return departmentService.update(department).flatMap(updated -> {
+                log.info("structure updated [{}]",updated);
                 return Mono.just(Rendering.redirectTo("/admin/departments").build());
             });
         }

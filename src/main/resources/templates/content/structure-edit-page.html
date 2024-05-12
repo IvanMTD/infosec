@@ -1,19 +1,10 @@
-<form class="container" th:method="POST" th:action="@{/guide/division/add}" th:object="${division}">
+<form class="container" th:method="POST" th:action="@{/guide/department/edit}" th:object="${department}">
+    <input type="number" th:field="*{id}" hidden>
     <div class="row">
         <div class="col"></div>
         <div class="col-6">
             <div class="row pt-4">
-                <p class="text-center fs-3 text-dark">Добавить подструктуру</p>
-            </div>
-            <div class="row pt-4 border-start border-4 border-dark">
-                <div class="col">
-                    <div class="form-floating">
-                        <select class="form-select" id="departmentId" th:field="*{departmentId}">
-                            <option th:each="department, stat : ${departmentList}" th:value="${department.id}" th:text="${department.title}"></option>
-                        </select>
-                        <label for="departmentId">Структура</label>
-                    </div>
-                </div>
+                <p class="text-center fs-3 text-dark">Редактировать структуру</p>
             </div>
             <div class="row pt-4 border-start border-4 border-dark">
                 <div class="col">
@@ -22,8 +13,7 @@
                         <label for="title">Название</label>
                     </div>
                     <div class="form-floating" th:if="${#fields.hasErrors('title')}">
-                        <input type="text" class="form-control is-invalid" id="title-error" placeholder="title-error"
-                               th:field="*{title}">
+                        <input type="text" class="form-control is-invalid" id="title-error" placeholder="title-error" th:field="*{title}">
                         <label for="title-error">Название</label>
                         <small class="text-center text-danger" th:errors="*{title}"></small>
                     </div>
@@ -32,13 +22,11 @@
             <div class="row pt-4 border-start border-4 border-dark">
                 <div class="col">
                     <div class="form-floating" th:if="${#fields.hasErrors('description')} != true">
-                        <input type="text" class="form-control" id="description" placeholder="description"
-                               th:field="*{description}">
+                        <input type="text" class="form-control" id="description" placeholder="description" th:field="*{description}">
                         <label for="description">Короткое описание</label>
                     </div>
                     <div class="form-floating" th:if="${#fields.hasErrors('description')}">
-                        <input type="text" class="form-control is-invalid" id="description-error"
-                               placeholder="description-error" th:field="*{description}">
+                        <input type="text" class="form-control is-invalid" id="description-error" placeholder="description-error" th:field="*{description}">
                         <label for="description-error">Короткое описание</label>
                         <small class="text-center text-danger" th:errors="*{description}"></small>
                     </div>
@@ -48,11 +36,7 @@
             <div class="row pt-4 border-start border-4 border-dark">
                 <div class="col">
                     <div class="d-grid gap-2 col-6 mx-auto">
-                        <button class="btn btn-dark" type="submit" th:if="${departmentList.size()} == 0" disabled>
-                            Добавьте хотя бы одну структуру
-                        </button>
-                        <button class="btn btn-dark" type="submit" th:if="${departmentList.size()} != 0">Добавить
-                        </button>
+                        <button class="btn btn-dark" type="submit">Обновить</button>
                     </div>
                 </div>
             </div>

@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.security.infosec.models.Employee;
 import net.security.infosec.repositories.EmployeeRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -26,6 +25,21 @@ public class EmployeeService {
     }
 
     public Mono<Employee> create(Employee employee) {
-        return employeeRepository.save(employee);
+        return Mono.just(employee).flatMap(e -> {
+            long department = e.getDepartmentId();
+            long division = e.getDivisionId();
+            if(division != 0){
+                department = 0;
+            }else{
+                division = 0;
+            }
+            e.setDepartmentId(department);
+            e.setDivisionId(division);
+            return employeeRepository.save(e);
+        });
+    }
+
+    public Mono<Employee> getBy(long id) {
+        return employeeRepository.findById(id);
     }
 }

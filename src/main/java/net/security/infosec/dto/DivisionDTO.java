@@ -9,6 +9,7 @@ import net.security.infosec.models.Division;
 public class DivisionDTO {
     private long id;
     private String title;
+    private DepartmentDTO department;
 
     public DivisionDTO(Division division) {
         this.id = division.getId();

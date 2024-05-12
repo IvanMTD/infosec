@@ -34,4 +34,17 @@ public class DivisionService {
     public Flux<Division> getAllBy(Set<Long> divisionIds) {
         return divisionRepository.findAllByIdIn(divisionIds);
     }
+
+    public Mono<Division> getBy(long id) {
+        return divisionRepository.findById(id);
+    }
+
+    public Mono<Division> update(Division division) {
+        return divisionRepository.findById(division.getId()).flatMap(original -> {
+            original.setDepartmentId(division.getDepartmentId());
+            original.setTitle(division.getTitle());
+            original.setDescription(division.getDescription());
+            return divisionRepository.save(original);
+        });
+    }
 }
