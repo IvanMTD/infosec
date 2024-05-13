@@ -1,8 +1,53 @@
-<div class="container">
+<div class="container-fluid">
     <div class="row py-2">
         <div class="col">
             <h3 class="text-center">Справочник ФЦПСР</h3>
         </div>
     </div>
+    <div class="row">
+        <div class="col-4">
+            <div class="row">
+                <div class="col">
+                    <div class="d-grid gap-2">
+                        <button th:each="department, dps : ${guide.departments}" th:text="${department.title}" th:id="'btn-dep-' + ${dps.index}" class="btn btn-outline-primary department" type="button" onclick="selectDepartment(this.id)"></button>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="d-grid gap-2" id="division-grid">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
 
+        </div>
+    </div>
 </div>
+<script th:inline="javascript">
+    let departments = [[${guide}]].departments;
+    function selectDepartment(buttonId){
+        let data = buttonId.split('-');
+        let id = data[data.length - 1];
+        let department = departments[id];
+        let divisions = department.divisions;
+
+        // Получить все кнопки с классом 'btn-primary' и удалить класс
+        let activeButtons = document.querySelectorAll('.department');
+        activeButtons.forEach(function(button) {
+            button.setAttribute('class', 'btn btn-outline-primary department');
+        });
+
+        // Добавить класс 'btn-primary' выбранной кнопке
+        let selectedButton = document.getElementById(buttonId);
+        selectedButton.setAttribute('class','btn btn-primary department');
+
+        let count = 0;
+        $('#division-grid').empty();
+        divisions.forEach(function (division){
+            $('#division-grid').append(
+                '<button id="btn-div-' + id + '-' + count + '" class="btn btn-outline-primary department" type="button">' + division.title + '</button>'
+            );
+            count++;
+        });
+    }
+</script>

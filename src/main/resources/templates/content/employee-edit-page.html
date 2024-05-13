@@ -1,0 +1,185 @@
+<form class="container" th:method="POST" th:action="@{/guide/employee/edit}" th:object="${employee}">
+    <input type="number" th:field="*{id}" hidden>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-6">
+            <div class="row pt-4">
+                <p class="text-center fs-3 text-dark">Редактировать сотрудника</p>
+            </div>
+            <div class="row pt-4 border-start border-4 border-dark">
+                <div class="col">
+                    <div class="form-floating" th:if="${#fields.hasErrors('lastname')} != true">
+                        <input type="text" class="form-control" id="lastname" placeholder="lastname" th:field="*{lastname}">
+                        <label for="lastname">Фамилия</label>
+                    </div>
+                    <div class="form-floating" th:if="${#fields.hasErrors('lastname')}">
+                        <input type="text" class="form-control is-invalid" id="lastname-error" placeholder="lastname-error" th:field="*{lastname}">
+                        <label for="lastname-error">Фамилия</label>
+                        <small class="text-center text-danger" th:errors="*{lastname}"></small>
+                    </div>
+                </div>
+            </div>
+            <div class="row pt-2 border-start border-4 border-dark">
+                <div class="col">
+                    <div class="form-floating" th:if="${#fields.hasErrors('name')} != true">
+                        <input type="text" class="form-control" id="name" placeholder="name" th:field="*{name}">
+                        <label for="name">Имя</label>
+                    </div>
+                    <div class="form-floating" th:if="${#fields.hasErrors('name')}">
+                        <input type="text" class="form-control is-invalid" id="name-error" placeholder="name-error" th:field="*{name}">
+                        <label for="name-error">Имя</label>
+                        <small class="text-center text-danger" th:errors="*{name}"></small>
+                    </div>
+                </div>
+            </div>
+            <div class="row pt-2 border-start border-4 border-dark">
+                <div class="col">
+                    <div class="form-floating" th:if="${#fields.hasErrors('middleName')} != true">
+                        <input type="text" class="form-control" id="middleName" placeholder="middleName" th:field="*{middleName}">
+                        <label for="middleName">Отчество</label>
+                    </div>
+                    <div class="form-floating" th:if="${#fields.hasErrors('middleName')}">
+                        <input type="text" class="form-control is-invalid" id="middleName-error" placeholder="middleName-error" th:field="*{middleName}">
+                        <label for="middleName-error">Отчество</label>
+                        <small class="text-center text-danger" th:errors="*{middleName}"></small>
+                    </div>
+                </div>
+            </div>
+            <div class="row pt-2 border-start border-4 border-dark">
+                <div class="col">
+                    <div class="form-floating" th:if="${#fields.hasErrors('address')} != true">
+                        <input type="text" class="form-control" id="address" placeholder="address" th:field="*{address}">
+                        <label for="address">Расположение</label>
+                    </div>
+                    <div class="form-floating" th:if="${#fields.hasErrors('address')}">
+                        <input type="text" class="form-control is-invalid" id="address-error" placeholder="address-error" th:field="*{address}">
+                        <label for="address-error">Расположение</label>
+                        <small class="text-center text-danger" th:errors="*{address}"></small>
+                    </div>
+                </div>
+            </div>
+            <div class="row pt-2 border-start border-4 border-dark">
+                <div class="col">
+                    <div class="form-floating" th:if="${#fields.hasErrors('cabinet')} != true">
+                        <input type="text" class="form-control" id="cabinet" placeholder="cabinet" th:field="*{cabinet}">
+                        <label for="cabinet">Кабинет</label>
+                    </div>
+                    <div class="form-floating" th:if="${#fields.hasErrors('cabinet')}">
+                        <input type="text" class="form-control is-invalid" id="cabinet-error" placeholder="cabinet-error" th:field="*{cabinet}">
+                        <label for="cabinet-error">Кабинет</label>
+                        <small class="text-center text-danger" th:errors="*{name}"></small>
+                    </div>
+                </div>
+            </div>
+            <div class="row pt-2 border-start border-4 border-dark">
+                <div class="col">
+                    <div class="form-floating" th:if="${#fields.hasErrors('phone')} != true">
+                        <input type="number" class="form-control" id="phone" placeholder="phone" th:field="*{phone}">
+                        <label for="phone">Короткий номер</label>
+                    </div>
+                    <div class="form-floating" th:if="${#fields.hasErrors('phone')}">
+                        <input type="number" class="form-control is-invalid" id="phone-error" placeholder="phone-error" th:field="*{phone}">
+                        <label for="phone-error">Короткий номер</label>
+                        <small class="text-center text-danger" th:errors="*{phone}"></small>
+                    </div>
+                </div>
+            </div>
+            <div class="row pt-2 pb-4 border-start border-4 border-dark">
+                <div class="col">
+                    <div class="form-floating" th:if="${#fields.hasErrors('email')} != true">
+                        <input type="email" class="form-control" id="email" placeholder="email" th:field="*{email}">
+                        <label for="email">Электронная почта</label>
+                    </div>
+                    <div class="form-floating" th:if="${#fields.hasErrors('email')}">
+                        <input type="email" class="form-control is-invalid" id="email-error" placeholder="email-error" th:field="*{email}">
+                        <label for="email-error">Электронная почта</label>
+                        <small class="text-center text-danger" th:errors="*{email}"></small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row pt-4 border-start border-4 border-dark">
+                <div class="col">
+                    <div class="form-floating">
+                        <select class="form-select" id="departmentId" th:field="*{departmentId}">
+                            <option value="0">Отсутствует</option>
+                            <option th:each="department : ${departmentList}" th:value="${department.id}" th:text="${department.title}"></option>
+                        </select>
+                        <label for="departmentId">Структура</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row pt-2 border-start border-4 border-dark" id="division-row">
+                <div class="col">
+                    <div class="form-floating">
+                        <select class="form-select" id="divisionId" th:field="*{divisionId}">
+                            <option value="0">Отсутствует</option>
+                        </select>
+                        <label for="divisionId">Подструктура</label>
+                    </div>
+                </div>
+            </div>
+            <script th:inline="javascript">
+                let departments = [[${departmentList}]];
+                substructureUpdate();
+                document.getElementById('divisionId').value = [[${employee}]].divisionId;
+                $('#departmentId').on('change', function (){
+                    substructureUpdate();
+                });
+                function substructureUpdate(){
+                    console.log("init")
+                    let department_id = document.getElementById('departmentId').value;
+                    let department = null;
+                    for(let i=0; i<departments.length; i++){
+                        if(departments[i].id == department_id){
+                            department = departments[i];
+                            break;
+                        }
+                    }
+
+                    let division = $('#divisionId');
+                    division.empty();
+
+                    if(department_id === 0){
+                        division.append(
+                            '<option value="0">Отсутствует</option>'
+                        );
+                    }else{
+                        if(department != null){
+                            division.append(
+                                '<option value="0">Отсутствует</option>'
+                            );
+                            department.divisions.forEach(function (d){
+                                division.append(
+                                    '<option value="' + d.id + '">' + d.title + '</option>'
+                                );
+                            });
+                        }else{
+                            division.append(
+                                '<option value="0">Отсутствует</option>'
+                            );
+                        }
+                    }
+                }
+            </script>
+
+            <div class="row pt-2 pb-2 border-start border-4 border-dark">
+                <div class="col">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="position" placeholder="position" th:field="*{position}">
+                        <label for="position">Должность</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row pt-4 border-start border-4 border-dark">
+                <div class="col">
+                    <div class="d-grid gap-2 col-6 mx-auto">
+                        <button class="btn btn-dark" type="submit">Обновить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col"></div>
+    </div>
+</form>

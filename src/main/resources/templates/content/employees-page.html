@@ -11,12 +11,31 @@
                         </div>
                         <div class="col-3">
                             <div class="btn-group float-end" role="group" aria-label="Basic example">
-                                <button type="button" class="btn btn-outline-primary"><i class="bi bi-postcard"></i>
+                                <!--<button type="button" class="btn btn-outline-primary"><i class="bi bi-postcard"></i></button>-->
+                                <a class="btn btn-outline-primary" th:href="@{/guide/employee/edit/page(employee=${e.id})}"><i class="bi bi-pencil"></i></a>
+                                <button th:id="'del-btn-' + ${e.id}" type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#deleteEmployee-">
+                                    <i class="bi bi-trash"></i>
                                 </button>
-                                <button type="button" class="btn btn-outline-primary"><i class="bi bi-pencil"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-primary"><i class="bi bi-trash"></i>
-                                </button>
+                            </div>
+                            <script th:inline="javascript">
+                                document.getElementById('del-btn-' + [[${e.id}]]).setAttribute('data-bs-target','#deleteEmployee-' + [[${e.id}]]);
+                            </script>
+                            <div class="modal fade" th:id="'deleteEmployee-' + ${e.id}" tabindex="-1" aria-labelledby="deleteEmployeeLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Внимание! Удаление!</h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Вы собираетесь удалить запись пользователя <b><span th:text="${e.fullName}"></span></b> из справочника! Вы уверены?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                            <a class="btn btn-danger" th:href="@{/guide/employee/delete(employee=${e.id})}">Подтвердить</a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

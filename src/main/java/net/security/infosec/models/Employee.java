@@ -49,7 +49,39 @@ public class Employee {
     @NotBlank(message = "Не может быть пустым")
     private String email;
 
+    public Employee(Employee employee) {
+        setId(employee.getId());
+        setName(employee.getName());
+        setMiddleName(employee.getMiddleName());
+        setLastname(employee.getLastname());
+        setPosition(employee.getPosition());
+        setDepartmentId(employee.getDepartmentId());
+        setDivisionId(employee.getDivisionId());
+        setCabinet(employee.getCabinet());
+        setAddress(employee.getAddress());
+        setPhone(employee.getPhone());
+        setEmail(employee.getEmail());
+    }
+
     public String getFullName(){
         return lastname + " " + name + " " + middleName;
+    }
+
+    public void update(Employee employee) {
+        setName(employee.getName());
+        setMiddleName(employee.getMiddleName());
+        setLastname(employee.getLastname());
+        setPosition(employee.getPosition());
+        setCabinet(employee.getCabinet());
+        setAddress(employee.getAddress());
+        setPhone(employee.getPhone());
+        setEmail(employee.getEmail());
+        if(employee.getDivisionId() != 0){
+            setDepartmentId(0);
+            setDivisionId(employee.getDivisionId());
+        }else{
+            setDepartmentId(employee.getDepartmentId());
+            setDivisionId(0);
+        }
     }
 }

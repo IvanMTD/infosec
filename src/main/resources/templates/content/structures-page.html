@@ -10,9 +10,31 @@
                         </div>
                         <div class="col-3">
                             <div class="btn-group float-end" role="group" aria-label="Basic example">
-                                <button type="button" class="btn btn-outline-primary"><i class="bi bi-postcard"></i></button>
+                                <!--<button type="button" class="btn btn-outline-primary"><i class="bi bi-postcard"></i></button>-->
                                 <a class="btn btn-outline-primary" th:href="@{/guide/department/edit/page(department=${d.id})}"><i class="bi bi-pencil"></i></a>
-                                <button type="button" class="btn btn-outline-primary"><i class="bi bi-trash"></i></button>
+                                <button th:id="'del-btn-' + ${d.id}" type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#deleteDepartment-">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                            <script th:inline="javascript">
+                                document.getElementById('del-btn-' + [[${d.id}]]).setAttribute('data-bs-target','#deleteDepartment-' + [[${d.id}]]);
+                            </script>
+                            <div class="modal fade" th:id="'deleteDepartment-' + ${d.id}" tabindex="-1" aria-labelledby="deleteDepartmentLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Внимание! Удаление!</h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Вы собираетесь удалить запись структуры <b><span th:text="${d.title}"></span></b> из справочника! Это приведет к удалению всех подструктур. Сотрудники не будут удалены. Вы уверены?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                            <a class="btn btn-danger" th:href="@{/guide/department/delete(department=${d.id})}">Подтвердить</a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

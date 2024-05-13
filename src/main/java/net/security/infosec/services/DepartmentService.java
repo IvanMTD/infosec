@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.security.infosec.models.Department;
 import net.security.infosec.models.Division;
+import net.security.infosec.models.Employee;
 import net.security.infosec.repositories.DepartmentRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -66,5 +68,20 @@ public class DepartmentService {
                 return Mono.just(departmentNext);
             });
         });
+    }
+
+    public Mono<Department> getByIn(long divisionId) {
+        return departmentRepository.findByDivisionId(divisionId);
+    }
+
+    public Mono<Department> removeDivision(Division deleted) {
+        return departmentRepository.findById(deleted.getDepartmentId()).flatMap(department -> {
+            department.getDivisionIds().remove(deleted.getId());
+            return departmentRepository.save(department);
+        }).switchIfEmpty(Mono.just(new Department()));
+    }
+
+    public Mono<Department> deleteBy(long id) {
+        return departmentRepository.findById(id).flatMap(department -> departmentRepository.delete(department).then(Mono.just(department)));
     }
 }

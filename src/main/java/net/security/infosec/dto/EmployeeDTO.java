@@ -1,0 +1,39 @@
+package net.security.infosec.dto;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import net.security.infosec.models.Employee;
+
+@Data
+@NoArgsConstructor
+public class EmployeeDTO {
+    private long id;
+
+    private String name;
+    private String middleName;
+    private String lastname;
+    private String position;
+    private long departmentId;
+    private long divisionId;
+    private String cabinet;
+    private String address;
+    private int phone;
+    private String email;
+
+    public EmployeeDTO(Employee employee) {
+        setName(employee.getName());
+        setMiddleName(employee.getMiddleName());
+        setLastname(employee.getLastname());
+        setPosition(employee.getPosition());
+        setCabinet(employee.getCabinet());
+        setAddress(employee.getAddress());
+        setPhone(employee.getPhone());
+        setEmail(employee.getEmail());
+        setDivisionId(employee.getDivisionId());
+        setDepartmentId(employee.getDepartmentId());
+    }
+
+    public String getFullName(){
+        return lastname + " " + name + " " + middleName;
+    }
+}

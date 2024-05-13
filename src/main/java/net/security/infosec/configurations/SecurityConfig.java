@@ -32,6 +32,8 @@ public class SecurityConfig {
                 .authorizeExchange(
                         auth -> auth
                                 .pathMatchers("/login").permitAll()
+                                .pathMatchers("/guide/list").permitAll()
+                                .pathMatchers("/favicon.ico").permitAll()
                                 .anyExchange().authenticated()
                 )
                 .formLogin(loginSpec -> loginSpec.loginPage("/login"))

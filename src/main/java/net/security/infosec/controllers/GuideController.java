@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.security.infosec.dto.DepartmentDTO;
 import net.security.infosec.dto.DivisionDTO;
+import net.security.infosec.dto.EmployeeDTO;
+import net.security.infosec.dto.GuideDTO;
 import net.security.infosec.models.Department;
 import net.security.infosec.models.Division;
 import net.security.infosec.models.Employee;
@@ -19,7 +21,10 @@ import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,6 +43,7 @@ public class GuideController {
                 Rendering.view("template")
                         .modelAttribute("title","Guide page")
                         .modelAttribute("index","guide-page")
+                        .modelAttribute("guide",createGuide())
                         .build()
         );
     }
@@ -82,28 +88,39 @@ public class GuideController {
                 Rendering.view("template")
                         .modelAttribute("title","Employee edit")
                         .modelAttribute("index","employee-edit-page")
-                        .modelAttribute("employee", employeeService.getBy(id))
-                        .modelAttribute("departmentList",departmentService.getAll())
-                        .modelAttribute("divisionList",divisionService.getAll())
+                        .modelAttribute("employee", getCompleteEmployee(id))
+                        .modelAttribute("departmentList", getCompleteDepartments())
                         .build()
         );
     }
 
-    private Flux<DepartmentDTO> getCompleteDepartments(){
-        return departmentService.getAll().flatMap(department -> getCompleteDepartment(department.getId()));
+    @PostMapping("/employee/edit")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Rendering> editEmployee(@ModelAttribute(name = "employee") @Valid Employee employee, Errors errors){
+        if(errors.hasErrors()){
+            return Mono.just(
+                    Rendering.view("template")
+                            .modelAttribute("title","Employee edit")
+                            .modelAttribute("index","employee-edit-page")
+                            .modelAttribute("employee", employee)
+                            .modelAttribute("departmentList", getCompleteDepartments())
+                            .build()
+            );
+        }else{
+            log.info("try saved [{}]", employee);
+            return employeeService.update(employee).flatMap(updated -> {
+                log.info("employee has been updated [{}]", updated);
+                return Mono.just(Rendering.redirectTo("/admin/employees").build());
+            });
+        }
     }
 
-    private Mono<DepartmentDTO> getCompleteDepartment(long id){
-        return departmentService.getBy(id).flatMap(department -> {
-            DepartmentDTO departmentDTO = new DepartmentDTO(department);
-            return divisionService.getAllBy(department.getDivisionIds()).flatMap(division -> {
-                DivisionDTO divisionDTO = new DivisionDTO(division);
-                return Mono.just(divisionDTO);
-            }).collectList().flatMap(l -> {
-                l = l.stream().sorted(Comparator.comparing(DivisionDTO::getTitle)).collect(Collectors.toList());
-                departmentDTO.setDivisions(l);
-                return Mono.just(departmentDTO);
-            });
+    @GetMapping("/employee/delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Rendering> deleteEmployee(@RequestParam(name = "employee") long id){
+        return employeeService.deleteBy(id).flatMap(deleted -> {
+            log.info("employee has been deleted from db [{}]", deleted);
+            return Mono.just(Rendering.redirectTo("/admin/employees").build());
         });
     }
 
@@ -182,6 +199,19 @@ public class GuideController {
         }
     }
 
+    @GetMapping("/division/delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Rendering> deleteDivision(@RequestParam(name = "division") long id){
+        return removeDivision(id).flatMap(deleted -> {
+            return departmentService.removeDivision(deleted).flatMap(department -> {
+                if(department.getId() != 0) {
+                    log.info("department has updated [{}]", department);
+                }
+                return Mono.just(Rendering.redirectTo("/admin/divisions").build());
+            });
+        });
+    }
+
     @GetMapping("/department/add/form")
     @PreAuthorize("hasRole('ADMIN')")
     public Mono<Rendering> addDepartmentPage(){
@@ -242,5 +272,115 @@ public class GuideController {
                 return Mono.just(Rendering.redirectTo("/admin/departments").build());
             });
         }
+    }
+
+    @GetMapping("/department/delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Rendering> deleteDepartment(@RequestParam(name = "department") long id){
+        return departmentService.deleteBy(id).flatMap(deleted -> {
+            log.info("department deleted from db [{}]",deleted);
+            return employeeService.removeDepartment(deleted).collectList().flatMap(l -> {
+                if(l.size() != 0){
+                    for(Employee employee : l){
+                        log.info("employer has updated [{}]",employee);
+                    }
+                }
+                return Mono.just(deleted);
+            });
+        }).flatMap(deleted -> {
+            return removeDivisions(deleted.getDivisionIds()).collectList().flatMap(l -> {
+                if(l.size() != 0){
+                    for(Division division : l){
+                        log.info("division has been deleted [{}]", division);
+                    }
+                }
+                return Mono.just(Rendering.redirectTo("/admin/departments").build());
+            });
+        });
+    }
+
+    private Flux<DepartmentDTO> getCompleteDepartments(){
+        return departmentService.getAll().flatMap(department -> getCompleteDepartment(department.getId()));
+    }
+
+    private Mono<DepartmentDTO> getCompleteDepartment(long id){
+        return departmentService.getBy(id).flatMap(department -> {
+            DepartmentDTO departmentDTO = new DepartmentDTO(department);
+            return divisionService.getAllBy(department.getDivisionIds()).flatMap(division -> {
+                DivisionDTO divisionDTO = new DivisionDTO(division);
+                return Mono.just(divisionDTO);
+            }).collectList().flatMap(l -> {
+                l = l.stream().sorted(Comparator.comparing(DivisionDTO::getTitle)).collect(Collectors.toList());
+                departmentDTO.setDivisions(l);
+                return Mono.just(departmentDTO);
+            });
+        });
+    }
+
+    private Mono<Employee> getCompleteEmployee(long id){
+        return employeeService.getBy(id).flatMap(original -> {
+            Employee employee = new Employee(original);
+            if(original.getDivisionId() != 0){
+                return departmentService.getByIn(original.getDivisionId()).flatMap(department -> {
+                    employee.setDepartmentId(department.getId());
+                    return Mono.just(employee);
+                });
+            }else{
+                return Mono.just(employee);
+            }
+        });
+    }
+
+    private Flux<Division> removeDivisions(Set<Long> ids){
+        return divisionService.getAllBy(ids).flatMap(division -> removeDivision(division.getId())).switchIfEmpty(Flux.fromIterable(new ArrayList<>()));
+    }
+
+    private Mono<Division> removeDivision(long id){
+        return divisionService.deleteBy(id).flatMap(deleted -> {
+            log.info("division has been deleted [{}]",deleted);
+            return employeeService.removeDivision(deleted).collectList().flatMap(l -> {
+                if(l.size() != 0){
+                    for(Employee employee : l){
+                        log.info("employee has updated [{}]",employee);
+                    }
+                }
+                return Mono.just(deleted);
+            });
+        });
+    }
+
+    private Mono<GuideDTO> createGuide(){
+        return Mono.just(new GuideDTO()).flatMap(guide -> {
+            return departmentService.getAll().flatMap(department -> {
+                DepartmentDTO departmentDTO = new DepartmentDTO(department);
+                return employeeService.getAllByDepartmentId(department.getId()).collectList().flatMap(l -> {
+                    List<EmployeeDTO> employeeDTOList = new ArrayList<>();
+                    for(Employee employee : l){
+                        employeeDTOList.add(new EmployeeDTO(employee));
+                    }
+                    departmentDTO.setEmployees(employeeDTOList);
+                    return Mono.just(departmentDTO);
+                });
+            }).flatMap(departmentDTO -> {
+                return divisionService.getAllBy(departmentDTO.getDivisionIds()).flatMap(division -> {
+                    DivisionDTO divisionDTO = new DivisionDTO(division);
+                    return employeeService.getAllByDivisionId(division.getId()).collectList().flatMap(l -> {
+                        List<EmployeeDTO> employeeDTOList = new ArrayList<>();
+                        for(Employee employee : l){
+                            employeeDTOList.add(new EmployeeDTO(employee));
+                        }
+                        divisionDTO.setEmployees(employeeDTOList);
+                        return Mono.just(divisionDTO);
+                    });
+                }).collectList().flatMap(divisionDTOS -> {
+                    departmentDTO.setDivisions(divisionDTOS);
+                    return Mono.just(departmentDTO);
+                });
+            }).collectList().flatMap(l -> {
+                l = l.stream().sorted(Comparator.comparing(DepartmentDTO::getTitle)).collect(Collectors.toList());
+                guide.setDepartments(l);
+                return Mono.just(guide);
+            });
+        });
     }
 }

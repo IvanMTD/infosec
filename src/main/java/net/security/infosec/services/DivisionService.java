@@ -47,4 +47,8 @@ public class DivisionService {
             return divisionRepository.save(original);
         });
     }
+
+    public Mono<Division> deleteBy(long id) {
+        return divisionRepository.findById(id).flatMap(division -> divisionRepository.delete(division).then(Mono.just(division)));
+    }
 }
