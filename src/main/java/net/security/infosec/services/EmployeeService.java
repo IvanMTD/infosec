@@ -6,7 +6,6 @@ import net.security.infosec.models.Department;
 import net.security.infosec.models.Division;
 import net.security.infosec.models.Employee;
 import net.security.infosec.repositories.EmployeeRepository;
-import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,7 +22,7 @@ public class EmployeeService {
 
     public Flux<Employee> getAll() {
         return employeeRepository.findAll().collectList().flatMapMany(l -> {
-            l = l.stream().sorted(Comparator.comparing(Employee::getFullName)).collect(Collectors.toList());
+            l = l.stream().sorted(Comparator.comparing(Employee::getNumber)).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);
     }
@@ -74,14 +73,14 @@ public class EmployeeService {
 
     public Flux<Employee> getAllByDepartmentId(long id) {
         return employeeRepository.findByDepartmentId(id).collectList().flatMapMany(l -> {
-            l = l.stream().sorted(Comparator.comparing(Employee::getFullName)).collect(Collectors.toList());
+            l = l.stream().sorted(Comparator.comparing(Employee::getNumber)).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);
     }
 
     public Flux<Employee> getAllByDivisionId(long id) {
         return employeeRepository.findByDivisionId(id).collectList().flatMapMany(l -> {
-            l = l.stream().sorted(Comparator.comparing(Employee::getFullName)).collect(Collectors.toList());
+            l = l.stream().sorted(Comparator.comparing(Employee::getNumber)).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);
     }

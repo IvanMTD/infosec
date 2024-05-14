@@ -22,7 +22,7 @@ public class DepartmentService {
 
     public Flux<Department> getAll() {
         return departmentRepository.findAll().collectList().flatMapMany(l -> {
-            l = l.stream().sorted(Comparator.comparing(Department::getTitle)).collect(Collectors.toList());
+            l = l.stream().sorted(Comparator.comparing(Department::getNumber)).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);
     }
@@ -50,6 +50,7 @@ public class DepartmentService {
         return departmentRepository.findById(department.getId()).flatMap(original -> {
             original.setTitle(department.getTitle());
             original.setDescription(department.getDescription());
+            original.setNumber(department.getNumber());
             return departmentRepository.save(original);
         });
     }

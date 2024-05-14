@@ -2,11 +2,9 @@ package net.security.infosec.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.security.infosec.dto.DepartmentDTO;
 import net.security.infosec.models.Division;
 import net.security.infosec.repositories.DivisionRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -22,7 +20,7 @@ public class DivisionService {
 
     public Flux<Division> getAll() {
         return divisionRepository.findAll().collectList().flatMapMany(l -> {
-            l = l.stream().sorted(Comparator.comparing(Division::getTitle)).collect(Collectors.toList());
+            l = l.stream().sorted(Comparator.comparing(Division::getNumber)).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);
     }
@@ -44,6 +42,7 @@ public class DivisionService {
             original.setDepartmentId(division.getDepartmentId());
             original.setTitle(division.getTitle());
             original.setDescription(division.getDescription());
+            original.setNumber(division.getNumber());
             return divisionRepository.save(original);
         });
     }

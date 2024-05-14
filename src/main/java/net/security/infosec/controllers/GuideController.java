@@ -310,7 +310,7 @@ public class GuideController {
                 DivisionDTO divisionDTO = new DivisionDTO(division);
                 return Mono.just(divisionDTO);
             }).collectList().flatMap(l -> {
-                l = l.stream().sorted(Comparator.comparing(DivisionDTO::getTitle)).collect(Collectors.toList());
+                l = l.stream().sorted(Comparator.comparing(DivisionDTO::getNumber)).collect(Collectors.toList());
                 departmentDTO.setDivisions(l);
                 return Mono.just(departmentDTO);
             });
@@ -373,11 +373,12 @@ public class GuideController {
                         return Mono.just(divisionDTO);
                     });
                 }).collectList().flatMap(divisionDTOS -> {
+                    divisionDTOS = divisionDTOS.stream().sorted(Comparator.comparing(DivisionDTO::getNumber)).collect(Collectors.toList());
                     departmentDTO.setDivisions(divisionDTOS);
                     return Mono.just(departmentDTO);
                 });
             }).collectList().flatMap(l -> {
-                l = l.stream().sorted(Comparator.comparing(DepartmentDTO::getTitle)).collect(Collectors.toList());
+                l = l.stream().sorted(Comparator.comparing(DepartmentDTO::getNumber)).collect(Collectors.toList());
                 guide.setDepartments(l);
                 return Mono.just(guide);
             });

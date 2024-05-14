@@ -8,6 +8,14 @@
             </div>
             <div class="row pt-4 border-start border-4 border-dark">
                 <div class="col">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="number" placeholder="number" th:field="*{number}">
+                        <label for="number">Порядковый номер</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row pt-2 border-start border-4 border-dark">
+                <div class="col">
                     <div class="form-floating" th:if="${#fields.hasErrors('title')} != true">
                         <input type="text" class="form-control" id="title" placeholder="title" th:field="*{title}">
                         <label for="title">Название</label>

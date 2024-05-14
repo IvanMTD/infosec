@@ -48,6 +48,7 @@ public class Employee {
     @Email(message = "Не валидный email")
     @NotBlank(message = "Не может быть пустым")
     private String email;
+    private int number;
 
     public Employee(Employee employee) {
         setId(employee.getId());
@@ -61,6 +62,7 @@ public class Employee {
         setAddress(employee.getAddress());
         setPhone(employee.getPhone());
         setEmail(employee.getEmail());
+        setNumber(employee.getNumber());
     }
 
     public String getFullName(){
@@ -76,6 +78,7 @@ public class Employee {
         setAddress(employee.getAddress());
         setPhone(employee.getPhone());
         setEmail(employee.getEmail());
+        setNumber(employee.getNumber());
         if(employee.getDivisionId() != 0){
             setDepartmentId(0);
             setDivisionId(employee.getDivisionId());

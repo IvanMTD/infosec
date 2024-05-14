@@ -1,6 +1,7 @@
 package net.security.infosec.models;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -28,4 +29,5 @@ public class Department {
     private String title;
     @NotBlank(message = "Не может быть пустым")
     private String description;
+    private int number;
 }

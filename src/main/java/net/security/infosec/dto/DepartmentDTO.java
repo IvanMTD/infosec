@@ -19,12 +19,14 @@ public class DepartmentDTO {
     private List<EmployeeDTO> employees = new ArrayList<>();
 
     private Set<Long> divisionIds = new HashSet<>();
+    private int number;
 
     public DepartmentDTO(Department department) {
         this.id = department.getId();
         this.title = department.getTitle();
         this.description = department.getDescription();
         this.divisionIds = department.getDivisionIds();
+        this.number = department.getNumber();
     }
 
     public void addDivision(DivisionDTO division){

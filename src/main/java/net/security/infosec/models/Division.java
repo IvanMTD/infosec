@@ -25,4 +25,5 @@ public class Division {
     private String title;
     @NotBlank(message = "Не может быть пустым")
     private String description;
+    private int number;
 }

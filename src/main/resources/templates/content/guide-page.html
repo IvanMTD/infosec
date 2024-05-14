@@ -9,17 +9,48 @@
             <div class="row">
                 <div class="col">
                     <div class="d-grid gap-2">
-                        <button th:each="department, dps : ${guide.departments}" th:text="${department.title}" th:id="'btn-dep-' + ${dps.index}" class="btn btn-outline-primary department" type="button" onclick="selectDepartment(this.id)"></button>
+                        <button th:each="department, dps : ${guide.departments}" th:text="${department.title}" th:id="'btn-dep-' + ${dps.index}" class="btn btn-outline-secondary department text-start" type="button" onclick="selectDepartment(this.id)"></button>
+                        <script>
+                            document.getElementById('btn-dep-0').setAttribute('class',"btn btn-secondary department text-start")
+                        </script>
                     </div>
                 </div>
                 <div class="col">
-                    <div class="d-grid gap-2" id="division-grid">
+                    <div th:if="${guide.getDepartments().size()} != 0">
+                        <div class="d-grid gap-2" id="division-grid">
+                            <button th:each="division, dvs : ${guide.departments[0].divisions}" th:text="${division.title}" th:id="'btn-div-0-' + ${dvs.index}" class="btn btn-outline-secondary department text-start" type="button" onclick="selectDivision(this.id)"></button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col">
-
+        <div class="col border-start border-dark" id="guide-card-col">
+            <div th:if="${guide.getDepartments().size()} != 0">
+                <div th:if="${guide.departments[0].employees.size()} != 0">
+                    <div class="row rounded-4 shadow m-2" th:each="employee : ${guide.departments[0].employees}">
+                        <div class="col m-0 p-1 my-auto">
+                            <div class="m-0 p-1">
+                                <b><p class="m-0 p-0 ps-2" th:text="${employee.fullName}"></p></b>
+                            </div>
+                        </div>
+                        <div class="col m-0 p-1 my-auto">
+                            <div class="m-0 p-1">
+                                <p class="m-0 p-0 text-center" th:text="${employee.position}"></p>
+                            </div>
+                        </div>
+                        <div class="col m-0 p-1 my-auto">
+                            <div class="m-0 p-1">
+                                <p class="m-0 p-0 text-center" th:text="${employee.email}"></p>
+                            </div>
+                        </div>
+                        <div class="col-2 m-0 p-1 my-auto">
+                            <div class="m-0 p-1 d-flex">
+                                <p class="m-0 p-0 pe-2 text-center ms-auto" th:text="'телефон: ' + ${employee.phone}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -31,23 +62,93 @@
         let department = departments[id];
         let divisions = department.divisions;
 
-        // Получить все кнопки с классом 'btn-primary' и удалить класс
         let activeButtons = document.querySelectorAll('.department');
         activeButtons.forEach(function(button) {
-            button.setAttribute('class', 'btn btn-outline-primary department');
+            button.setAttribute('class', 'btn btn-outline-secondary department text-start');
         });
 
-        // Добавить класс 'btn-primary' выбранной кнопке
         let selectedButton = document.getElementById(buttonId);
-        selectedButton.setAttribute('class','btn btn-primary department');
+        selectedButton.setAttribute('class','btn btn-secondary department text-start');
 
         let count = 0;
         $('#division-grid').empty();
         divisions.forEach(function (division){
             $('#division-grid').append(
-                '<button id="btn-div-' + id + '-' + count + '" class="btn btn-outline-primary department" type="button">' + division.title + '</button>'
+                '<button id="btn-div-' + id + '-' + count + '" class="btn btn-outline-secondary division text-start" type="button" onclick="selectDivision(this.id)">' + division.title + '</button>'
             );
             count++;
+        });
+
+        $('#guide-card-col').empty();
+        department.employees.forEach(function (employee){
+            $('#guide-card-col').append(
+                '<div class="row rounded-4 shadow m-2">' +
+                '   <div class="col m-0 p-1 my-auto">' +
+                '       <div class="m-0 p-1">' +
+                '           <p class="m-0 p-0 ps-2"><b>' + employee.fullName + '</b></p>' +
+                '       </div>' +
+                '   </div>' +
+                '   <div class="col m-0 p-1 my-auto">' +
+                '       <div class="m-0 p-1">' +
+                '           <p class="m-0 p-0 text-center">' + employee.position + '</p>' +
+                '       </div>' +
+                '   </div>' +
+                '   <div class="col m-0 p-1 my-auto">' +
+                '       <div class="m-0 p-1">' +
+                '           <p class="m-0 p-0 text-center">' + employee.email + '</p>' +
+                '       </div>' +
+                '   </div>' +
+                '   <div class="col-2 m-0 p-1 my-auto">' +
+                '       <div class="m-0 p-1 d-flex">' +
+                '           <p class="m-0 p-0 pe-2 text-center ms-auto">телефон: ' + employee.phone + '</p>' +
+                '       </div>' +
+                '   </div>' +
+                '</div>'
+            );
+        });
+    }
+
+    function selectDivision(buttonId){
+        let parts = buttonId.split('-');
+        let departmentId = parts[parts.length-2];
+        let divisionId = parts[parts.length-1];
+        let department = departments[departmentId];
+        let division = department.divisions[divisionId];
+
+        let activeButtons = document.querySelectorAll('.division');
+        activeButtons.forEach(function(button) {
+            button.setAttribute('class', 'btn btn-outline-secondary division text-start');
+        });
+
+        let selectedButton = document.getElementById(buttonId);
+        selectedButton.setAttribute('class','btn btn-secondary division text-start');
+
+        $('#guide-card-col').empty();
+        division.employees.forEach(function (employee){
+            $('#guide-card-col').append(
+                '<div class="row rounded-4 shadow m-2">' +
+                '   <div class="col m-0 p-1 my-auto">' +
+                '       <div class="m-0 p-1">' +
+                '           <p class="m-0 p-0 ps-2"><b>' + employee.fullName + '</b></p>' +
+                '       </div>' +
+                '   </div>' +
+                '   <div class="col m-0 p-1 my-auto">' +
+                '       <div class="m-0 p-1">' +
+                '           <p class="m-0 p-0 text-center">' + employee.position + '</p>' +
+                '       </div>' +
+                '   </div>' +
+                '   <div class="col m-0 p-1 my-auto">' +
+                '       <div class="m-0 p-1">' +
+                '           <p class="m-0 p-0 text-center">' + employee.email + '</p>' +
+                '       </div>' +
+                '   </div>' +
+                '   <div class="col-2 m-0 p-1 my-auto">' +
+                '       <div class="m-0 p-1 d-flex">' +
+                '           <p class="m-0 p-0 pe-2 text-center ms-auto">телефон: ' + employee.phone + '</p>' +
+                '       </div>' +
+                '   </div>' +
+                '</div>'
+            );
         });
     }
 </script>

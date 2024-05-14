@@ -19,6 +19,7 @@ public class EmployeeDTO {
     private String address;
     private int phone;
     private String email;
+    private int number;
 
     public EmployeeDTO(Employee employee) {
         setName(employee.getName());
@@ -31,6 +32,7 @@ public class EmployeeDTO {
         setEmail(employee.getEmail());
         setDivisionId(employee.getDivisionId());
         setDepartmentId(employee.getDepartmentId());
+        setNumber(employee.getNumber());
     }
 
     public String getFullName(){
