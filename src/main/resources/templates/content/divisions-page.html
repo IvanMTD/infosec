@@ -1,4 +1,13 @@
 <div class="container">
+
+    <div class="row pt-4">
+        <div class="col">
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <a class="btn btn-outline-primary" th:href="@{/guide/division/add/form}">Добавить подструктуру</a>
+            </div>
+        </div>
+    </div>
+
     <div class="row pt-4">
         <div class="col">
             <ul class="list-group">
@@ -6,7 +15,7 @@
                 <li class="list-group-item" th:each="d, stat : ${divisionList}">
                     <div class="row">
                         <div class="col">
-                            <b><p th:text="${d.title}"></p></b>
+                            <b><p th:text="${d.number} + '. ' + ${d.title}"></p></b>
                         </div>
                         <div class="col-3">
                             <div class="btn-group float-end" role="group" aria-label="Basic example">
@@ -42,11 +51,5 @@
             </ul>
         </div>
     </div>
-    <div class="row pt-4">
-        <div class="col">
-            <div class="d-grid gap-2 col-6 mx-auto">
-                <a class="btn btn-primary" th:href="@{/guide/division/add/form}">Добавить подструктуру</a>
-            </div>
-        </div>
-    </div>
+
 </div>
