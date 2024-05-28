@@ -1,51 +1,53 @@
-<div class="container-fluid">
+<div class="container-fluid my-5">
     <div class="row py-2">
         <div class="col">
             <h3 class="text-center">Справочник ФЦПСР</h3>
         </div>
     </div>
     <div class="row">
-        <div class="col-4">
+        <div class="col-5">
             <div class="row">
                 <div class="col">
                     <div class="d-grid gap-2">
-                        <button th:each="department, dps : ${guide.departments}" th:text="${department.title}" th:id="'btn-dep-' + ${dps.index}" class="btn btn-outline-secondary department text-start" type="button" onclick="selectDepartment(this.id)"></button>
+                        <button th:each="department, dps : ${guide.departments}" th:text="${department.title}" th:id="'btn-dep-' + ${dps.index}" class="btn btn-sm btn-outline-secondary department text-start" type="button" onclick="selectDepartment(this.id)"></button>
                         <script>
-                            document.getElementById('btn-dep-0').setAttribute('class',"btn btn-secondary department text-start")
+                            document.getElementById('btn-dep-0').setAttribute('class',"btn btn-sm btn-secondary department text-start")
                         </script>
                     </div>
                 </div>
                 <div class="col">
                     <div th:if="${guide.getDepartments().size()} != 0">
                         <div class="d-grid gap-2" id="division-grid">
-                            <button th:each="division, dvs : ${guide.departments[0].divisions}" th:text="${division.title}" th:id="'btn-div-0-' + ${dvs.index}" class="btn btn-outline-secondary department text-start" type="button" onclick="selectDivision(this.id)"></button>
+                            <button th:each="division, dvs : ${guide.departments[0].divisions}" th:text="${division.title}" th:id="'btn-div-0-' + ${dvs.index}" class="btn btn-sm btn-outline-secondary department text-start" type="button" onclick="selectDivision(this.id)"></button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col border-start border-dark" id="guide-card-col">
+        <div class="col border-start border-dark img-bg" id="guide-card-col">
             <div th:if="${guide.getDepartments().size()} != 0">
                 <div th:if="${guide.departments[0].employees.size()} != 0">
-                    <div class="row rounded-4 shadow m-2" th:each="employee : ${guide.departments[0].employees}">
-                        <div class="col m-0 p-1 my-auto">
-                            <div class="m-0 p-1">
-                                <b><p class="m-0 p-0 ps-2" th:text="${employee.fullName}"></p></b>
+                    <div class="card m-1">
+                        <div class="row rounded-4 shadow m-2" th:each="employee : ${guide.departments[0].employees}">
+                            <div class="col m-0 p-1 my-auto">
+                                <div class="m-0 p-1">
+                                    <b><p class="m-0 p-0 ps-2" th:text="${employee.fullName}"></p></b>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col m-0 p-1 my-auto">
-                            <div class="m-0 p-1">
-                                <p class="m-0 p-0 text-center" th:text="${employee.position}"></p>
+                            <div class="col m-0 p-1 my-auto">
+                                <div class="m-0 p-1">
+                                    <p class="m-0 p-0 text-center" th:text="${employee.position}"></p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col m-0 p-1 my-auto">
-                            <div class="m-0 p-1">
-                                <p class="m-0 p-0 text-center" th:text="${employee.email}"></p>
+                            <div class="col m-0 p-1 my-auto">
+                                <div class="m-0 p-1">
+                                    <p class="m-0 p-0 text-center" th:text="${employee.email}"></p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-2 m-0 p-1 my-auto">
-                            <div class="m-0 p-1 d-flex">
-                                <p class="m-0 p-0 pe-2 text-center ms-auto" th:text="'телефон: ' + ${employee.phone}"></p>
+                            <div class="col-2 m-0 p-1 my-auto">
+                                <div class="m-0 p-1 d-flex">
+                                    <p class="m-0 p-0 pe-2 text-center ms-auto" th:text="'телефон: ' + ${employee.phone}"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -64,17 +66,17 @@
 
         let activeButtons = document.querySelectorAll('.department');
         activeButtons.forEach(function(button) {
-            button.setAttribute('class', 'btn btn-outline-secondary department text-start');
+            button.setAttribute('class', 'btn btn-sm btn-outline-secondary department text-start');
         });
 
         let selectedButton = document.getElementById(buttonId);
-        selectedButton.setAttribute('class','btn btn-secondary department text-start');
+        selectedButton.setAttribute('class','btn btn-sm btn-secondary department text-start');
 
         let count = 0;
         $('#division-grid').empty();
         divisions.forEach(function (division){
             $('#division-grid').append(
-                '<button id="btn-div-' + id + '-' + count + '" class="btn btn-outline-secondary division text-start" type="button" onclick="selectDivision(this.id)">' + division.title + '</button>'
+                '<button id="btn-div-' + id + '-' + count + '" class="btn btn-sm btn-outline-secondary division text-start" type="button" onclick="selectDivision(this.id)">' + division.title + '</button>'
             );
             count++;
         });
@@ -82,6 +84,7 @@
         $('#guide-card-col').empty();
         department.employees.forEach(function (employee){
             $('#guide-card-col').append(
+                '<div class="card m-1">' +
                 '<div class="row rounded-4 shadow m-2">' +
                 '   <div class="col m-0 p-1 my-auto">' +
                 '       <div class="m-0 p-1">' +
@@ -103,6 +106,7 @@
                 '           <p class="m-0 p-0 pe-2 text-center ms-auto">телефон: ' + employee.phone + '</p>' +
                 '       </div>' +
                 '   </div>' +
+                '</div>' +
                 '</div>'
             );
         });
@@ -117,15 +121,16 @@
 
         let activeButtons = document.querySelectorAll('.division');
         activeButtons.forEach(function(button) {
-            button.setAttribute('class', 'btn btn-outline-secondary division text-start');
+            button.setAttribute('class', 'btn btn-sm btn-outline-secondary division text-start');
         });
 
         let selectedButton = document.getElementById(buttonId);
-        selectedButton.setAttribute('class','btn btn-secondary division text-start');
+        selectedButton.setAttribute('class','btn btn-sm btn-secondary division text-start');
 
         $('#guide-card-col').empty();
         division.employees.forEach(function (employee){
             $('#guide-card-col').append(
+                '<div class="card m-1">' +
                 '<div class="row rounded-4 shadow m-2">' +
                 '   <div class="col m-0 p-1 my-auto">' +
                 '       <div class="m-0 p-1">' +
@@ -147,6 +152,7 @@
                 '           <p class="m-0 p-0 pe-2 text-center ms-auto">телефон: ' + employee.phone + '</p>' +
                 '       </div>' +
                 '   </div>' +
+                '</div>' +
                 '</div>'
             );
         });
