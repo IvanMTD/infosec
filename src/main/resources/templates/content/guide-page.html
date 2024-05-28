@@ -24,10 +24,10 @@
                 </div>
             </div>
         </div>
-        <div class="col border-start border-dark img-bg" id="guide-card-col">
+        <div class="col border border-dark img-bg rounded-3 me-4" id="guide-card-col">
             <div th:if="${guide.getDepartments().size()} != 0">
                 <div th:if="${guide.departments[0].employees.size()} != 0">
-                    <div class="card m-1">
+                    <div class="card mx-1 my-3">
                         <div class="row rounded-4 shadow m-2" th:each="employee : ${guide.departments[0].employees}">
                             <div class="col m-0 p-1 my-auto">
                                 <div class="m-0 p-1">
@@ -84,7 +84,7 @@
         $('#guide-card-col').empty();
         department.employees.forEach(function (employee){
             $('#guide-card-col').append(
-                '<div class="card m-1">' +
+                '<div class="card mx-1 my-3">' +
                 '<div class="row rounded-4 shadow m-2">' +
                 '   <div class="col m-0 p-1 my-auto">' +
                 '       <div class="m-0 p-1">' +
@@ -130,7 +130,7 @@
         $('#guide-card-col').empty();
         division.employees.forEach(function (employee){
             $('#guide-card-col').append(
-                '<div class="card m-1">' +
+                '<div class="card mx-1 my-3">' +
                 '<div class="row rounded-4 shadow m-2">' +
                 '   <div class="col m-0 p-1 my-auto">' +
                 '       <div class="m-0 p-1">' +
