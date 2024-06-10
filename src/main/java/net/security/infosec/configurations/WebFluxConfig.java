@@ -30,7 +30,7 @@ public class WebFluxConfig {
     public WebSessionIdResolver webSessionIdResolver() {
         CookieWebSessionIdResolver resolver = new CookieWebSessionIdResolver();
         resolver.setCookieName("session-info-security");
-        resolver.setCookieMaxAge(Duration.ofHours(12));
+        //resolver.setCookieMaxAge(Duration.ofHours(12));
         return resolver;
     }
 }
