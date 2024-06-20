@@ -37,7 +37,7 @@ public class JwtAuthenticationSuccessHandler implements ServerAuthenticationSucc
                 .build();
         ResponseCookie refreshCookie = ResponseCookie.from(NamingUtil.getInstance().getRefreshName(), refreshToken)
                 .httpOnly(true)
-                .maxAge(Duration.ofDays(30))
+                .maxAge(Duration.ofDays(1))
                 .path("/")
                 .build();
 

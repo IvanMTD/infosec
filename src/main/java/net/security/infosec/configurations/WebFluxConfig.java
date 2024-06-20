@@ -1,7 +1,6 @@
 package net.security.infosec.configurations;
 
 import net.security.infosec.services.WebFluxWebSocketHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.HandlerMapping;
@@ -9,7 +8,6 @@ import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.server.session.CookieWebSessionIdResolver;
 import org.springframework.web.server.session.WebSessionIdResolver;
 
-import java.time.Duration;
 import java.util.Map;
 
 @Configuration

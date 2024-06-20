@@ -44,7 +44,7 @@ public class JwtAuthenticationManager implements ReactiveAuthenticationManager {
                             .build();
                     ResponseCookie refreshCookie = ResponseCookie.from(NamingUtil.getInstance().getRefreshName(), newRefreshToken)
                             .httpOnly(true)
-                            .maxAge(Duration.ofDays(30))
+                            .maxAge(Duration.ofDays(1))
                             .path("/")
                             .build();
 
