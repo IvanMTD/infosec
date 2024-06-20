@@ -20,7 +20,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -151,7 +153,10 @@ public class AdminController {
                 categoryDTO.setTroubles(troubleDTOList);
                 return Mono.just(categoryDTO);
             });
-        });
+        }).collectList().flatMapMany(l -> {
+            l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
+            return Flux.fromIterable(l);
+        }).flatMapSequential(Mono::just);
 
         return Mono.just(
                 Rendering.view("template")

@@ -3,8 +3,8 @@
     background-position: center center;
     background-repeat: no-repeat;
     background-size: auto;
-    position: relative; /* добавляем position: relative, чтобы z-index работал */
-    z-index: -1; /* устанавливаем z-index для фонового изображения */
+    /*position: relative;*/ /* добавляем position: relative, чтобы z-index работал */
+    /*z-index: -1;*/ /* устанавливаем z-index для фонового изображения */
 }
 
 /* устанавливаем z-index для элементов внутри контейнера */

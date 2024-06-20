@@ -9,7 +9,7 @@
             <div class="row">
                 <div class="col">
                     <div class="d-grid gap-2">
-                        <button th:each="department, dps : ${guide.departments}" th:text="${department.title}" th:id="'btn-dep-' + ${dps.index}" class="btn btn-sm btn-outline-secondary department text-start" type="button" onclick="selectDepartment(this.id)"></button>
+                        <button th:each="department, dps : ${guide.departments}" th:text="${department.title}" th:id="'btn-dep-' + ${dps.index}" th:my-data="${department.id}" class="btn btn-sm btn-outline-secondary department text-start" type="button" onclick="selectDepartment(this.id)"></button>
                         <script>
                             document.getElementById('btn-dep-0').setAttribute('class',"btn btn-sm btn-secondary department text-start")
                         </script>
@@ -18,15 +18,15 @@
                 <div class="col">
                     <div th:if="${guide.getDepartments().size()} != 0">
                         <div class="d-grid gap-2" id="division-grid">
-                            <button th:each="division, dvs : ${guide.departments[0].divisions}" th:text="${division.title}" th:id="'btn-div-0-' + ${dvs.index}" class="btn btn-sm btn-outline-secondary department text-start" type="button" onclick="selectDivision(this.id)"></button>
+                            <button th:each="division, dvs : ${guide.departments[0].divisions}" th:text="${division.title}" th:id="'btn-div-0-' + ${dvs.index}" th:my-data="${division.id}" class="btn btn-sm btn-outline-secondary department text-start" type="button" onclick="selectDivision(this.id)"></button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col border border-dark img-bg rounded-3 me-4" id="guide-card-col">
+        <div class="col border border-dark img-bg rounded-3 me-4 position-relative">
             <div th:if="${guide.getDepartments().size()} != 0">
-                <div th:if="${guide.departments[0].employees.size()} != 0">
+                <div th:if="${guide.departments[0].employees.size()} != 0" id="guide-card-col">
                     <div class="card mx-1 my-3">
                         <div class="row rounded-4 shadow m-2" th:each="employee : ${guide.departments[0].employees}">
                             <div class="col m-0 p-1 my-auto">
@@ -48,6 +48,77 @@
                                 <div class="m-0 p-1 d-flex">
                                     <p class="m-0 p-0 pe-2 text-center ms-auto" th:text="'телефон: ' + ${employee.phone}"></p>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="position-absolute bottom-0 end-0 rounded-4 border m-3">
+                <button type="button" class="btn btn-outline-secondary rounded-circle shadow m-1" data-bs-toggle="modal" data-bs-target="#person-modal"><i class="bi bi-plus"></i></button>
+                <div class="modal fade" id="person-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Добавить сотрудника</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-1">
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control" id="number" placeholder="number">
+                                            <label for="number">№</label>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="lastname" placeholder="lastname">
+                                            <label for="lastname">Фамилия</label>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="name" placeholder="name">
+                                            <label for="name">Имя</label>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="middleName" placeholder="middleName">
+                                            <label for="middleName">Отчество</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row pt-3">
+                                    <div class="col">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="location" placeholder="location">
+                                            <label for="location">Расположение</label>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="office" placeholder="office">
+                                            <label for="office">Кабинет</label>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control" id="shot-number" placeholder="shot-number">
+                                            <label for="shot-number">Короткий номер</label>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-floating">
+                                            <input type="email" class="form-control" id="email" placeholder="email">
+                                            <label for="email">@Mail</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                                <button type="button" class="btn btn-outline-success" onclick="sendEmployeeData()">Добавить</button>
                             </div>
                         </div>
                     </div>
@@ -156,5 +227,18 @@
                 '</div>'
             );
         });
+    }
+
+    function sendEmployeeData(){
+        let selectedButtons = document.querySelectorAll('button.btn-secondary');
+        let departmentButton = selectedButtons[0];
+        let divisionButton = selectedButtons[1];
+        let departmentId = departmentButton.getAttribute('my-data');
+        let divisionId = -1;
+        console.log(divisionButton);
+        if(divisionButton !== undefined){
+            divisionId = divisionButton.getAttribute('my-data');
+        }
+        //console.log(selectedButtons,departmentId,divisionId);
     }
 </script>

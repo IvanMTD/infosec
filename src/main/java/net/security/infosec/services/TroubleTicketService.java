@@ -34,7 +34,10 @@ public class TroubleTicketService {
     }
 
     public Flux<Category> getAllCategories() {
-        return categoryRepository.findAll();
+        return categoryRepository.findAll().collectList().flatMapMany(l -> {
+            l = l.stream().sorted(Comparator.comparing(Category::getName)).collect(Collectors.toList());
+            return Flux.fromIterable(l);
+        }).flatMapSequential(Mono::just);
     }
 
     public Mono<Category> saveTroubleInCategory(TicketDataTransferObject dto) {

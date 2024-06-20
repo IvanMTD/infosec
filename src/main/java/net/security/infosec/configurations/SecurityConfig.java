@@ -47,6 +47,7 @@ public class SecurityConfig {
                                 .pathMatchers("/login").permitAll()
                                 .pathMatchers("/guide/list").permitAll()
                                 .pathMatchers("/favicon.ico").permitAll()
+                                .pathMatchers("/img/**").permitAll()
                                 .anyExchange().authenticated()
                 )
                 .formLogin(loginSpec -> loginSpec.loginPage("/login").authenticationSuccessHandler(authenticationSuccessHandler()))
