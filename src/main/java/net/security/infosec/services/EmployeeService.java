@@ -2,6 +2,7 @@ package net.security.infosec.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.security.infosec.dto.PersonDTO;
 import net.security.infosec.models.Department;
 import net.security.infosec.models.Division;
 import net.security.infosec.models.Employee;
@@ -11,7 +12,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -40,6 +43,10 @@ public class EmployeeService {
             e.setDivisionId(division);
             return employeeRepository.save(e);
         });
+    }
+
+    public Mono<Employee> create(PersonDTO person){
+        return Mono.just(new Employee(person)).flatMap(employeeRepository::save);
     }
 
     public Mono<Employee> getBy(long id) {
@@ -83,5 +90,43 @@ public class EmployeeService {
             l = l.stream().sorted(Comparator.comparing(Employee::getNumber)).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);
+    }
+
+    public Flux<Employee> searchFreeEmployees(String query) {
+        String[] searchParts = query.split(" ");
+        List<Flux<Employee>> fluxes = new ArrayList<>();
+        for(String part : searchParts){
+            if(!part.equals("")){
+                String searchData = "%" + part + "%";
+                Flux<Employee> lastnameFlux = employeeRepository.findAllByLastnameLikeIgnoreCase(searchData).switchIfEmpty(Flux.empty());
+                Flux<Employee> nameFlux = employeeRepository.findAllByNameLikeIgnoreCase(searchData).switchIfEmpty(Flux.empty());
+                Flux<Employee> middleNameFlux = employeeRepository.findAllByMiddleNameIgnoreCase(searchData).switchIfEmpty(Flux.empty());
+                fluxes.addAll(Arrays.asList(lastnameFlux,nameFlux,middleNameFlux));
+            }
+        }
+
+        return filterEmployees(fluxes,searchParts);
+    }
+
+    private Flux<Employee> filterEmployees(List<Flux<Employee>> fluxes, String[] searchParts){
+        return Flux.merge(fluxes).distinct().flatMap(employee -> {
+            int check = 0;
+            for(String part : searchParts){
+                if (employee.getLastname().toLowerCase().contains(part.toLowerCase())){
+                    check++;
+                }
+                if (employee.getName().toLowerCase().contains(part.toLowerCase())){
+                    check++;
+                }
+                if (employee.getMiddleName().toLowerCase().contains(part.toLowerCase())){
+                    check++;
+                }
+            }
+            if(check >= searchParts.length){
+                return Mono.just(employee);
+            }else{
+                return Mono.empty();
+            }
+        });
     }
 }

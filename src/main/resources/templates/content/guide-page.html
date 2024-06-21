@@ -14,6 +14,15 @@
                             document.getElementById('btn-dep-0').setAttribute('class',"btn btn-sm btn-secondary department text-start")
                         </script>
                     </div>
+                    <div class="row" th:if="@{admin}">
+                        <div class="col mt-2 d-flex">
+                            <div class="btn-group mx-auto" role="group">
+                                <button type="button" class="btn btn-outline-secondary"><i class="bi bi-plus-square"></i></button>
+                                <button type="button" class="btn btn-outline-secondary"><i class="bi bi-pencil-square"></i></button>
+                                <button type="button" class="btn btn-outline-secondary"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col">
                     <div th:if="${guide.getDepartments().size()} != 0">
@@ -54,64 +63,136 @@
                 </div>
             </div>
             <div class="position-absolute bottom-0 end-0 rounded-4 border m-3">
-                <button type="button" class="btn btn-outline-secondary rounded-circle shadow m-1" data-bs-toggle="modal" data-bs-target="#person-modal"><i class="bi bi-plus"></i></button>
+                <button type="button" class="btn btn-outline-secondary rounded-circle shadow m-1" data-bs-toggle="modal" data-bs-target="#person-modal"><i class="bi bi-person-add"></i></button>
                 <div class="modal fade" id="person-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-xl">
-                        <div class="modal-content">
+                        <form id="person-modal-form" class="modal-content" novalidate>
                             <div class="modal-header">
                                 <h1 class="modal-title fs-5" id="exampleModalLabel">Добавить сотрудника</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
+                                <div class="row pt-3">
+                                    <div class="col">
+                                        <input type="text" id="search-free-employees" class="form-control" list="free-employee-list" oninput="searchFreeEmployees()">
+                                        <datalist id="free-employee-list"></datalist>
+                                    </div>
+                                    <div class="col-2">
+                                        <button type="button" class="btn btn-outline-secondary w-100">Добавить</button>
+                                    </div>
+                                </div>
+                                <hr>
                                 <div class="row">
-                                    <div class="col-1">
+                                    <div class="col-2">
                                         <div class="form-floating">
-                                            <input type="number" class="form-control" id="number" placeholder="number">
+                                            <input type="number" class="form-control" id="number" placeholder="number" required>
                                             <label for="number">№</label>
+                                            <div class="valid-feedback">
+                                                Все хорошо
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Укажите п/н
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div class="form-floating">
-                                            <input type="text" class="form-control" id="lastname" placeholder="lastname">
+                                            <input type="text" class="form-control" id="lastname" placeholder="lastname" required>
                                             <label for="lastname">Фамилия</label>
+                                            <div class="valid-feedback">
+                                                Все хорошо
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Укажите фамилию
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div class="form-floating">
-                                            <input type="text" class="form-control" id="name" placeholder="name">
+                                            <input type="text" class="form-control" id="name" placeholder="name" required>
                                             <label for="name">Имя</label>
+                                            <div class="valid-feedback">
+                                                Все хорошо
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Укажите имя
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div class="form-floating">
-                                            <input type="text" class="form-control" id="middleName" placeholder="middleName">
+                                            <input type="text" class="form-control" id="middleName" placeholder="middleName" required>
                                             <label for="middleName">Отчество</label>
+                                            <div class="valid-feedback">
+                                                Все хорошо
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Укажите отчество
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row pt-3">
+                                    <div class="col-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="location" placeholder="location" required>
+                                            <label for="location">Расположение</label>
+                                            <div class="valid-feedback">
+                                                Все хорошо
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Укажите расположение
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="office" placeholder="office" required>
+                                            <label for="office">Кабинет</label>
+                                            <div class="valid-feedback">
+                                                Все хорошо
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Укажите кабинет
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control" id="short-number" placeholder="short-number" required>
+                                            <label for="short-number">Короткий номер</label>
+                                            <div class="valid-feedback">
+                                                Все хорошо
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Укажите короткий номер
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row pt-3">
                                     <div class="col">
                                         <div class="form-floating">
-                                            <input type="text" class="form-control" id="location" placeholder="location">
-                                            <label for="location">Расположение</label>
+                                            <input type="text" class="form-control" id="position" placeholder="position" required>
+                                            <label for="position">Должность</label>
+                                            <div class="valid-feedback">
+                                                Все хорошо
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Укажите должность
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div class="form-floating">
-                                            <input type="text" class="form-control" id="office" placeholder="office">
-                                            <label for="office">Кабинет</label>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="form-floating">
-                                            <input type="number" class="form-control" id="shot-number" placeholder="shot-number">
-                                            <label for="shot-number">Короткий номер</label>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="form-floating">
-                                            <input type="email" class="form-control" id="email" placeholder="email">
+                                            <input type="email" class="form-control" id="email" placeholder="email" required>
                                             <label for="email">@Mail</label>
+                                            <div class="valid-feedback">
+                                                Все хорошо
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Укажите почту
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -120,7 +201,7 @@
                                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
                                 <button type="button" class="btn btn-outline-success" onclick="sendEmployeeData()">Добавить</button>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -147,39 +228,14 @@
         $('#division-grid').empty();
         divisions.forEach(function (division){
             $('#division-grid').append(
-                '<button id="btn-div-' + id + '-' + count + '" class="btn btn-sm btn-outline-secondary division text-start" type="button" onclick="selectDivision(this.id)">' + division.title + '</button>'
+                '<button id="btn-div-' + id + '-' + count + '" my-data="' + division.id + '" class="btn btn-sm btn-outline-secondary division text-start" type="button" onclick="selectDivision(this.id)">' + division.title + '</button>'
             );
             count++;
         });
 
         $('#guide-card-col').empty();
         department.employees.forEach(function (employee){
-            $('#guide-card-col').append(
-                '<div class="card mx-1 my-3">' +
-                '<div class="row rounded-4 shadow m-2">' +
-                '   <div class="col m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1">' +
-                '           <p class="m-0 p-0 ps-2"><b>' + employee.fullName + '</b></p>' +
-                '       </div>' +
-                '   </div>' +
-                '   <div class="col m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1">' +
-                '           <p class="m-0 p-0 text-center">' + employee.position + '</p>' +
-                '       </div>' +
-                '   </div>' +
-                '   <div class="col m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1">' +
-                '           <p class="m-0 p-0 text-center">' + employee.email + '</p>' +
-                '       </div>' +
-                '   </div>' +
-                '   <div class="col-2 m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1 d-flex">' +
-                '           <p class="m-0 p-0 pe-2 text-center ms-auto">телефон: ' + employee.phone + '</p>' +
-                '       </div>' +
-                '   </div>' +
-                '</div>' +
-                '</div>'
-            );
+            employeeAppend(employee);
         });
     }
 
@@ -200,45 +256,118 @@
 
         $('#guide-card-col').empty();
         division.employees.forEach(function (employee){
-            $('#guide-card-col').append(
-                '<div class="card mx-1 my-3">' +
-                '<div class="row rounded-4 shadow m-2">' +
-                '   <div class="col m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1">' +
-                '           <p class="m-0 p-0 ps-2"><b>' + employee.fullName + '</b></p>' +
-                '       </div>' +
-                '   </div>' +
-                '   <div class="col m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1">' +
-                '           <p class="m-0 p-0 text-center">' + employee.position + '</p>' +
-                '       </div>' +
-                '   </div>' +
-                '   <div class="col m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1">' +
-                '           <p class="m-0 p-0 text-center">' + employee.email + '</p>' +
-                '       </div>' +
-                '   </div>' +
-                '   <div class="col-2 m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1 d-flex">' +
-                '           <p class="m-0 p-0 pe-2 text-center ms-auto">телефон: ' + employee.phone + '</p>' +
-                '       </div>' +
-                '   </div>' +
-                '</div>' +
-                '</div>'
-            );
+            employeeAppend(employee);
         });
     }
 
     function sendEmployeeData(){
+        const form = document.getElementById('person-modal-form');
+        if (!form.checkValidity()) {
+            // Пометить неверные поля как invalid
+            form.classList.add('was-validated');
+            return;
+        }
+
         let selectedButtons = document.querySelectorAll('button.btn-secondary');
         let departmentButton = selectedButtons[0];
+        let depParts = departmentButton.id.split('-');
+        let depIndex = depParts[depParts.length - 1];
         let divisionButton = selectedButtons[1];
         let departmentId = departmentButton.getAttribute('my-data');
-        let divisionId = -1;
-        console.log(divisionButton);
+        let divisionId = 0;
+        let divIndex = null;
         if(divisionButton !== undefined){
+            let divParts = divisionButton.id.split('-');
+            divIndex = divParts[divParts.length - 1];
             divisionId = divisionButton.getAttribute('my-data');
         }
-        //console.log(selectedButtons,departmentId,divisionId);
+
+        let request = {
+            number:$('#number').val(),
+            lastname:$('#lastname').val(),
+            name:$('#name').val(),
+            middleName:$('#middleName').val(),
+            location:$('#location').val(),
+            office:$('#office').val(),
+            shortNumber:$('#short-number').val(),
+            position:$('#position').val(),
+            email:$('#email').val(),
+            department:departmentId,
+            division:divisionId
+        }
+
+        let csrf = [[${_csrf}]];
+        let header = csrf.headerName;
+        let token = csrf.token;
+
+        $.ajax({
+            url: '/api/add/employee',
+            method:'POST',
+            data: JSON.stringify(request),
+            contentType:'application/json',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token);
+            },
+            success: function (response){
+                if(request.division != 0){
+                    departments[depIndex].divisions[divIndex].employees.push(response);
+                }else{
+                    departments[depIndex].employees.push(response);
+                }
+                employeeAppend(response);
+                $('#person-modal').modal('hide');
+            }
+        });
+
+    }
+
+    function searchFreeEmployees(){
+        let query = $('#search-free-employees').val();
+        console.log(query);
+        $.ajax({
+            url:'/api/search/free/employees',
+            type:'get',
+            data: {
+                query: query
+            },
+            success: function (response){
+                let datalist = $('#free-employee-list');
+                datalist.empty();
+                response.forEach(function (employee){
+                    datalist.append(
+                        '<option value="' + employee.id + '">' + employee.fullName + '</option>'
+                    );
+                });
+            }
+        });
+    }
+
+    function employeeAppend(employee){
+        $('#guide-card-col').append(
+            '<div class="card mx-1 my-3">' +
+            '<div class="row rounded-4 shadow m-2">' +
+            '   <div class="col m-0 p-1 my-auto">' +
+            '       <div class="m-0 p-1">' +
+            '           <p class="m-0 p-0 ps-2"><b>' + employee.fullName + '</b></p>' +
+            '       </div>' +
+            '   </div>' +
+            '   <div class="col m-0 p-1 my-auto">' +
+            '       <div class="m-0 p-1">' +
+            '           <p class="m-0 p-0 text-center">' + employee.position + '</p>' +
+            '       </div>' +
+            '   </div>' +
+            '   <div class="col m-0 p-1 my-auto">' +
+            '       <div class="m-0 p-1">' +
+            '           <p class="m-0 p-0 text-center">' + employee.email + '</p>' +
+            '       </div>' +
+            '   </div>' +
+            '   <div class="col-2 m-0 p-1 my-auto">' +
+            '       <div class="m-0 p-1 d-flex">' +
+            '           <p class="m-0 p-0 pe-2 text-center ms-auto">телефон: ' + employee.phone + '</p>' +
+            '       </div>' +
+            '   </div>' +
+            '</div>' +
+            '</div>'
+        );
     }
 </script>

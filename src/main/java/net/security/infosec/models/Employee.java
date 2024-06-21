@@ -18,6 +18,7 @@ create table if not exists employee(
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.security.infosec.dto.PersonDTO;
 import org.springframework.data.annotation.Id;
 
 @Data
@@ -63,6 +64,24 @@ public class Employee {
         setPhone(employee.getPhone());
         setEmail(employee.getEmail());
         setNumber(employee.getNumber());
+    }
+
+    public Employee(PersonDTO person) {
+        setNumber(person.getNumber());
+        setLastname(person.getLastname());
+        setName(person.getName());
+        setMiddleName(person.getMiddleName());
+        setAddress(person.getLocation());
+        setCabinet(person.getOffice());
+        setPhone(person.getShortNumber());
+        setPosition(person.getPosition());
+        setEmail(person.getEmail());
+
+        if(person.getDivision() != 0){
+            setDivisionId(person.getDivision());
+        }else{
+            setDepartmentId(person.getDepartment());
+        }
     }
 
     public String getFullName(){
