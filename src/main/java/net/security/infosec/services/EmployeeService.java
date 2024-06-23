@@ -98,9 +98,9 @@ public class EmployeeService {
         for(String part : searchParts){
             if(!part.equals("")){
                 String searchData = "%" + part + "%";
-                Flux<Employee> lastnameFlux = employeeRepository.findAllByLastnameLikeIgnoreCase(searchData).switchIfEmpty(Flux.empty());
-                Flux<Employee> nameFlux = employeeRepository.findAllByNameLikeIgnoreCase(searchData).switchIfEmpty(Flux.empty());
-                Flux<Employee> middleNameFlux = employeeRepository.findAllByMiddleNameIgnoreCase(searchData).switchIfEmpty(Flux.empty());
+                Flux<Employee> lastnameFlux = employeeRepository.findAllByLastnameLikeIgnoreCaseAndDepartmentIdAndDivisionId(searchData,0,0).switchIfEmpty(Flux.empty());
+                Flux<Employee> nameFlux = employeeRepository.findAllByNameLikeIgnoreCaseAndDepartmentIdAndDivisionId(searchData,0,0).switchIfEmpty(Flux.empty());
+                Flux<Employee> middleNameFlux = employeeRepository.findAllByMiddleNameIgnoreCaseAndDepartmentIdAndDivisionId(searchData,0,0).switchIfEmpty(Flux.empty());
                 fluxes.addAll(Arrays.asList(lastnameFlux,nameFlux,middleNameFlux));
             }
         }

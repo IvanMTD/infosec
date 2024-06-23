@@ -14,7 +14,7 @@
                             document.getElementById('btn-dep-0').setAttribute('class',"btn btn-sm btn-secondary department text-start")
                         </script>
                     </div>
-                    <div class="row" th:if="@{admin}">
+                    <div class="row" th:if="${admin}">
                         <div class="col mt-2 d-flex">
                             <div class="btn-group mx-auto" role="group">
                                 <button type="button" class="btn btn-outline-secondary"><i class="bi bi-plus-square"></i></button>
@@ -34,28 +34,30 @@
             </div>
         </div>
         <div class="col border border-dark img-bg rounded-3 me-4 position-relative">
-            <div th:if="${guide.getDepartments().size()} != 0">
-                <div th:if="${guide.departments[0].employees.size()} != 0" id="guide-card-col">
-                    <div class="card mx-1 my-3">
-                        <div class="row rounded-4 shadow m-2" th:each="employee : ${guide.departments[0].employees}">
-                            <div class="col m-0 p-1 my-auto">
-                                <div class="m-0 p-1">
-                                    <b><p class="m-0 p-0 ps-2" th:text="${employee.fullName}"></p></b>
+            <div id="guide-card-col" class="mb-5 pb-3">
+                <div th:if="${guide.getDepartments().size()} != 0">
+                    <div th:if="${guide.departments[0].employees.size()} != 0">
+                        <div class="card mx-1 my-3">
+                            <div class="row rounded-4 shadow m-2" th:each="employee : ${guide.departments[0].employees}">
+                                <div class="col m-0 p-1 my-auto">
+                                    <div class="m-0 p-1">
+                                        <b><p class="m-0 p-0 ps-2" th:text="${employee.fullName}"></p></b>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col m-0 p-1 my-auto">
-                                <div class="m-0 p-1">
-                                    <p class="m-0 p-0 text-center" th:text="${employee.position}"></p>
+                                <div class="col m-0 p-1 my-auto">
+                                    <div class="m-0 p-1">
+                                        <p class="m-0 p-0 text-center" th:text="${employee.position}"></p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col m-0 p-1 my-auto">
-                                <div class="m-0 p-1">
-                                    <p class="m-0 p-0 text-center" th:text="${employee.email}"></p>
+                                <div class="col m-0 p-1 my-auto">
+                                    <div class="m-0 p-1">
+                                        <p class="m-0 p-0 text-center" th:text="${employee.email}"></p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-2 m-0 p-1 my-auto">
-                                <div class="m-0 p-1 d-flex">
-                                    <p class="m-0 p-0 pe-2 text-center ms-auto" th:text="'телефон: ' + ${employee.phone}"></p>
+                                <div class="col-2 m-0 p-1 my-auto">
+                                    <div class="m-0 p-1 d-flex">
+                                        <p class="m-0 p-0 pe-2 text-center ms-auto" th:text="'телефон: ' + ${employee.phone}"></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -63,7 +65,7 @@
                 </div>
             </div>
             <div class="position-absolute bottom-0 end-0 rounded-4 border m-3">
-                <button type="button" class="btn btn-outline-secondary rounded-circle shadow m-1" data-bs-toggle="modal" data-bs-target="#person-modal"><i class="bi bi-person-add"></i></button>
+                <button type="button" class="btn btn-outline-secondary rounded-circle shadow m-1" data-bs-toggle="modal" data-bs-target="#person-modal" th:if="${admin}"><i class="bi bi-person-add"></i></button>
                 <div class="modal fade" id="person-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-xl">
                         <form id="person-modal-form" class="modal-content" novalidate>
@@ -78,7 +80,7 @@
                                         <datalist id="free-employee-list"></datalist>
                                     </div>
                                     <div class="col-2">
-                                        <button type="button" class="btn btn-outline-secondary w-100">Добавить</button>
+                                        <button type="button" class="btn btn-outline-secondary w-100" onclick="setupEmployee()">Добавить</button>
                                     </div>
                                 </div>
                                 <hr>
@@ -335,11 +337,22 @@
                 datalist.empty();
                 response.forEach(function (employee){
                     datalist.append(
-                        '<option value="' + employee.id + '">' + employee.fullName + '</option>'
+                        '<option value="' + employee.fullName + '" my-data="' + JSON.stringify(employee).replace(/"/g, '&quot;') + '"></option>'
                     );
                 });
             }
         });
+    }
+
+    function setupEmployee(){
+        let employeeSearch = document.getElementById('search-free-employees').value;
+        let dataList = document.getElementById('free-employee-list').options;
+        for(let i=0; i<dataList.length; i++){
+            if(dataList[i].value === employeeSearch){
+                let employee = JSON.parse(dataList[i].getAttribute('my-data').replace(/&quot;/g, '"'));
+
+            }
+        }
     }
 
     function employeeAppend(employee){

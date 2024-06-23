@@ -22,6 +22,7 @@ public class EmployeeDTO {
     private int number;
 
     public EmployeeDTO(Employee employee) {
+        setId(employee.getId());
         setName(employee.getName());
         setMiddleName(employee.getMiddleName());
         setLastname(employee.getLastname());

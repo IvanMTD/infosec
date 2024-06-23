@@ -9,7 +9,7 @@ public interface EmployeeRepository extends ReactiveCrudRepository<Employee,Long
 
     Flux<Employee> findByDepartmentId(long id);
 
-    Flux<Employee> findAllByLastnameLikeIgnoreCase(String lastname);
-    Flux<Employee> findAllByNameLikeIgnoreCase(String name);
-    Flux<Employee> findAllByMiddleNameIgnoreCase(String middleName);
+    Flux<Employee> findAllByLastnameLikeIgnoreCaseAndDepartmentIdAndDivisionId(String lastname, long departmentId, long divisionId);
+    Flux<Employee> findAllByNameLikeIgnoreCaseAndDepartmentIdAndDivisionId(String name, long departmentId, long divisionId);
+    Flux<Employee> findAllByMiddleNameIgnoreCaseAndDepartmentIdAndDivisionId(String middleName, long departmentId, long divisionId);
 }
