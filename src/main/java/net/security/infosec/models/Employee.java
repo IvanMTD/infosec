@@ -67,6 +67,7 @@ public class Employee {
     }
 
     public Employee(PersonDTO person) {
+        setId(person.getId());
         setNumber(person.getNumber());
         setLastname(person.getLastname());
         setName(person.getName());

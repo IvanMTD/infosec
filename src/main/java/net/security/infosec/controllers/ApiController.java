@@ -4,10 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.security.infosec.dto.EmployeeDTO;
 import net.security.infosec.dto.PersonDTO;
+import net.security.infosec.models.Employee;
 import net.security.infosec.services.EmployeeService;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -20,7 +24,7 @@ public class ApiController {
     @PostMapping("/add/employee")
     public Mono<EmployeeDTO> addEmployee(@RequestBody PersonDTO personDTO){
         log.info("controller request on \"/api/add/employee\" with data [{}]",personDTO);
-        return employeeService.create(personDTO).flatMap(saved -> {
+        return employeeService.setup(personDTO).flatMap(saved -> {
             log.info("data saved [{}]",saved);
             return Mono.just(new EmployeeDTO(saved));
         });
@@ -28,6 +32,13 @@ public class ApiController {
 
     @GetMapping("/search/free/employees")
     public Flux<EmployeeDTO> searchFreeEmployees(@RequestParam(name = "query") String query){
-        return employeeService.searchFreeEmployees(query).flatMap(employee -> Mono.just(new EmployeeDTO(employee)));
+        return employeeService.searchFreeEmployees(query).collectList().flatMapMany(l -> {
+            l = l.stream().sorted(Comparator.comparing(Employee::getFullName)).collect(Collectors.toList());
+            if(l.size() > 10){
+                return Flux.fromIterable(l).take(10);
+            }else{
+                return Flux.fromIterable(l);
+            }
+        }).flatMapSequential(employee -> Mono.just(new EmployeeDTO(employee)));
     }
 }

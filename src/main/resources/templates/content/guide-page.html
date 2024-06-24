@@ -34,35 +34,47 @@
             </div>
         </div>
         <div class="col border border-dark img-bg rounded-3 me-4 position-relative">
-            <div id="guide-card-col" class="mb-5 pb-3">
-                <div th:if="${guide.getDepartments().size()} != 0">
-                    <div th:if="${guide.departments[0].employees.size()} != 0">
-                        <div class="card mx-1 my-3">
-                            <div class="row rounded-4 shadow m-2" th:each="employee : ${guide.departments[0].employees}">
-                                <div class="col m-0 p-1 my-auto">
-                                    <div class="m-0 p-1">
-                                        <b><p class="m-0 p-0 ps-2" th:text="${employee.fullName}"></p></b>
-                                    </div>
-                                </div>
-                                <div class="col m-0 p-1 my-auto">
-                                    <div class="m-0 p-1">
-                                        <p class="m-0 p-0 text-center" th:text="${employee.position}"></p>
-                                    </div>
-                                </div>
-                                <div class="col m-0 p-1 my-auto">
-                                    <div class="m-0 p-1">
-                                        <p class="m-0 p-0 text-center" th:text="${employee.email}"></p>
-                                    </div>
-                                </div>
-                                <div class="col-2 m-0 p-1 my-auto">
-                                    <div class="m-0 p-1 d-flex">
-                                        <p class="m-0 p-0 pe-2 text-center ms-auto" th:text="'телефон: ' + ${employee.phone}"></p>
+            <div class="row">
+
+                <div class="col">
+                    <div id="guide-card-col" class="mb-5 pb-3">
+                        <div th:if="${guide.getDepartments().size()} != 0">
+                            <div th:if="${guide.departments[0].employees.size()} != 0">
+                                <div class="card mx-1 my-3">
+                                    <div class="row rounded-4 shadow m-2" th:each="employee : ${guide.departments[0].employees}">
+                                        <div class="col m-0 p-1 my-auto">
+                                            <div class="m-0 p-1">
+                                                <b><p class="m-0 p-0 ps-2" th:text="${employee.fullName}"></p></b>
+                                            </div>
+                                        </div>
+                                        <div class="col m-0 p-1 my-auto">
+                                            <div class="m-0 p-1">
+                                                <p class="m-0 p-0 text-center" th:text="${employee.position}"></p>
+                                            </div>
+                                        </div>
+                                        <div class="col m-0 p-1 my-auto">
+                                            <div class="m-0 p-1">
+                                                <p class="m-0 p-0 text-center" th:text="${employee.email}"></p>
+                                            </div>
+                                        </div>
+                                        <div class="col-2 m-0 p-1 my-auto">
+                                            <div class="m-0 p-1 d-flex">
+                                                <p class="m-0 p-0 pe-2 text-center ms-auto" th:text="'телефон: ' + ${employee.phone}"></p>
+                                            </div>
+                                        </div>
+                                        <div class="col border-start d-flex" th:if="${admin}">
+                                            <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">
+                                                <button type="button" th:id="'pin-out-' + ${employee.id}" class="btn btn-outline-secondary" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i></button>
+                                                <button type="button" th:id="'edit-' + ${employee.id}" class="btn btn-outline-secondary" onclick="editEmployee(this.id)"><i class="bi bi-pencil"></i></button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
             <div class="position-absolute bottom-0 end-0 rounded-4 border m-3">
                 <button type="button" class="btn btn-outline-secondary rounded-circle shadow m-1" data-bs-toggle="modal" data-bs-target="#person-modal" th:if="${admin}"><i class="bi bi-person-add"></i></button>
@@ -201,7 +213,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
-                                <button type="button" class="btn btn-outline-success" onclick="sendEmployeeData()">Добавить</button>
+                                <button type="button" class="btn btn-outline-success" onclick="sendEmployeeData(null)">Добавить</button>
                             </div>
                         </form>
                     </div>
@@ -210,8 +222,20 @@
         </div>
     </div>
 </div>
+
+<script>
+    const modal = document.getElementById('person-modal');
+
+    modal.addEventListener('hidden.bs.modal', function () {
+        const form = document.getElementById('person-modal-form');
+        form.reset();
+        form.classList.remove('was-validated');
+    });
+</script>
+
 <script th:inline="javascript">
     let departments = [[${guide}]].departments;
+    let admin = [[${admin}]];
     function selectDepartment(buttonId){
         let data = buttonId.split('-');
         let id = data[data.length - 1];
@@ -262,40 +286,49 @@
         });
     }
 
-    function sendEmployeeData(){
-        const form = document.getElementById('person-modal-form');
-        if (!form.checkValidity()) {
-            // Пометить неверные поля как invalid
-            form.classList.add('was-validated');
-            return;
-        }
+    function sendEmployeeData(employeeData){
+        let structData = getCurrentSelectedData();
 
-        let selectedButtons = document.querySelectorAll('button.btn-secondary');
-        let departmentButton = selectedButtons[0];
-        let depParts = departmentButton.id.split('-');
-        let depIndex = depParts[depParts.length - 1];
-        let divisionButton = selectedButtons[1];
-        let departmentId = departmentButton.getAttribute('my-data');
-        let divisionId = 0;
-        let divIndex = null;
-        if(divisionButton !== undefined){
-            let divParts = divisionButton.id.split('-');
-            divIndex = divParts[divParts.length - 1];
-            divisionId = divisionButton.getAttribute('my-data');
-        }
+        let request = null;
 
-        let request = {
-            number:$('#number').val(),
-            lastname:$('#lastname').val(),
-            name:$('#name').val(),
-            middleName:$('#middleName').val(),
-            location:$('#location').val(),
-            office:$('#office').val(),
-            shortNumber:$('#short-number').val(),
-            position:$('#position').val(),
-            email:$('#email').val(),
-            department:departmentId,
-            division:divisionId
+        if(employeeData != null){
+            request = {
+                id: employeeData.id,
+                number: employeeData.number,
+                lastname: employeeData.lastname,
+                name: employeeData.name,
+                middleName: employeeData.middleName,
+                location: employeeData.address,
+                office: employeeData.cabinet,
+                shortNumber: employeeData.phone,
+                position: employeeData.position,
+                email: employeeData.email,
+                department: structData.departmentId,
+                division: structData.divisionId
+            }
+        }else {
+
+            const form = document.getElementById('person-modal-form');
+            if (!form.checkValidity()) {
+                // Пометить неверные поля как invalid
+                form.classList.add('was-validated');
+                return;
+            }
+
+            request = {
+                id: 0,
+                number: $('#number').val(),
+                lastname: $('#lastname').val(),
+                name: $('#name').val(),
+                middleName: $('#middleName').val(),
+                location: $('#location').val(),
+                office: $('#office').val(),
+                shortNumber: $('#short-number').val(),
+                position: $('#position').val(),
+                email: $('#email').val(),
+                department: structData.departmentId,
+                division: structData.divisionId
+            }
         }
 
         let csrf = [[${_csrf}]];
@@ -312,9 +345,9 @@
             },
             success: function (response){
                 if(request.division != 0){
-                    departments[depIndex].divisions[divIndex].employees.push(response);
+                    departments[structData.departmentIndex].divisions[structData.divisionIndex].employees.push(response);
                 }else{
-                    departments[depIndex].employees.push(response);
+                    departments[structData.departmentIndex].employees.push(response);
                 }
                 employeeAppend(response);
                 $('#person-modal').modal('hide');
@@ -325,7 +358,6 @@
 
     function searchFreeEmployees(){
         let query = $('#search-free-employees').val();
-        console.log(query);
         $.ajax({
             url:'/api/search/free/employees',
             type:'get',
@@ -350,37 +382,113 @@
         for(let i=0; i<dataList.length; i++){
             if(dataList[i].value === employeeSearch){
                 let employee = JSON.parse(dataList[i].getAttribute('my-data').replace(/&quot;/g, '"'));
-
+                sendEmployeeData(employee);
             }
         }
     }
 
+    function getCurrentSelectedData(){
+        let selectedButtons = document.querySelectorAll('button.btn-secondary');
+        let departmentButton = selectedButtons[0];
+        let depParts = departmentButton.id.split('-');
+        let depIndex = depParts[depParts.length - 1];
+        let divisionButton = selectedButtons[1];
+        let departmentId = departmentButton.getAttribute('my-data');
+        let divisionId = 0;
+        let divIndex = null;
+        if(divisionButton !== undefined){
+            let divParts = divisionButton.id.split('-');
+            divIndex = divParts[divParts.length - 1];
+            divisionId = divisionButton.getAttribute('my-data');
+        }
+        return {
+            departmentIndex: depIndex,
+            department: departmentId,
+            divisionIndex: divIndex,
+            division: divisionId
+        }
+    }
+
+    function pinOut(buttonId){
+        let parts = buttonId.split('-');
+        let id = parts[parts.length -1];
+        $.ajax({
+            url:'/api/pinout/employee',
+            type:'get',
+            data:{
+                query:id
+            },
+            success: function (response){
+
+            }
+        });
+    }
+
+    function editEmployee(id){
+        console.log(id);
+    }
+
     function employeeAppend(employee){
-        $('#guide-card-col').append(
-            '<div class="card mx-1 my-3">' +
-            '<div class="row rounded-4 shadow m-2">' +
-            '   <div class="col m-0 p-1 my-auto">' +
-            '       <div class="m-0 p-1">' +
-            '           <p class="m-0 p-0 ps-2"><b>' + employee.fullName + '</b></p>' +
-            '       </div>' +
-            '   </div>' +
-            '   <div class="col m-0 p-1 my-auto">' +
-            '       <div class="m-0 p-1">' +
-            '           <p class="m-0 p-0 text-center">' + employee.position + '</p>' +
-            '       </div>' +
-            '   </div>' +
-            '   <div class="col m-0 p-1 my-auto">' +
-            '       <div class="m-0 p-1">' +
-            '           <p class="m-0 p-0 text-center">' + employee.email + '</p>' +
-            '       </div>' +
-            '   </div>' +
-            '   <div class="col-2 m-0 p-1 my-auto">' +
-            '       <div class="m-0 p-1 d-flex">' +
-            '           <p class="m-0 p-0 pe-2 text-center ms-auto">телефон: ' + employee.phone + '</p>' +
-            '       </div>' +
-            '   </div>' +
-            '</div>' +
-            '</div>'
-        );
+        if(admin){
+            $('#guide-card-col').append(
+                '<div class="card mx-1 my-3">' +
+                '<div class="row rounded-4 shadow m-2">' +
+                '   <div class="col m-0 p-1 my-auto">' +
+                '       <div class="m-0 p-1">' +
+                '           <p class="m-0 p-0 ps-2"><b>' + employee.fullName + '</b></p>' +
+                '       </div>' +
+                '   </div>' +
+                '   <div class="col m-0 p-1 my-auto">' +
+                '       <div class="m-0 p-1">' +
+                '           <p class="m-0 p-0 text-center">' + employee.position + '</p>' +
+                '       </div>' +
+                '   </div>' +
+                '   <div class="col m-0 p-1 my-auto">' +
+                '       <div class="m-0 p-1">' +
+                '           <p class="m-0 p-0 text-center">' + employee.email + '</p>' +
+                '       </div>' +
+                '   </div>' +
+                '   <div class="col-2 m-0 p-1 my-auto">' +
+                '       <div class="m-0 p-1 d-flex">' +
+                '           <p class="m-0 p-0 pe-2 text-center ms-auto">телефон: ' + employee.phone + '</p>' +
+                '       </div>' +
+                '   </div>' +
+                '   <div class="col border-start d-flex">\n' +
+                '       <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">\n' +
+                '           <button type="button" id="pin-out-' + employee.id + '" class="btn btn-outline-secondary" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i></button>\n' +
+                '           <button type="button" id="edit-' + employee.id + '" class="btn btn-outline-secondary" onclick="editEmployee(this.id)"><i class="bi bi-pencil"></i></button>\n' +
+                '       </div>\n' +
+                '   </div>' +
+                '</div>' +
+                '</div>'
+            );
+        }else{
+            $('#guide-card-col').append(
+                '<div class="card mx-1 my-3">' +
+                '<div class="row rounded-4 shadow m-2">' +
+                '   <div class="col m-0 p-1 my-auto">' +
+                '       <div class="m-0 p-1">' +
+                '           <p class="m-0 p-0 ps-2"><b>' + employee.fullName + '</b></p>' +
+                '       </div>' +
+                '   </div>' +
+                '   <div class="col m-0 p-1 my-auto">' +
+                '       <div class="m-0 p-1">' +
+                '           <p class="m-0 p-0 text-center">' + employee.position + '</p>' +
+                '       </div>' +
+                '   </div>' +
+                '   <div class="col m-0 p-1 my-auto">' +
+                '       <div class="m-0 p-1">' +
+                '           <p class="m-0 p-0 text-center">' + employee.email + '</p>' +
+                '       </div>' +
+                '   </div>' +
+                '   <div class="col-2 m-0 p-1 my-auto">' +
+                '       <div class="m-0 p-1 d-flex">' +
+                '           <p class="m-0 p-0 pe-2 text-center ms-auto">телефон: ' + employee.phone + '</p>' +
+                '       </div>' +
+                '   </div>' +
+                '</div>' +
+                '</div>'
+            );
+        }
     }
 </script>

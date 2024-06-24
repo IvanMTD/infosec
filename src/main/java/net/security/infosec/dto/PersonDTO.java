@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class PersonDTO {
+    private long id;
     private int number;
     private String lastname;
     private String name;
