@@ -5,6 +5,20 @@
         </div>
     </div>
     <div class="row">
+        <div class="d-grid col-6 mx-auto my-4">
+            <div class="row">
+                <div class="col form-floating">
+                    <input type="text" class="form-control" id="global-search" list="global-list" placeholder="global-search" oninput="globalSearch()">
+                    <datalist id="global-list"></datalist>
+                    <label for="global-search" class="ms-2">Поиск</label>
+                </div>
+                <div class="col-1 d-flex">
+                    <i class="fs-2 m-auto bi bi-search"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-5">
             <div class="row">
                 <div class="col">
@@ -62,10 +76,10 @@
                                                 <p class="m-0 p-0 pe-2 text-center ms-auto" th:text="'телефон: ' + ${employee.phone}"></p>
                                             </div>
                                         </div>
-                                        <div class="col border-start d-flex" th:if="${admin}">
+                                        <div class="col border-start d-flex bg-primary-subtle rounded-end-4" th:if="${admin}">
                                             <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">
-                                                <button type="button" th:id="'pin-out-' + ${employee.id}" class="btn btn-outline-secondary" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i></button>
-                                                <button type="button" th:id="'edit-' + ${employee.id}" class="btn btn-outline-secondary" onclick="editEmployee(this.id)" disabled><i class="bi bi-pencil"></i></button>
+                                                <button type="button" th:id="'pin-out-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i></button>
+                                                <button type="button" th:id="'edit-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)" disabled><i class="bi bi-pencil"></i></button>
                                             </div>
                                         </div>
                                     </div>
@@ -453,6 +467,20 @@
         console.log(id);
     }
 
+    function globalSearch(){
+        let search = $('#global-search').val();
+        $.ajax({
+            url:'/api/search/employees',
+            type:'get',
+            data:{
+                search:search
+            },
+            success: function (response){
+                rebuildEmployees(response);
+            }
+        });
+    }
+
     function rebuildEmployees(employees){
         $('#guide-card-col').empty();
         employees.forEach(function(employee){
@@ -485,10 +513,10 @@
                 '           <p class="m-0 p-0 pe-2 text-center ms-auto">телефон: ' + employee.phone + '</p>' +
                 '       </div>' +
                 '   </div>' +
-                '   <div class="col border-start d-flex">\n' +
+                '   <div class="col border-start d-flex bg-primary-subtle rounded-end-4">\n' +
                 '       <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">\n' +
-                '           <button type="button" id="pin-out-' + employee.id + '" class="btn btn-outline-secondary" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i></button>\n' +
-                '           <button type="button" id="edit-' + employee.id + '" class="btn btn-outline-secondary" onclick="editEmployee(this.id)" disabled><i class="bi bi-pencil"></i></button>\n' +
+                '           <button type="button" id="pin-out-' + employee.id + '" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i></button>\n' +
+                '           <button type="button" id="edit-' + employee.id + '" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)" disabled><i class="bi bi-pencil"></i></button>\n' +
                 '       </div>\n' +
                 '   </div>' +
                 '</div>' +

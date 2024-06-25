@@ -43,9 +43,9 @@ public class Employee {
     @NotBlank(message = "Не может быть пустым")
     private String address;
 
-    @Min(value = 100, message = "Короткий номер не может быть меньше 3 цифр")
-    @Max(value = 9999, message = "Короткий номер не может быть больше 4 цифр")
-    private int phone;
+    /*@Min(value = 100, message = "Короткий номер не может быть меньше 3 цифр")
+    @Max(value = 9999, message = "Короткий номер не может быть больше 4 цифр")*/
+    private String phone;
     @Email(message = "Не валидный email")
     @NotBlank(message = "Не может быть пустым")
     private String email;

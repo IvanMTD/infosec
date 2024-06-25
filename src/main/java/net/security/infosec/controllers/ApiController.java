@@ -49,4 +49,9 @@ public class ApiController {
             return Mono.just(new EmployeeDTO(employee));
         });
     }
+
+    @GetMapping("/search/employees")
+    public Flux<EmployeeDTO> searchEmployees(@RequestParam(name = "search") String search){
+        return employeeService.findBySearchData(search).flatMap(employee -> Mono.just(new EmployeeDTO(employee)));
+    }
 }

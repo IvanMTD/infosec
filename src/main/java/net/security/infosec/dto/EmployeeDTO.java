@@ -17,7 +17,7 @@ public class EmployeeDTO {
     private long divisionId;
     private String cabinet;
     private String address;
-    private int phone;
+    private String phone;
     private String email;
     private int number;
 

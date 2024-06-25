@@ -8,6 +8,7 @@ import net.security.infosec.models.Department;
 import net.security.infosec.models.Division;
 import net.security.infosec.models.Employee;
 import net.security.infosec.repositories.EmployeeRepository;
+import net.security.infosec.utils.Checker;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -101,7 +102,7 @@ public class EmployeeService {
                 String searchData = "%" + part + "%";
                 Flux<Employee> lastnameFlux = employeeRepository.findAllByLastnameLikeIgnoreCaseAndDepartmentIdAndDivisionId(searchData,0,0).switchIfEmpty(Flux.empty());
                 Flux<Employee> nameFlux = employeeRepository.findAllByNameLikeIgnoreCaseAndDepartmentIdAndDivisionId(searchData,0,0).switchIfEmpty(Flux.empty());
-                Flux<Employee> middleNameFlux = employeeRepository.findAllByMiddleNameIgnoreCaseAndDepartmentIdAndDivisionId(searchData,0,0).switchIfEmpty(Flux.empty());
+                Flux<Employee> middleNameFlux = employeeRepository.findAllByMiddleNameLikeIgnoreCaseAndDepartmentIdAndDivisionId(searchData,0,0).switchIfEmpty(Flux.empty());
                 fluxes.addAll(Arrays.asList(lastnameFlux,nameFlux,middleNameFlux));
             }
         }
@@ -122,7 +123,7 @@ public class EmployeeService {
                 if (employee.getMiddleName().toLowerCase().contains(part.toLowerCase())){
                     check++;
                 }
-            }
+             }
             if(check >= searchParts.length){
                 return Mono.just(employee);
             }else{
@@ -136,6 +137,53 @@ public class EmployeeService {
             employee.setDepartmentId(0);
             employee.setDivisionId(0);
             return employeeRepository.save(employee);
+        });
+    }
+
+    public Flux<Employee> findBySearchData(String search) {
+        String parts[] = search.split(" ");
+        List<Flux<Employee>> fluxes = new ArrayList<>();
+        for(String part : parts){
+            String searchData = "%" + part + "%";
+            fluxes.add(employeeRepository.findAllByLastnameLikeIgnoreCase(searchData));
+            fluxes.add(employeeRepository.findAllByNameLikeIgnoreCase(searchData));
+            fluxes.add(employeeRepository.findAllByMiddleNameLikeIgnoreCase(searchData));
+            fluxes.add(employeeRepository.findAllByPositionLikeIgnoreCase(searchData));
+            fluxes.add(employeeRepository.findAllByEmailLikeIgnoreCase(searchData));
+            fluxes.add(employeeRepository.findAllByPhoneLikeIgnoreCase(searchData));
+        }
+
+        return globalFilterEmployees(fluxes,parts);
+    }
+
+    private Flux<Employee> globalFilterEmployees(List<Flux<Employee>> fluxes, String[] searchParts){
+        return Flux.merge(fluxes).distinct().flatMap(employee -> {
+            int check = 0;
+            for(String part : searchParts){
+                if (employee.getLastname().toLowerCase().contains(part.toLowerCase())){
+                    check++;
+                }
+                if (employee.getName().toLowerCase().contains(part.toLowerCase())){
+                    check++;
+                }
+                if (employee.getMiddleName().toLowerCase().contains(part.toLowerCase())){
+                    check++;
+                }
+                if (employee.getPosition().toLowerCase().contains(part.toLowerCase())){
+                    check++;
+                }
+                if (employee.getEmail().toLowerCase().contains(part.toLowerCase())){
+                    check++;
+                }
+                if (employee.getPhone().toLowerCase().contains(part.toLowerCase())){
+                    check++;
+                }
+            }
+            if(check >= searchParts.length){
+                return Mono.just(employee);
+            }else{
+                return Mono.empty();
+            }
         });
     }
 }

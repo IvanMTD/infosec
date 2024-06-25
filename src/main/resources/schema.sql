@@ -63,6 +63,6 @@ create table if not exists employee(
     division_id bigint,
     cabinet text,
     address text,
-    phone int,
+    phone text,
     email text
 );

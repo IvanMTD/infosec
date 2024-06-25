@@ -13,7 +13,7 @@ public class PersonDTO {
     private String middleName;
     private String location;
     private String office;
-    private int shortNumber;
+    private String shortNumber;
     private String position;
     private String email;
     private long department;

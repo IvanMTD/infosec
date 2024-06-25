@@ -53,15 +53,15 @@ public class ApplicationConfig {
             String result = firstLetter + restOfString;
 
             String trimNumber = shortNumber.toString().trim();
-            int phoneNumber = 0;
+            String phoneNumber = "0";
             if(!trimNumber.equals("-")){
                 String data = trimNumber.substring(0,trimNumber.length() - 2);
-                phoneNumber = Integer.parseInt(data);
+                phoneNumber = data;
             }
 
             String trimEmail = email.toString().trim();
 
-            int finalPhoneNumber = phoneNumber;
+            String finalPhoneNumber = phoneNumber;
             employeeRepository.findByLastnameIgnoreCaseAndNameIgnoreCaseAndMiddleNameIgnoreCase(lastname,name,middleName).switchIfEmpty(
                     Mono.just(new Employee()).flatMap(employee -> {
                         employee.setLastname(lastname);
