@@ -17,9 +17,9 @@
                     <div class="row" th:if="${admin}">
                         <div class="col mt-2 d-flex">
                             <div class="btn-group mx-auto" role="group">
-                                <button type="button" class="btn btn-outline-secondary"><i class="bi bi-plus-square"></i></button>
-                                <button type="button" class="btn btn-outline-secondary"><i class="bi bi-pencil-square"></i></button>
-                                <button type="button" class="btn btn-outline-secondary"><i class="bi bi-trash"></i></button>
+                                <button type="button" class="btn btn-outline-secondary" disabled><i class="bi bi-plus-square"></i></button>
+                                <button type="button" class="btn btn-outline-secondary" disabled><i class="bi bi-pencil-square"></i></button>
+                                <button type="button" class="btn btn-outline-secondary" disabled><i class="bi bi-trash"></i></button>
                             </div>
                         </div>
                     </div>
@@ -65,7 +65,7 @@
                                         <div class="col border-start d-flex" th:if="${admin}">
                                             <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">
                                                 <button type="button" th:id="'pin-out-' + ${employee.id}" class="btn btn-outline-secondary" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i></button>
-                                                <button type="button" th:id="'edit-' + ${employee.id}" class="btn btn-outline-secondary" onclick="editEmployee(this.id)"><i class="bi bi-pencil"></i></button>
+                                                <button type="button" th:id="'edit-' + ${employee.id}" class="btn btn-outline-secondary" onclick="editEmployee(this.id)" disabled><i class="bi bi-pencil"></i></button>
                                             </div>
                                         </div>
                                     </div>
@@ -288,6 +288,7 @@
 
     function sendEmployeeData(employeeData){
         let structData = getCurrentSelectedData();
+        console.log(structData);
 
         let request = null;
 
@@ -303,9 +304,10 @@
                 shortNumber: employeeData.phone,
                 position: employeeData.position,
                 email: employeeData.email,
-                department: structData.departmentId,
-                division: structData.divisionId
+                department: structData.department,
+                division: structData.division
             }
+            console.log(request);
         }else {
 
             const form = document.getElementById('person-modal-form');
@@ -412,20 +414,50 @@
     function pinOut(buttonId){
         let parts = buttonId.split('-');
         let id = parts[parts.length -1];
+        let structure = getCurrentSelectedData();
         $.ajax({
             url:'/api/pinout/employee',
             type:'get',
             data:{
-                query:id
+                employeeId:id
             },
             success: function (response){
-
+                if(structure.division != 0){
+                    let employees = departments[structure.departmentIndex].divisions[structure.divisionIndex].employees;
+                    let employeeIndex = null;
+                    for(let i=0; i<employees.length; i++){
+                        if(employees[i].id == response.id){
+                            employeeIndex = i;
+                        }
+                    }
+                    departments[structure.departmentIndex].divisions[structure.divisionIndex].employees.splice(employeeIndex,1);
+                    employees = departments[structure.departmentIndex].divisions[structure.divisionIndex].employees;
+                    rebuildEmployees(employees);
+                }else{
+                    let employees = departments[structure.departmentIndex].employees;
+                    let employeeIndex = null;
+                    for(let i=0; i<employees.length; i++){
+                        if(employees[i].id == response.id){
+                            employeeIndex = i;
+                        }
+                    }
+                    departments[structure.departmentIndex].employees.splice(employeeIndex,1);
+                    employees =departments[structure.departmentIndex].employees;
+                        rebuildEmployees(employees);
+                }
             }
         });
     }
 
     function editEmployee(id){
         console.log(id);
+    }
+
+    function rebuildEmployees(employees){
+        $('#guide-card-col').empty();
+        employees.forEach(function(employee){
+            employeeAppend(employee);
+        })
     }
 
     function employeeAppend(employee){
@@ -456,7 +488,7 @@
                 '   <div class="col border-start d-flex">\n' +
                 '       <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">\n' +
                 '           <button type="button" id="pin-out-' + employee.id + '" class="btn btn-outline-secondary" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i></button>\n' +
-                '           <button type="button" id="edit-' + employee.id + '" class="btn btn-outline-secondary" onclick="editEmployee(this.id)"><i class="bi bi-pencil"></i></button>\n' +
+                '           <button type="button" id="edit-' + employee.id + '" class="btn btn-outline-secondary" onclick="editEmployee(this.id)" disabled><i class="bi bi-pencil"></i></button>\n' +
                 '       </div>\n' +
                 '   </div>' +
                 '</div>' +

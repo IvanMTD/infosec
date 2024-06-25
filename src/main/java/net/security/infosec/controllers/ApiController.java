@@ -41,4 +41,12 @@ public class ApiController {
             }
         }).flatMapSequential(employee -> Mono.just(new EmployeeDTO(employee)));
     }
+
+    @GetMapping("/pinout/employee")
+    public Mono<EmployeeDTO> pinOut(@RequestParam(name = "employeeId") long id){
+        return employeeService.pinOut(id).flatMap(employee -> {
+            log.info("employee pin out [{}]",employee);
+            return Mono.just(new EmployeeDTO(employee));
+        });
+    }
 }

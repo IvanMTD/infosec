@@ -2,6 +2,7 @@ package net.security.infosec.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.security.infosec.dto.EmployeeDTO;
 import net.security.infosec.dto.PersonDTO;
 import net.security.infosec.models.Department;
 import net.security.infosec.models.Division;
@@ -127,6 +128,14 @@ public class EmployeeService {
             }else{
                 return Mono.empty();
             }
+        });
+    }
+
+    public Mono<Employee> pinOut(long id) {
+        return employeeRepository.findById(id).flatMap(employee -> {
+            employee.setDepartmentId(0);
+            employee.setDivisionId(0);
+            return employeeRepository.save(employee);
         });
     }
 }
