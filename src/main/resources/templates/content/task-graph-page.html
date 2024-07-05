@@ -19,7 +19,12 @@
             var options = {
                 title: 'Процент выполненных работ сотрудниками',
                 is3D: false,
-                pieResidueSliceLabel: 'Остальное'
+                pieResidueSliceLabel: 'Остальное',
+                colors: [
+                    '#F46060','#F09872','#F3D179','#DCE8BA',
+                    '#B0D9B1','#618264','#79AC78',
+                    '#7BD3EA','#1572A1','#5D6EC7','#9F71DB'
+                ]
             };
             var chart = new google.visualization.PieChart(document.getElementById('statistics1'));
             chart.draw(data, options);
@@ -57,7 +62,12 @@
             let options = {
                 title: 'Выполненные заявки по датам',
                 vAxis: {title: 'Всего выполнено заявок'},
-                isStacked: true
+                isStacked: true,
+                colors: [
+                    '#F46060','#F09872','#F3D179','#DCE8BA',
+                    '#B0D9B1','#618264','#79AC78',
+                    '#7BD3EA','#1572A1','#5D6EC7','#9F71DB'
+                ]
             };
 
             let chart = new google.visualization.SteppedAreaChart(document.getElementById('chart_div'));
@@ -103,7 +113,12 @@
                 title : 'Детализация',
                 vAxis: {title: 'Количество выполненных заявок'},
                 hAxis: {title: 'Даты'},
-                seriesType: 'bars'
+                seriesType: 'bars',
+                colors: [
+                    '#F46060','#F09872','#F3D179','#DCE8BA',
+                    '#B0D9B1','#618264','#79AC78',
+                    '#7BD3EA','#1572A1','#5D6EC7','#9F71DB'
+                ]
                /* series: {5: {type: 'line'}, 6: {type:'line'}},*/
             };
 
@@ -116,7 +131,12 @@
                 vAxis: {title: 'Количество выполненных заявок'},
                 hAxis: {title: 'Даты'},
                 seriesType: 'bars',
-                series: {}
+                series: {},
+                colors: [
+                    '#F46060','#F09872','#F3D179','#DCE8BA',
+                    '#B0D9B1','#618264','#79AC78',
+                    '#7BD3EA','#1572A1','#5D6EC7','#9F71DB'
+                ]
             };
 
             console.log(startIndex + ' ' + count);
@@ -153,7 +173,12 @@
                 title : 'Детализация',
                 vAxis: {title: 'Количество выполненных заявок'},
                 hAxis: {title: 'Даты'},
-                seriesType: 'bars'
+                seriesType: 'bars',
+                colors: [
+                    '#F46060','#F09872','#F3D179','#DCE8BA',
+                    '#B0D9B1','#618264','#79AC78',
+                    '#7BD3EA','#1572A1','#5D6EC7','#9F71DB'
+                ]
             };
             var chart = new google.visualization.ComboChart(document.getElementById('chart_div3'));
             chart.draw(dataTable, options);
