@@ -71,12 +71,17 @@
                                                 <p class="m-0 p-0 text-center" th:text="${employee.email}"></p>
                                             </div>
                                         </div>
-                                        <div class="col-2 m-0 p-1 my-auto">
+                                        <div class="col m-0 p-1 my-auto blur">
+                                            <div class="m-0 p-1">
+                                                <p class="m-0 p-0 text-center" th:text="${employee.personalPhone}"></p>
+                                            </div>
+                                        </div>
+                                        <div class="col m-0 p-1 my-auto">
                                             <div class="m-0 p-1 d-flex">
                                                 <p class="m-0 p-0 pe-2 text-center ms-auto" th:text="'телефон: ' + ${employee.phone}"></p>
                                             </div>
                                         </div>
-                                        <div class="col border-start d-flex bg-primary-subtle rounded-end-4" th:if="${admin}">
+                                        <div class="col-2 border-start d-flex bg-primary-subtle rounded-end-4" th:if="${admin}">
                                             <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">
                                                 <button type="button" th:id="'pin-out-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i></button>
                                                 <button type="button" th:id="'edit-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)" disabled><i class="bi bi-pencil"></i></button>
@@ -468,16 +473,20 @@
 
     function globalSearch(){
         let search = $('#global-search').val();
-        $.ajax({
-            url:'/api/search/employees',
-            type:'get',
-            data:{
-                search:search
-            },
-            success: function (response){
-                rebuildEmployees(response);
-            }
-        });
+        if(search === ''){
+            $('#guide-card-col').empty();
+        }else{
+            $.ajax({
+                url:'/api/search/employees',
+                type:'get',
+                data:{
+                    search:search
+                },
+                success: function (response){
+                    rebuildEmployees(response);
+                }
+            });
+        }
     }
 
     function rebuildEmployees(employees){
@@ -507,12 +516,17 @@
                 '           <p class="m-0 p-0 text-center">' + employee.email + '</p>' +
                 '       </div>' +
                 '   </div>' +
-                '   <div class="col-2 m-0 p-1 my-auto">' +
+                '   <div class="col m-0 p-1 my-auto blur">' +
+                '       <div class="m-0 p-1">' +
+                '           <p class="m-0 p-0 text-center">' + employee.personalPhone + '</p>' +
+                '       </div>' +
+                '   </div>' +
+                '   <div class="col m-0 p-1 my-auto">' +
                 '       <div class="m-0 p-1 d-flex">' +
                 '           <p class="m-0 p-0 pe-2 text-center ms-auto">телефон: ' + employee.phone + '</p>' +
                 '       </div>' +
                 '   </div>' +
-                '   <div class="col border-start d-flex bg-primary-subtle rounded-end-4">\n' +
+                '   <div class="col-2 border-start d-flex bg-primary-subtle rounded-end-4">\n' +
                 '       <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">\n' +
                 '           <button type="button" id="pin-out-' + employee.id + '" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i></button>\n' +
                 '           <button type="button" id="edit-' + employee.id + '" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)" disabled><i class="bi bi-pencil"></i></button>\n' +
@@ -540,7 +554,12 @@
                 '           <p class="m-0 p-0 text-center">' + employee.email + '</p>' +
                 '       </div>' +
                 '   </div>' +
-                '   <div class="col-2 m-0 p-1 my-auto">' +
+                '   <div class="col m-0 p-1 my-auto blur">' +
+                '       <div class="m-0 p-1">' +
+                '           <p class="m-0 p-0 text-center">' + employee.personalPhone + '</p>' +
+                '       </div>' +
+                '   </div>' +
+                '   <div class="col m-0 p-1 my-auto">' +
                 '       <div class="m-0 p-1 d-flex">' +
                 '           <p class="m-0 p-0 pe-2 text-center ms-auto">телефон: ' + employee.phone + '</p>' +
                 '       </div>' +

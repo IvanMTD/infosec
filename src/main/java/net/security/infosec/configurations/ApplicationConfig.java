@@ -39,6 +39,7 @@ public class ApplicationConfig {
             Cell fullName = row.getCell(0);
             Cell position = row.getCell(1);
             Cell shortNumber = row.getCell(3);
+            Cell personalPhone = row.getCell(4);
             Cell email = row.getCell(5);
 
             String trimName = fullName.toString().trim();
@@ -58,17 +59,28 @@ public class ApplicationConfig {
                 String data = trimNumber.substring(0,trimNumber.length() - 2);
                 phoneNumber = data;
             }
+            String trimPersonalPhone = personalPhone.toString().trim();
 
             String trimEmail = email.toString().trim();
 
             String finalPhoneNumber = phoneNumber;
-            employeeRepository.findByLastnameIgnoreCaseAndNameIgnoreCaseAndMiddleNameIgnoreCase(lastname,name,middleName).switchIfEmpty(
+            employeeRepository.findByLastnameIgnoreCaseAndNameIgnoreCaseAndMiddleNameIgnoreCase(lastname,name,middleName).flatMap(employee -> {
+                employee.setLastname(lastname);
+                employee.setName(name);
+                employee.setMiddleName(middleName);
+                employee.setPosition(result);
+                employee.setPhone(finalPhoneNumber);
+                employee.setPersonalPhone(trimPersonalPhone);
+                employee.setEmail(trimEmail);
+                return employeeRepository.save(employee);
+            }).switchIfEmpty(
                     Mono.just(new Employee()).flatMap(employee -> {
                         employee.setLastname(lastname);
                         employee.setName(name);
                         employee.setMiddleName(middleName);
                         employee.setPosition(result);
                         employee.setPhone(finalPhoneNumber);
+                        employee.setPersonalPhone(trimPersonalPhone);
                         employee.setEmail(trimEmail);
                         return employeeRepository.save(employee);
                     })

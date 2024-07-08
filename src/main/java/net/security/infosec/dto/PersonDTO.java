@@ -14,6 +14,7 @@ public class PersonDTO {
     private String location;
     private String office;
     private String shortNumber;
+    private String personalPhone;
     private String position;
     private String email;
     private long department;

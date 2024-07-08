@@ -18,6 +18,7 @@ public class EmployeeDTO {
     private String cabinet;
     private String address;
     private String phone;
+    private String personalPhone;
     private String email;
     private int number;
 
@@ -30,6 +31,7 @@ public class EmployeeDTO {
         setCabinet(employee.getCabinet());
         setAddress(employee.getAddress());
         setPhone(employee.getPhone());
+        setPersonalPhone(employee.getPersonalPhone());
         setEmail(employee.getEmail());
         setDivisionId(employee.getDivisionId());
         setDepartmentId(employee.getDepartmentId());

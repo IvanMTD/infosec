@@ -12,3 +12,14 @@
     position: relative; /* добавляем position: relative, чтобы z-index работал */
     z-index: 1; /* устанавливаем z-index для элементов внутри контейнера */
 }
+
+.blur {
+    filter: blur(4px);
+    transition: filter 0.3s;
+    user-select: none;
+    cursor: pointer;
+}
+
+.blur:hover {
+    filter: none;
+}

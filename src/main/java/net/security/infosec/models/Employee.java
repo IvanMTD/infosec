@@ -46,6 +46,7 @@ public class Employee {
     /*@Min(value = 100, message = "Короткий номер не может быть меньше 3 цифр")
     @Max(value = 9999, message = "Короткий номер не может быть больше 4 цифр")*/
     private String phone;
+    private String personalPhone;
     @Email(message = "Не валидный email")
     @NotBlank(message = "Не может быть пустым")
     private String email;
@@ -62,6 +63,7 @@ public class Employee {
         setCabinet(employee.getCabinet());
         setAddress(employee.getAddress());
         setPhone(employee.getPhone());
+        setPersonalPhone(employee.getPersonalPhone());
         setEmail(employee.getEmail());
         setNumber(employee.getNumber());
     }
@@ -75,6 +77,7 @@ public class Employee {
         setAddress(person.getLocation());
         setCabinet(person.getOffice());
         setPhone(person.getShortNumber());
+        setPersonalPhone(person.getPersonalPhone());
         setPosition(person.getPosition());
         setEmail(person.getEmail());
 
@@ -97,6 +100,7 @@ public class Employee {
         setCabinet(employee.getCabinet());
         setAddress(employee.getAddress());
         setPhone(employee.getPhone());
+        setPersonalPhone(employee.getPersonalPhone());
         setEmail(employee.getEmail());
         setNumber(employee.getNumber());
         if(employee.getDivisionId() != 0){

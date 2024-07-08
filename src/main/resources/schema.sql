@@ -64,5 +64,6 @@ create table if not exists employee(
     cabinet text,
     address text,
     phone text,
+    personal_phone text,
     email text
 );
