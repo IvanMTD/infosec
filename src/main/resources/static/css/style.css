@@ -13,13 +13,25 @@
     z-index: 1; /* устанавливаем z-index для элементов внутри контейнера */
 }
 
+.user-select-none {
+    user-select: none;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
 .blur {
     filter: blur(4px);
+    -webkit-filter: blur(4px);
+    -moz-filter: blur(4px);
+    -ms-filter: blur(4px);
     transition: filter 0.3s;
-    user-select: none;
-    cursor: pointer;
 }
 
 .blur:hover {
     filter: none;
+    -webkit-filter: none;
+    -moz-filter: none;
+    -ms-filter: none;
 }

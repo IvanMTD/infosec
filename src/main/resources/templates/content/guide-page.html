@@ -71,9 +71,9 @@
                                                 <p class="m-0 p-0 text-center" th:text="${employee.email}"></p>
                                             </div>
                                         </div>
-                                        <div class="col m-0 p-1 my-auto blur">
+                                        <div class="col m-0 p-1 my-auto">
                                             <div class="m-0 p-1">
-                                                <p class="m-0 p-0 text-center" th:text="${employee.personalPhone}"></p>
+                                                <p class="m-0 p-0 text-center user-select-none cursor-pointer blur" th:text="${employee.personalPhone}"></p>
                                             </div>
                                         </div>
                                         <div class="col m-0 p-1 my-auto">
@@ -239,6 +239,25 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div id="user-ip" class="col d-flex">
+
+            </div>
+        </div>
+        <script>
+            $.ajax({
+                url:'/api/service/get/ip',
+                type:'get',
+                success: function (ip){
+                    $('#user-ip').empty();
+                    $('#user-ip').append(
+                        '<div class="ms-auto">' +
+                        '   <small id="user-ip" class="text-secondary">' + ip + '</small>' +
+                        '</div>'
+                    );
+                }
+            });
+        </script>
     </div>
 </div>
 
@@ -250,6 +269,8 @@
         form.reset();
         form.classList.remove('was-validated');
     });
+
+    document.querySelectorAll('.blur');
 </script>
 
 <script th:inline="javascript">
@@ -516,9 +537,9 @@
                 '           <p class="m-0 p-0 text-center">' + employee.email + '</p>' +
                 '       </div>' +
                 '   </div>' +
-                '   <div class="col m-0 p-1 my-auto blur">' +
+                '   <div class="col m-0 p-1 my-auto">' +
                 '       <div class="m-0 p-1">' +
-                '           <p class="m-0 p-0 text-center">' + employee.personalPhone + '</p>' +
+                '           <p class="m-0 p-0 text-center user-select-none cursor-pointer blur">' + employee.personalPhone + '</p>' +
                 '       </div>' +
                 '   </div>' +
                 '   <div class="col m-0 p-1 my-auto">' +
@@ -554,9 +575,9 @@
                 '           <p class="m-0 p-0 text-center">' + employee.email + '</p>' +
                 '       </div>' +
                 '   </div>' +
-                '   <div class="col m-0 p-1 my-auto blur">' +
+                '   <div class="col m-0 p-1 my-auto">' +
                 '       <div class="m-0 p-1">' +
-                '           <p class="m-0 p-0 text-center">' + employee.personalPhone + '</p>' +
+                '           <p class="m-0 p-0 text-center user-select-none cursor-pointer blur">' + employee.personalPhone + '</p>' +
                 '       </div>' +
                 '   </div>' +
                 '   <div class="col m-0 p-1 my-auto">' +
