@@ -1,25 +1,28 @@
 <div class="container-fluid my-5">
+    <!-- Заголовок -->
     <div class="row py-2">
         <div class="col">
             <h3 class="text-center">Справочник ФЦПСР</h3>
         </div>
     </div>
+    <!-- Главная поисковая система -->
     <div class="row">
-        <div class="d-grid col-6 mx-auto my-4">
-            <div class="row">
-                <div class="col form-floating">
+        <div class="d-grid col-12 col-md-6 col-lg-6 mx-auto my-4">
+            <div class="row mx-0">
+                <div class="col-10 px-0 form-floating">
                     <input type="text" class="form-control" id="global-search" list="global-list" placeholder="global-search" oninput="globalSearch()">
                     <datalist id="global-list"></datalist>
                     <label for="global-search" class="ms-2">Поиск</label>
                 </div>
-                <div class="col-1 d-flex">
+                <div class="col-2 px-0 d-flex">
                     <i class="fs-2 m-auto bi bi-search"></i>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Ручной поиск и поле результатов -->
     <div class="row">
-        <div class="col-5">
+        <div class="col-12 col-md-5 col-lg-5 mt-4">
             <div class="row">
                 <div class="col">
                     <div class="d-grid gap-2">
@@ -47,7 +50,7 @@
                 </div>
             </div>
         </div>
-        <div class="col border border-dark img-bg rounded-3 me-4 position-relative">
+        <div class="col-12 col-md-7 col-lg-7 border border-dark img-bg rounded-3 position-relative mt-4">
             <div class="row">
 
                 <div class="col">
