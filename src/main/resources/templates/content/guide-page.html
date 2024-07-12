@@ -63,9 +63,24 @@
                                     <div class="row rounded-4 shadow m-2" th:each="employee : ${guide.departments[0].employees}">
                                         <div class="col">
                                             <div class="row border-bottom">
+                                                <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
+                                                    <div class="m-0 p-1">
+                                                        <b>
+                                                            <p class="m-0 p-0 ps-2 text-sm-start text-md-center text-lg-center" th:text="${employee.position}"></p>
+                                                        </b>
+                                                    </div>
+                                                </div>
+                                                <!--<div class="col-sm-12 col-md-6 col-lg-6 border-start d-flex bg-primary-subtle rounded-end-4" th:if="${admin}">
+                                                    <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">
+                                                        <button type="button" th:id="'pin-out-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i></button>
+                                                        <button type="button" th:id="'edit-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)" disabled><i class="bi bi-pencil"></i></button>
+                                                    </div>
+                                                </div>-->
+                                            </div>
+                                            <div class="row">
                                                 <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
                                                     <div class="m-0 p-1">
-                                                        <b><p class="m-0 p-0 px-2" th:text="${employee.fullName}"></p></b>
+                                                        <p class="m-0 p-0 px-2" th:text="${employee.fullName}"></p>
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
@@ -75,7 +90,7 @@
                                                 </div>
                                                 <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
                                                     <div class="m-0 p-1">
-                                                        <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center" th:text="'8 (499) 550-94-74: [' + ${employee.phone} + ']'"></p>
+                                                        <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center text-secondary"><i style="font-size: 14px">8 (499) 550-94-74 — </i><span class="text-dark" th:text="${employee.phone}"></span></p>
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
@@ -83,19 +98,6 @@
                                                         <p class="m-0 p-0 px-2 user-select-none cursor-pointer blur text-sm-start text-md-end text-lg-end" th:text="${employee.personalPhone}"></p>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
-                                                    <div class="m-0 p-1">
-                                                        <p class="m-0 p-0 ps-2 text-sm-start text-md-center text-lg-center" th:text="${employee.position}"></p>
-                                                    </div>
-                                                </div>
-                                                <!--<div class="col-sm-12 col-md-6 col-lg-6 border-start d-flex bg-primary-subtle rounded-end-4" th:if="${admin}">
-                                                    <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">
-                                                        <button type="button" th:id="'pin-out-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i></button>
-                                                        <button type="button" th:id="'edit-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)" disabled><i class="bi bi-pencil"></i></button>
-                                                    </div>
-                                                </div>-->
                                             </div>
                                         </div>
                                     </div>
@@ -535,9 +537,16 @@
                 <div class="row rounded-4 shadow m-2">
                     <div class="col">
                         <div class="row border-bottom">
+                            <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
+                                <div class="m-0 p-1">
+                                    <p class="m-0 p-0 text-sm-start text-md-center text-lg-center ps-2"><b>${employee.position}</b></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
                                 <div class="m-0 p-1">
-                                    <b><p class="m-0 p-0 px-2">${employee.fullName}</p></b>
+                                    <p class="m-0 p-0 px-2">${employee.fullName}</p>
                                 </div>
                             </div>
                             <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
@@ -547,19 +556,12 @@
                             </div>
                             <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
                                 <div class="m-0 p-1">
-                                    <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center">8 (499) 550-94-74: [${employee.phone}]</p>
+                                    <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center text-secondary"><i style="font-size: 14px">8 (499) 550-94-74 — </i><span class="text-dark">${employee.phone}</span></p>
                                 </div>
                             </div>
                             <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
                                 <div class="m-0 p-1">
                                     <p class="m-0 p-0 px-2 user-select-none cursor-pointer blur text-sm-start text-md-end text-lg-end">${employee.personalPhone}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
-                                <div class="m-0 p-1">
-                                    <p class="m-0 p-0 text-sm-start text-md-center text-lg-center ps-2">${employee.position}</p>
                                 </div>
                             </div>
                         </div>
@@ -574,9 +576,16 @@
                 <div class="row rounded-4 shadow m-2">
                     <div class="col">
                         <div class="row border-bottom">
+                            <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
+                                <div class="m-0 p-1">
+                                    <b><p class="m-0 p-0 text-sm-start text-md-center text-lg-center ps-2">${employee.position}</p></b>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
                                 <div class="m-0 p-1">
-                                    <b><p class="m-0 p-0 px-2">${employee.fullName}</p></b>
+                                    <p class="m-0 p-0 px-2">${employee.fullName}</p>
                                 </div>
                             </div>
                             <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
@@ -586,19 +595,12 @@
                             </div>
                             <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
                                 <div class="m-0 p-1">
-                                    <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center">8 (499) 550-94-74: [${employee.phone}]</p>
+                                    <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center text-secondary"><i style="font-size: 14px">8 (499) 550-94-74 — </i><span class="text-dark">${employee.phone}</span></p>
                                 </div>
                             </div>
                             <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
                                 <div class="m-0 p-1">
                                     <p class="m-0 p-0 px-2 user-select-none cursor-pointer blur text-sm-start text-md-end text-lg-end">${employee.personalPhone}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
-                                <div class="m-0 p-1">
-                                    <p class="m-0 p-0 text-sm-start text-md-center text-lg-center ps-2">${employee.position}</p>
                                 </div>
                             </div>
                         </div>
