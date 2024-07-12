@@ -6,7 +6,7 @@
         </div>
     </div>
     <!-- Главная поисковая система -->
-    <div class="row">
+    <div class="row mx-0">
         <div class="d-grid col-12 col-md-6 col-lg-6 mx-auto my-4">
             <div class="row mx-0">
                 <div class="col-10 px-0 form-floating">
@@ -22,8 +22,9 @@
     </div>
     <!-- Ручной поиск и поле результатов -->
     <div class="row">
-        <div class="col-12 col-md-5 col-lg-5 mt-4">
-            <div class="row">
+        <!-- d-none d-md-block -->
+        <div class="col-sm-6 col-md-5 col-lg-5 mt-4 d-none d-md-block">
+            <div class="row mx-2">
                 <div class="col">
                     <div class="d-grid gap-2">
                         <button th:each="department, dps : ${guide.departments}" th:text="${department.title}" th:id="'btn-dep-' + ${dps.index}" th:my-data="${department.id}" class="btn btn-sm btn-outline-secondary department text-start" type="button" onclick="selectDepartment(this.id)"></button>
@@ -50,44 +51,51 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-7 col-lg-7 border border-dark img-bg rounded-3 position-relative mt-4">
-            <div class="row">
+
+        <div class="col-sm-6 col-md-7 col-lg-7 position-relative mt-4">
+            <div class="row border border-dark img-bg rounded-3 h-100 mx-2">
 
                 <div class="col">
                     <div id="guide-card-col" class="mb-5 pb-3">
                         <div th:if="${guide.getDepartments().size()} != 0">
                             <div th:if="${guide.departments[0].employees.size()} != 0">
-                                <div class="card mx-1 my-3">
+                                <div class="card mx-1 my-3 zoom">
                                     <div class="row rounded-4 shadow m-2" th:each="employee : ${guide.departments[0].employees}">
-                                        <div class="col m-0 p-1 my-auto">
-                                            <div class="m-0 p-1">
-                                                <b><p class="m-0 p-0 ps-2" th:text="${employee.fullName}"></p></b>
+                                        <div class="col">
+                                            <div class="row border-bottom">
+                                                <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                                    <div class="m-0 p-1">
+                                                        <b><p class="m-0 p-0 px-2" th:text="${employee.fullName}"></p></b>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                                    <div class="m-0 p-1">
+                                                        <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center" th:text="${employee.email}"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                                    <div class="m-0 p-1">
+                                                        <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center" th:text="'8 (499) 550-94-74: [' + ${employee.phone} + ']'"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                                    <div class="m-0 p-1">
+                                                        <p class="m-0 p-0 px-2 user-select-none cursor-pointer blur text-sm-start text-md-end text-lg-end" th:text="${employee.personalPhone}"></p>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col m-0 p-1 my-auto">
-                                            <div class="m-0 p-1">
-                                                <p class="m-0 p-0 text-center" th:text="${employee.position}"></p>
-                                            </div>
-                                        </div>
-                                        <div class="col m-0 p-1 my-auto">
-                                            <div class="m-0 p-1">
-                                                <p class="m-0 p-0 text-center" th:text="${employee.email}"></p>
-                                            </div>
-                                        </div>
-                                        <div class="col m-0 p-1 my-auto">
-                                            <div class="m-0 p-1">
-                                                <p class="m-0 p-0 text-center user-select-none cursor-pointer blur" th:text="${employee.personalPhone}"></p>
-                                            </div>
-                                        </div>
-                                        <div class="col m-0 p-1 my-auto">
-                                            <div class="m-0 p-1 d-flex">
-                                                <p class="m-0 p-0 pe-2 text-center ms-auto" th:text="'телефон: ' + ${employee.phone}"></p>
-                                            </div>
-                                        </div>
-                                        <div class="col-2 border-start d-flex bg-primary-subtle rounded-end-4" th:if="${admin}">
-                                            <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">
-                                                <button type="button" th:id="'pin-out-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i></button>
-                                                <button type="button" th:id="'edit-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)" disabled><i class="bi bi-pencil"></i></button>
+                                            <div class="row">
+                                                <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
+                                                    <div class="m-0 p-1">
+                                                        <p class="m-0 p-0 ps-2 text-sm-start text-md-center text-lg-center" th:text="${employee.position}"></p>
+                                                    </div>
+                                                </div>
+                                                <!--<div class="col-sm-12 col-md-6 col-lg-6 border-start d-flex bg-primary-subtle rounded-end-4" th:if="${admin}">
+                                                    <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">
+                                                        <button type="button" th:id="'pin-out-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i></button>
+                                                        <button type="button" th:id="'edit-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)" disabled><i class="bi bi-pencil"></i></button>
+                                                    </div>
+                                                </div>-->
                                             </div>
                                         </div>
                                     </div>
@@ -98,7 +106,7 @@
                 </div>
 
             </div>
-            <div class="position-absolute bottom-0 end-0 rounded-4 border m-3">
+            <div class="position-absolute bottom-0 end-0 rounded-4 border" style="margin-right: 30px; margin-bottom: 10px">
                 <button type="button" class="btn btn-outline-secondary rounded-circle shadow m-1" data-bs-toggle="modal" data-bs-target="#person-modal" th:if="${admin}"><i class="bi bi-person-add"></i></button>
                 <div class="modal fade" id="person-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -522,75 +530,83 @@
 
     function employeeAppend(employee){
         if(admin){
-            $('#guide-card-col').append(
-                '<div class="card mx-1 my-3">' +
-                '<div class="row rounded-4 shadow m-2">' +
-                '   <div class="col m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1">' +
-                '           <p class="m-0 p-0 ps-2"><b>' + employee.fullName + '</b></p>' +
-                '       </div>' +
-                '   </div>' +
-                '   <div class="col m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1">' +
-                '           <p class="m-0 p-0 text-center">' + employee.position + '</p>' +
-                '       </div>' +
-                '   </div>' +
-                '   <div class="col m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1">' +
-                '           <p class="m-0 p-0 text-center">' + employee.email + '</p>' +
-                '       </div>' +
-                '   </div>' +
-                '   <div class="col m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1">' +
-                '           <p class="m-0 p-0 text-center user-select-none cursor-pointer blur">' + employee.personalPhone + '</p>' +
-                '       </div>' +
-                '   </div>' +
-                '   <div class="col m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1 d-flex">' +
-                '           <p class="m-0 p-0 pe-2 text-center ms-auto">телефон: ' + employee.phone + '</p>' +
-                '       </div>' +
-                '   </div>' +
-                '   <div class="col-2 border-start d-flex bg-primary-subtle rounded-end-4">\n' +
-                '       <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">\n' +
-                '           <button type="button" id="pin-out-' + employee.id + '" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i></button>\n' +
-                '           <button type="button" id="edit-' + employee.id + '" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)" disabled><i class="bi bi-pencil"></i></button>\n' +
-                '       </div>\n' +
-                '   </div>' +
-                '</div>' +
-                '</div>'
-            );
+            let cardBody = `
+            <div class="card mx-1 my-3 zoom">
+                <div class="row rounded-4 shadow m-2">
+                    <div class="col">
+                        <div class="row border-bottom">
+                            <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                <div class="m-0 p-1">
+                                    <b><p class="m-0 p-0 px-2">${employee.fullName}</p></b>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                <div class="m-0 p-1">
+                                    <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center">${employee.email}</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                <div class="m-0 p-1">
+                                    <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center">8 (499) 550-94-74: [${employee.phone}]</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                <div class="m-0 p-1">
+                                    <p class="m-0 p-0 px-2 user-select-none cursor-pointer blur text-sm-start text-md-end text-lg-end">${employee.personalPhone}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
+                                <div class="m-0 p-1">
+                                    <p class="m-0 p-0 text-sm-start text-md-center text-lg-center ps-2">${employee.position}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `
+            $('#guide-card-col').append(cardBody);
         }else{
-            $('#guide-card-col').append(
-                '<div class="card mx-1 my-3">' +
-                '<div class="row rounded-4 shadow m-2">' +
-                '   <div class="col m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1">' +
-                '           <p class="m-0 p-0 ps-2"><b>' + employee.fullName + '</b></p>' +
-                '       </div>' +
-                '   </div>' +
-                '   <div class="col m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1">' +
-                '           <p class="m-0 p-0 text-center">' + employee.position + '</p>' +
-                '       </div>' +
-                '   </div>' +
-                '   <div class="col m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1">' +
-                '           <p class="m-0 p-0 text-center">' + employee.email + '</p>' +
-                '       </div>' +
-                '   </div>' +
-                '   <div class="col m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1">' +
-                '           <p class="m-0 p-0 text-center user-select-none cursor-pointer blur">' + employee.personalPhone + '</p>' +
-                '       </div>' +
-                '   </div>' +
-                '   <div class="col m-0 p-1 my-auto">' +
-                '       <div class="m-0 p-1 d-flex">' +
-                '           <p class="m-0 p-0 pe-2 text-center ms-auto">телефон: ' + employee.phone + '</p>' +
-                '       </div>' +
-                '   </div>' +
-                '</div>' +
-                '</div>'
-            );
+            let cardBody = `
+            <div class="card mx-1 my-3 zoom">
+                <div class="row rounded-4 shadow m-2">
+                    <div class="col">
+                        <div class="row border-bottom">
+                            <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                <div class="m-0 p-1">
+                                    <b><p class="m-0 p-0 px-2">${employee.fullName}</p></b>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                <div class="m-0 p-1">
+                                    <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center">${employee.email}</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                <div class="m-0 p-1">
+                                    <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center">8 (499) 550-94-74: [${employee.phone}]</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                <div class="m-0 p-1">
+                                    <p class="m-0 p-0 px-2 user-select-none cursor-pointer blur text-sm-start text-md-end text-lg-end">${employee.personalPhone}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
+                                <div class="m-0 p-1">
+                                    <p class="m-0 p-0 text-sm-start text-md-center text-lg-center ps-2">${employee.position}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `
+            $('#guide-card-col').append(cardBody);
         }
     }
 </script>

@@ -1,7 +1,6 @@
 <div class="container">
     <div class="row">
-        <div class="col"></div>
-        <div class="col py-5">
+        <div class="d-greed col-sm-12 col-md-5 col-lg-5 py-5 mx-auto">
             <form th:method="POST" th:action="@{/login}">
                 <div class="mb-3">
                     <label for="username" class="form-label">Электронная почта</label>
@@ -25,9 +24,10 @@
                         });
                     </script>
                 </div>
-                <button type="submit" class="btn btn-primary">Войти</button>
+                <div class="d-grid col-6 col-md-5 col-lg-4 mx-auto">
+                    <button type="submit" class="btn btn-primary">Войти</button>
+                </div>
             </form>
         </div>
-        <div class="col"></div>
     </div>
 </div>

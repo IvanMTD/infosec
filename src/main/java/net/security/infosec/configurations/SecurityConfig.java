@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .authorizeExchange(
                         auth -> auth
-                                .pathMatchers("/favicon.ico","/img/**","/css/**","/js/***").permitAll()
+                                .pathMatchers("/favicon.ico","/img/**","/css/**","/js/**","/fw/**").permitAll()
                                 .pathMatchers("/login","/guide/list","/api/**").permitAll()
                                 .anyExchange().authenticated()
                 )
