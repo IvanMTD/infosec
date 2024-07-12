@@ -92,6 +92,19 @@
                     </div>
                 </div>
             </div>
+            <div class="row pt-2 border-start border-4 border-dark">
+                <div class="col">
+                    <div class="form-floating" th:if="${#fields.hasErrors('personalPhone')} != true">
+                        <input type="text" class="form-control" id="personalPhone" placeholder="personalPhone" th:field="*{personalPhone}">
+                        <label for="personalPhone">Личный номер</label>
+                    </div>
+                    <div class="form-floating" th:if="${#fields.hasErrors('personalPhone')}">
+                        <input type="number" class="form-control is-invalid" id="personalPhone-error" placeholder="personalPhone-error" th:field="*{personalPhone}">
+                        <label for="personalPhone-error">Короткий номер</label>
+                        <small class="text-center text-danger" th:errors="*{personalPhone}"></small>
+                    </div>
+                </div>
+            </div>
             <div class="row pt-2 pb-4 border-start border-4 border-dark">
                 <div class="col">
                     <div class="form-floating" th:if="${#fields.hasErrors('email')} != true">
