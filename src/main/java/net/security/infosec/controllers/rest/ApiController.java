@@ -1,4 +1,4 @@
-package net.security.infosec.controllers;
+package net.security.infosec.controllers.rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,5 +53,22 @@ public class ApiController {
     @GetMapping("/search/employees")
     public Flux<EmployeeDTO> searchEmployees(@RequestParam(name = "search") String search){
         return employeeService.findBySearchData(search).flatMap(employee -> Mono.just(new EmployeeDTO(employee)));
+    }
+
+    @GetMapping("/auth/employee/update")
+    public Mono<EmployeeDTO> updateEmployee(@ModelAttribute(name = "employee") EmployeeDTO employeeDTO){
+        return employeeService.getBy(employeeDTO.getId()).flatMap(employee -> {
+            employee.setNumber(employeeDTO.getNumber());
+            employee.setLastname(employeeDTO.getLastname());
+            employee.setName(employeeDTO.getName());
+            employee.setMiddleName(employeeDTO.getMiddleName());
+            employee.setAddress(employeeDTO.getAddress());
+            employee.setCabinet(employeeDTO.getCabinet());
+            employee.setPhone(employeeDTO.getPhone());
+            employee.setPersonalPhone(employeeDTO.getPersonalPhone());
+            employee.setPosition(employeeDTO.getPosition());
+            employee.setEmail(employeeDTO.getEmail());
+            return employeeService.save(employee).flatMap(e -> Mono.just(new EmployeeDTO(e)));
+        });
     }
 }

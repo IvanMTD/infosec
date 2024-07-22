@@ -1,4 +1,4 @@
-package net.security.infosec.controllers;
+package net.security.infosec.controllers.web;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

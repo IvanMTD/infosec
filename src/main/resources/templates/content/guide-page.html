@@ -1,4 +1,5 @@
 <div class="container-fluid my-2">
+    <div id="edit-modal-field"></div>
     <!-- Заголовок -->
     <div class="row pt-2">
         <div class="col">
@@ -45,9 +46,9 @@
                 <div class="col">
                     <div th:if="${guide.getDepartments().size()} != 0">
                         <div class="d-grid gap-2" id="division-grid">
-                            <button th:each="division, dvs : ${guide.departments[0].divisions}" th:text="${division.title}" th:id="'btn-div-0-' + ${dvs.index}" th:my-data="${division.id}" class="btn btn-sm btn-outline-secondary department text-start" type="button" onclick="selectDivision(this.id)"></button>
+                            <button th:each="division, dvs : ${guide.departments[0].divisions}" th:text="${division.title}" th:id="'btn-div-0-' + ${dvs.index}" th:my-data="${division.id}" class="btn btn-sm btn-outline-secondary division text-start" type="button" onclick="selectDivision(this.id)"></button>
                             <script>
-                                document.getElementById('btn-div-0-0').setAttribute('class',"btn btn-sm btn-secondary department text-start")
+                                document.getElementById('btn-div-0-0').setAttribute('class',"btn btn-sm btn-secondary division text-start")
                             </script>
                         </div>
                     </div>
@@ -98,10 +99,10 @@
                                                     </div>
                                                 </div>
                                                 <div class="row" th:if="${admin}">
-                                                    <div class="col-sm-12 col-md-6 col-lg-6 border-start d-flex bg-primary-subtle rounded-end-4" th:if="${admin}">
+                                                    <div class="col-sm-12 col-md-12 col-lg-12 d-flex bg-primary-subtle rounded-bottom-4" th:if="${admin}">
                                                         <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">
-                                                            <button type="button" th:id="'pin-out-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i></button>
-                                                            <button type="button" th:id="'edit-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)" disabled><i class="bi bi-pencil"></i></button>
+                                                            <button type="button" th:id="'pin-out-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle">Открепить</i></button>
+                                                            <button type="button" th:id="'edit-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)"><i class="bi bi-pencil">Редактор</i></button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -525,9 +526,129 @@
         });
     }
 
-    function editEmployee(id){
-        console.log(id);
+    function editEmployee(buttonId){
+        let parts = buttonId.split('-');
+        let id = parts[parts.length - 1];
+        let employee = findEmployeeById(departments,id);
+        showEmployeeModal(employee);
     }
+
+    function findEmployeeById(departments, id) {
+        id = parseInt(id);
+        for (let department of departments) {
+            // Проверяем сотрудников в департаменте
+            let employee = department.employees.find(emp => emp.id === id);
+            if (employee) return employee;
+
+            // Проверяем сотрудников в подразделениях департамента
+            for (let division of department.divisions) {
+                employee = division.employees.find(emp => emp.id === id);
+                if (employee) return employee;
+            }
+        }
+        // Если сотрудник не найден, возвращаем null или undefined
+        return null;
+    }
+
+    function showEmployeeModal(employee){
+        let modal = $('#edit-modal-field');
+        modal.empty();
+        modal.append(`
+            <div class="modal fade" id="employee-edit-modal" tabindex="-1" aria-labelledby="employee-edit-label" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Редактор - ${employee.fullName}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row g-2">
+                                <div class="col-sm-12 col-md-3 col-lg-3 form-floating">
+                                    <input type="number" class="form-control" id="employee-number" placeholder="employee-number" value="${employee.number}">
+                                    <label for="employee-number" class="ms-2">№</label>
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 form-floating">
+                                    <input type="text" class="form-control" id="employee-lastname" placeholder="employee-lastname" value="${employee.lastname}">
+                                    <label for="employee-lastname" class="ms-2">Фамилия</label>
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 form-floating">
+                                    <input type="text" class="form-control" id="employee-name" placeholder="employee-name" value="${employee.name}">
+                                    <label for="employee-name" class="ms-2">Имя</label>
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 form-floating">
+                                    <input type="text" class="form-control" id="employee-middle-name" placeholder="employee-middle-name" value="${employee.middleName}">
+                                    <label for="employee-middle-name" class="ms-2">Отчество</label>
+                                </div>
+                            </div>
+                            <div class="row pt-2 g-2">
+                                <div class="col-sm-12 col-md-3 col-lg-3 form-floating">
+                                    <input type="text" class="form-control" id="employee-address" placeholder="employee-address" value="${employee.address}">
+                                    <label for="employee-address" class="ms-2">Расположение</label>
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 form-floating">
+                                    <input type="text" class="form-control" id="employee-cabinet" placeholder="employee-cabinet" value="${employee.cabinet}">
+                                    <label for="employee-cabinet" class="ms-2">Кабинет</label>
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 form-floating">
+                                    <input type="text" class="form-control" id="employee-phone" placeholder="employee-phone" value="${employee.phone}">
+                                    <label for="employee-phone" class="ms-2">Короткий номер</label>
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 form-floating">
+                                    <input type="text" class="form-control" id="employee-personal-phone" placeholder="employee-personal-phone" value="${employee.personalPhone}">
+                                    <label for="employee-personal-phone" class="ms-2">Персональный номер</label>
+                                </div>
+                            </div>
+                            <div class="row pt-2 g-2">
+                                <div class="col-sm-12 col-md-6 col-lg-6 form-floating">
+                                    <input type="text" class="form-control" id="employee-position" placeholder="employee-position" value="${employee.position}">
+                                    <label for="employee-position" class="ms-2">Должность</label>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6 form-floating">
+                                    <input type="email" class="form-control" id="employee-email" placeholder="employee-email" value="${employee.email}">
+                                    <label for="employee-email" class="ms-2">@Mail</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Закрыть</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="updateEmployee(${employee.id})">Обновить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+
+        let employeeEditModal = new bootstrap.Modal(document.getElementById('employee-edit-modal'));
+        employeeEditModal.show();
+    }
+
+    function updateEmployee(id){
+        let employee = {
+            id: id,
+            number: $('#employee-number').val(),
+            lastname: $('#employee-lastname').val(),
+            name: $('#employee-name').val(),
+            middleName: $('#employee-middle-name').val(),
+            address: $('#employee-address').val(),
+            cabinet: $('#employee-cabinet').val(),
+            phone: $('#employee-phone').val(),
+            personalPhone: $('#employee-personal-phone').val(),
+            position: $('#employee-position').val(),
+            email: $('#employee-email').val()
+        };
+
+        // тут должна быть еще проверка
+
+        $.ajax({
+            url:'/api/auth/employee/update',
+            type:'get',
+            data:employee,
+            success:function (response){
+                location.reload(true);
+            }
+        });
+    }
+
 
     function globalSearch(){
         let search = $('#global-search').val();
@@ -586,6 +707,14 @@
                             <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
                                 <div class="m-0 p-1">
                                     <p class="m-0 p-0 px-2 user-select-none cursor-pointer blur text-sm-start text-md-end text-lg-end">${employee.personalPhone}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-12 col-lg-12 d-flex bg-primary-subtle rounded-bottom-4">
+                                <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">
+                                    <button type="button" id="pin-out-${employee.id}" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle">Открепить</i></button>
+                                    <button type="button" id="edit-${employee.id}" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)"><i class="bi bi-pencil">Редактор</i></button>
                                 </div>
                             </div>
                         </div>

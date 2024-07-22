@@ -1,4 +1,4 @@
-package net.security.infosec.controllers;
+package net.security.infosec.controllers.security;
 
 import lombok.RequiredArgsConstructor;
 import net.security.infosec.models.Implementer;

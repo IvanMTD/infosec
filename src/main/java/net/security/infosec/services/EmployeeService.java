@@ -25,6 +25,10 @@ import java.util.stream.Collectors;
 public class EmployeeService {
     private final EmployeeRepository employeeRepository;
 
+    public Mono<Employee> save(Employee employee){
+        return employeeRepository.save(employee);
+    }
+
     public Flux<Employee> getAll() {
         return employeeRepository.findAll().collectList().flatMapMany(l -> {
             l = l.stream().sorted(Comparator.comparing(Employee::getNumber)).collect(Collectors.toList());

@@ -2,6 +2,8 @@ package net.security.infosec.configurations;
 
 import lombok.extern.slf4j.Slf4j;
 import net.security.infosec.models.Employee;
+import net.security.infosec.repositories.DepartmentRepository;
+import net.security.infosec.repositories.DivisionRepository;
 import net.security.infosec.repositories.EmployeeRepository;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -11,6 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.FileInputStream;
@@ -22,10 +25,45 @@ import java.util.Objects;
 @Configuration
 public class ApplicationConfig {
     @Bean
-    public CommandLineRunner preLoad(EmployeeRepository employeeRepository){
+    public CommandLineRunner preLoad(DepartmentRepository departmentRepository, DivisionRepository divisionRepository, EmployeeRepository employeeRepository){
         return args -> {
             //setupEmployees(employeeRepository);
+            //numerate(departmentRepository,divisionRepository,employeeRepository);
         };
+    }
+
+    private void numerate(DepartmentRepository departmentRepository, DivisionRepository divisionRepository, EmployeeRepository employeeRepository){
+        departmentRepository.findAll().flatMap(department -> {
+            return employeeRepository.findByDepartmentId(department.getId()).collectList().flatMapMany(employees -> {
+                int n = 1;
+                for(Employee employee : employees){
+                    employee.setNumber(n);
+                    n++;
+                }
+                return Flux.fromIterable(employees);
+            }).flatMap(employee -> {
+                return employeeRepository.save(employee);
+            }).collectList().flatMap(l -> {
+                log.info("employee saved {}", l);
+                return Mono.just(department);
+            });
+        }).flatMap(department -> {
+            return divisionRepository.findAllByIdIn(department.getDivisionIds()).flatMap(division -> {
+                return employeeRepository.findByDivisionId(division.getId()).collectList().flatMapMany(employees -> {
+                    int n = 1;
+                    for(Employee employee : employees){
+                        employee.setNumber(n);
+                        n++;
+                    }
+                    return Flux.fromIterable(employees);
+                }).flatMap(employee -> {
+                    return employeeRepository.save(employee);
+                }).collectList().flatMap(l -> {
+                    log.info("employees saved: {}", l);
+                    return Mono.just(division);
+                });
+            });
+        }).subscribe();
     }
 
     private void setupEmployees(EmployeeRepository employeeRepository){
