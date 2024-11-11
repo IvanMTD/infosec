@@ -36,6 +36,23 @@ public class EmployeeService {
         }).flatMapSequential(Mono::just);
     }
 
+    public Flux<Employee> getAllActual() {
+        return employeeRepository.findAll().collectList().flatMapMany(l -> {
+            l = l.stream().sorted(Comparator.comparing(Employee::getNumber)).collect(Collectors.toList());
+            List<Employee> employees = new ArrayList<>();
+            for(Employee employee : l){
+                if(employee.getDivisionId() != 0){
+                    employees.add(employee);
+                }else{
+                    if(employee.getDepartmentId() != 0){
+                        employees.add(employee);
+                    }
+                }
+            }
+            return Flux.fromIterable(employees);
+        }).flatMapSequential(Mono::just);
+    }
+
     public Mono<Employee> create(Employee employee) {
         return Mono.just(employee).flatMap(e -> {
             long department = e.getDepartmentId();

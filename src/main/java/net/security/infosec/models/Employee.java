@@ -21,9 +21,11 @@ import lombok.NoArgsConstructor;
 import net.security.infosec.dto.EmployeeDTO;
 import net.security.infosec.dto.PersonDTO;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Data
 @NoArgsConstructor
+@Table("employee")
 public class Employee {
     @Id
     private long id;

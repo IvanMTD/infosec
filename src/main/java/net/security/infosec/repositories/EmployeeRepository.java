@@ -1,12 +1,15 @@
 package net.security.infosec.repositories;
 
 import net.security.infosec.models.Employee;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface EmployeeRepository extends ReactiveCrudRepository<Employee,Long> {
+public interface EmployeeRepository extends R2dbcRepository<Employee,Long> {
     Flux<Employee> findByDivisionId(long divisionId);
+    @Query("SELECT * FROM employee WHERE department_id != 0 AND division_id != 0")
+    Flux<Employee> findByDepartmentNotZeroAndDivisionNotZero();
 
     Flux<Employee> findByDepartmentId(long id);
 
