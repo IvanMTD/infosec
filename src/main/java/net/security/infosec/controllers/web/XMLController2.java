@@ -57,14 +57,16 @@ public class XMLController2 {
 
                     // Перебираем сотрудников и формируем XML для каждого
                     for(Employee employee : employees) {
-                        String[] parts = employee.getPersonalPhone().split("  ");
                         String phone2 = "";
                         String phone3 = "";
-                        if(parts.length == 2){
-                            phone2 = parts[0];
-                            phone3 = parts[1];
-                        }else{
-                            phone2 = employee.getPersonalPhone() != null ? employee.getPersonalPhone() : "";
+                        if(employee.getPersonalPhone() != null){
+                            String[] parts = employee.getPersonalPhone().split("  ");
+                            if(parts.length == 2){
+                                phone2 = parts[0];
+                                phone3 = parts[1];
+                            }else{
+                                phone2 = employee.getPersonalPhone() != null ? employee.getPersonalPhone() : "";
+                            }
                         }
 
                         divisionXml.append("<Unit Name=\"")

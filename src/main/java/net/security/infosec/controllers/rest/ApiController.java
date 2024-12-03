@@ -52,7 +52,13 @@ public class ApiController {
 
     @GetMapping("/search/employees")
     public Flux<EmployeeDTO> searchEmployees(@RequestParam(name = "search") String search){
-        return employeeService.findBySearchData(search).flatMap(employee -> Mono.just(new EmployeeDTO(employee)));
+        return employeeService.findBySearchData(search).flatMap(employee -> {
+           if(employee.getDepartmentId() == 0 && employee.getDivisionId() == 0){
+               return Mono.empty();
+           }else{
+               return Mono.just(new EmployeeDTO(employee));
+           }
+        });
     }
 
     @GetMapping("/auth/employee/update")
