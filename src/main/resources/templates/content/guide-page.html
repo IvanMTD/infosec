@@ -23,7 +23,7 @@
     </div>
     <!-- Ручной поиск и поле результатов -->
     <div class="row">
-        <!-- d-none d-md-block -->
+        <!-- Левое поле -->
         <div class="col-sm-6 col-md-5 col-lg-5 mt-4 d-none d-md-block">
             <div class="row mx-2">
                 <div class="col">
@@ -56,6 +56,7 @@
             </div>
         </div>
 
+        <!-- Правое поле -->
         <div class="col-sm-6 col-md-7 col-lg-7 position-relative mt-4">
             <div class="row border border-dark img-bg rounded-3 h-100 mx-2">
 
@@ -309,21 +310,95 @@
 <script th:inline="javascript">
     let departments = [[${guide}]].departments;
     let admin = [[${admin}]];
-    function selectDepartment(buttonId){
-        let data = buttonId.split('-');
-        let id = data[data.length - 1];
-        let department = departments[id];
-        let divisions = department.divisions;
 
-        let activeButtons = document.querySelectorAll('.department');
+    function showDepartmentAndDivision(eid){
+        var depId = 0;
+        var divId = 0;
+
+        for (var i = 0; i < departments.length; i++) {
+            var eList = departments[i].employees;
+            for (var k = 0; k < eList.length; k++) {
+                if (`${eList[k].id}` === eid) {
+                    depId = departments[i].id;
+                    divId = 0;
+                    break;
+                }
+            }
+
+            var divisions = departments[i].divisions;
+            for (var j = 0; j < divisions.length; j++) {
+                eList = divisions[j].employees;
+                for (var b = 0; b < eList.length; b++) {
+                    if (`${eList[b].id}` === eid) {
+                        depId = departments[i].id;
+                        divId = divisions[j].id;
+                        break;
+                    }
+                }
+            }
+        }
+
+        var depBtnId = 0;
+        var divBtnId = 0;
+
+        var depBtn = document.querySelectorAll('.department');
+        for(var i=0; i<depBtn.length; i++){
+            var data = depBtn[i].getAttribute('my-data');
+            if(data == depId){
+                depBtnId = depBtn[i].id;
+            }
+        }
+
+        lightOnDepartmentBtn(depBtnId);
+
+        var divBtn = document.querySelectorAll('.division');
+        for(var i=0; i<divBtn.length; i++){
+            var data = divBtn[i].getAttribute('my-data');
+            if(data == divId){
+                divBtn[i].setAttribute('class','btn btn-sm btn-secondary division text-start');
+            }
+        }
+    }
+
+    function lightOnDepartmentBtn(buttonId){
+        var data = buttonId.split('-');
+        var id = data[data.length - 1];
+        var department = departments[id];
+        var divisions = department.divisions;
+
+        var activeButtons = document.querySelectorAll('.department');
         activeButtons.forEach(function(button) {
             button.setAttribute('class', 'btn btn-sm btn-outline-secondary department text-start');
         });
 
-        let selectedButton = document.getElementById(buttonId);
+        var selectedButton = document.getElementById(buttonId);
         selectedButton.setAttribute('class','btn btn-sm btn-secondary department text-start');
 
-        let count = 0;
+        var count = 0;
+        $('#division-grid').empty();
+        divisions.forEach(function (division){
+            $('#division-grid').append(
+                '<button id="btn-div-' + id + '-' + count + '" my-data="' + division.id + '" class="btn btn-sm btn-outline-secondary division text-start" type="button" onclick="selectDivision(this.id)">' + division.title + '</button>'
+            );
+            count++;
+        });
+    }
+
+    function selectDepartment(buttonId){
+        var data = buttonId.split('-');
+        var id = data[data.length - 1];
+        var department = departments[id];
+        var divisions = department.divisions;
+
+        var activeButtons = document.querySelectorAll('.department');
+        activeButtons.forEach(function(button) {
+            button.setAttribute('class', 'btn btn-sm btn-outline-secondary department text-start');
+        });
+
+        var selectedButton = document.getElementById(buttonId);
+        selectedButton.setAttribute('class','btn btn-sm btn-secondary department text-start');
+
+        var count = 0;
         $('#division-grid').empty();
         divisions.forEach(function (division){
             $('#division-grid').append(
@@ -339,18 +414,18 @@
     }
 
     function selectDivision(buttonId){
-        let parts = buttonId.split('-');
-        let departmentId = parts[parts.length-2];
-        let divisionId = parts[parts.length-1];
-        let department = departments[departmentId];
-        let division = department.divisions[divisionId];
+        var parts = buttonId.split('-');
+        var departmentId = parts[parts.length-2];
+        var divisionId = parts[parts.length-1];
+        var department = departments[departmentId];
+        var division = department.divisions[divisionId];
 
-        let activeButtons = document.querySelectorAll('.division');
+        var activeButtons = document.querySelectorAll('.division');
         activeButtons.forEach(function(button) {
             button.setAttribute('class', 'btn btn-sm btn-outline-secondary division text-start');
         });
 
-        let selectedButton = document.getElementById(buttonId);
+        var selectedButton = document.getElementById(buttonId);
         selectedButton.setAttribute('class','btn btn-sm btn-secondary division text-start');
 
         $('#guide-card-col').empty();
@@ -360,10 +435,10 @@
     }
 
     function sendEmployeeData(employeeData){
-        let structData = getCurrentSelectedData();
+        var structData = getCurrentSelectedData();
         console.log(structData);
 
-        let request = null;
+        var request = null;
 
         if(employeeData != null){
             request = {
@@ -676,11 +751,10 @@
     }
 
     function employeeAppend(employee){
-        if(admin){
-            let cardBody = `
-            <div class="card mx-1 my-3 zoom">
+        var cardBody = `
+            <button class="card mx-1 my-3 zoom w-100" onclick="showDepartmentAndDivision('${employee.id}')">
                 <div class="row rounded-4 shadow m-2">
-                    <div class="col">
+                    <div class="col" id="col-${employee.id}">
                         <div class="row border-bottom">
                             <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
                                 <div class="m-0 p-1">
@@ -710,58 +784,111 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-sm-12 col-md-12 col-lg-12 d-flex bg-primary-subtle rounded-bottom-4">
-                                <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">
-                                    <button type="button" id="pin-out-${employee.id}" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle">Открепить</i></button>
-                                    <button type="button" id="edit-${employee.id}" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)"><i class="bi bi-pencil">Редактор</i></button>
+                    </div>
+                </div>
+            </button>
+        `;
+        $('#guide-card-col').append(cardBody);
+        if(admin){
+            var info = `
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12 d-flex bg-primary-subtle rounded-bottom-4">
+                        <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">
+                            <button type="button" id="pin-out-${employee.id}" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle">Открепить</i></button>
+                            <button type="button" id="edit-${employee.id}" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)"><i class="bi bi-pencil">Редактор</i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('#col-' + employee.id).append(info);
+        }
+
+        /*if(admin){
+            let cardBody = `
+                <div class="card mx-1 my-3 zoom">
+                    <div class="row rounded-4 shadow m-2">
+                        <div class="col" id="col-${employee.id}">
+                            <div class="row border-bottom">
+                                <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
+                                    <div class="m-0 p-1">
+                                        <p class="m-0 p-0 text-sm-start text-md-center text-lg-center ps-2"><b>${employee.position}</b></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                    <div class="m-0 p-1">
+                                        <p class="m-0 p-0 px-2">${employee.fullName}</p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                    <div class="m-0 p-1">
+                                        <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center">${employee.email}</p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                    <div class="m-0 p-1">
+                                        <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center text-secondary"><i style="font-size: 14px">8 (499) 550-94-74 — </i><span class="text-dark">${employee.phone}</span></p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                    <div class="m-0 p-1">
+                                        <p class="m-0 p-0 px-2 user-select-none cursor-pointer blur text-sm-start text-md-end text-lg-end">${employee.personalPhone}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 col-md-12 col-lg-12 d-flex bg-primary-subtle rounded-bottom-4">
+                                    <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">
+                                        <button type="button" id="pin-out-${employee.id}" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle">Открепить</i></button>
+                                        <button type="button" id="edit-${employee.id}" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)"><i class="bi bi-pencil">Редактор</i></button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
             `
             $('#guide-card-col').append(cardBody);
         }else{
             let cardBody = `
-            <div class="card mx-1 my-3 zoom">
-                <div class="row rounded-4 shadow m-2">
-                    <div class="col">
-                        <div class="row border-bottom">
-                            <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
-                                <div class="m-0 p-1">
-                                    <b><p class="m-0 p-0 text-sm-start text-md-center text-lg-center ps-2">${employee.position}</p></b>
+                <div class="card mx-1 my-3 zoom">
+                    <div class="row rounded-4 shadow m-2">
+                        <div class="col">
+                            <div class="row border-bottom">
+                                <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
+                                    <div class="m-0 p-1">
+                                        <b><p class="m-0 p-0 text-sm-start text-md-center text-lg-center ps-2">${employee.position}</p></b>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
-                                <div class="m-0 p-1">
-                                    <p class="m-0 p-0 px-2">${employee.fullName}</p>
+                            <div class="row">
+                                <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                    <div class="m-0 p-1">
+                                        <p class="m-0 p-0 px-2">${employee.fullName}</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
-                                <div class="m-0 p-1">
-                                    <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center">${employee.email}</p>
+                                <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                    <div class="m-0 p-1">
+                                        <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center">${employee.email}</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
-                                <div class="m-0 p-1">
-                                    <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center text-secondary"><i style="font-size: 14px">8 (499) 550-94-74 — </i><span class="text-dark">${employee.phone}</span></p>
+                                <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                    <div class="m-0 p-1">
+                                        <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center text-secondary"><i style="font-size: 14px">8 (499) 550-94-74 — </i><span class="text-dark">${employee.phone}</span></p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
-                                <div class="m-0 p-1">
-                                    <p class="m-0 p-0 px-2 user-select-none cursor-pointer blur text-sm-start text-md-end text-lg-end">${employee.personalPhone}</p>
+                                <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
+                                    <div class="m-0 p-1">
+                                        <p class="m-0 p-0 px-2 user-select-none cursor-pointer blur text-sm-start text-md-end text-lg-end">${employee.personalPhone}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
             `
             $('#guide-card-col').append(cardBody);
-        }
+        }*/
     }
 </script>

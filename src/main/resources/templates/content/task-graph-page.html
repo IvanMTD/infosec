@@ -20,11 +20,7 @@
                 title: 'Процент выполненных работ сотрудниками',
                 is3D: false,
                 pieResidueSliceLabel: 'Остальное',
-                colors: [
-                    '#F46060','#F09872','#F3D179','#DCE8BA',
-                    '#B0D9B1','#618264','#79AC78',
-                    '#7BD3EA','#1572A1','#5D6EC7','#9F71DB'
-                ]
+                colors: colorSet
             };
             var chart = new google.visualization.PieChart(document.getElementById('statistics1'));
             chart.draw(data, options);
@@ -63,11 +59,7 @@
                 title: 'Выполненные заявки по датам',
                 vAxis: {title: 'Всего выполнено заявок'},
                 isStacked: true,
-                colors: [
-                    '#F46060','#F09872','#F3D179','#DCE8BA',
-                    '#B0D9B1','#618264','#79AC78',
-                    '#7BD3EA','#1572A1','#5D6EC7','#9F71DB'
-                ]
+                colors: colorSet
             };
 
             let chart = new google.visualization.SteppedAreaChart(document.getElementById('chart_div'));
@@ -114,11 +106,7 @@
                 vAxis: {title: 'Количество выполненных заявок'},
                 hAxis: {title: 'Даты'},
                 seriesType: 'bars',
-                colors: [
-                    '#F46060','#F09872','#F3D179','#DCE8BA',
-                    '#B0D9B1','#618264','#79AC78',
-                    '#7BD3EA','#1572A1','#5D6EC7','#9F71DB'
-                ]
+                colors: colorSet
                /* series: {5: {type: 'line'}, 6: {type:'line'}},*/
             };
 
@@ -132,11 +120,7 @@
                 hAxis: {title: 'Даты'},
                 seriesType: 'bars',
                 series: {},
-                colors: [
-                    '#F46060','#F09872','#F3D179','#DCE8BA',
-                    '#B0D9B1','#618264','#79AC78',
-                    '#7BD3EA','#1572A1','#5D6EC7','#9F71DB'
-                ]
+                colors: colorSet
             };
 
             console.log(startIndex + ' ' + count);
@@ -174,11 +158,7 @@
                 vAxis: {title: 'Количество выполненных заявок'},
                 hAxis: {title: 'Даты'},
                 seriesType: 'bars',
-                colors: [
-                    '#F46060','#F09872','#F3D179','#DCE8BA',
-                    '#B0D9B1','#618264','#79AC78',
-                    '#7BD3EA','#1572A1','#5D6EC7','#9F71DB'
-                ]
+                colors: colorSet
             };
             var chart = new google.visualization.ComboChart(document.getElementById('chart_div3'));
             chart.draw(dataTable, options);

@@ -10,50 +10,9 @@
         </div>
         <div class="col"></div>
     </div>
-    <!--<div class="row">
-        <div class="col">
-            <script th:inline="javascript">
-                google.charts.load('current', {'packages':['annotationchart']});
-                google.charts.setOnLoadCallback(drawChart);
 
-                function drawChart() {
-                    let year = [[${year}]];
-                    let chartTitle = [[${categoryTitle}]];
-                    let chartTable = [[${categoryChart}]];
-
-                    let dataTable = new google.visualization.DataTable();
-                    dataTable.addColumn('date','Дата')
-                    for(let i=0; i<chartTitle.length; i++){
-                        dataTable.addColumn('number',chartTitle[i].name);
-                        dataTable.addColumn('string', 'description');
-                        dataTable.addColumn('string', 'count');
-                    }
-                    for(let i=0; i<chartTable.length; i++){
-                        let row = [];
-                        row[0] = new Date(chartTable[i].localDate);
-                        let tasks = chartTable[i].taskOnTrouble;
-                        for(let j=0; j<tasks.length; j++){
-                            row[(j+1) + j + j] = tasks[j];
-                            row[(j+2) + j + j] = chartTitle[j].name + '\n' + chartTitle[j].description + '\n' + 'Всего: ' + tasks[j];
-                            row[(j+3) + j + j] = 'Всего: ' + tasks[j];
-                        }
-                        dataTable.addRows([row]);
-                    }
-
-                    var options = {
-                        displayAnnotations: true,
-                    };
-
-                    var chart = new google.visualization.AnnotationChart(document.getElementById('chart_div'));
-
-                    chart.draw(dataTable, options);
-                }
-            </script>
-            <div id="chart_div" style="margin-left: 0; width: auto; height: 700px;"></div>
-        </div>
-    </div>-->
     <div class="row">
-        <div class="col">
+        <div class="col-12">
             <div id="day">
                 <script th:inline="javascript">
                     google.charts.load('current', {'packages':['corechart']});
@@ -86,12 +45,8 @@
                             connectSteps: true,
                             vAxis: {title: 'Всего выполненною'},
                             isStacked: true,
-                            legend: {position: 'top'},
-                            colors: [
-                                '#F46060','#F09872','#F3D179','#DCE8BA',
-                                '#B0D9B1','#618264','#79AC78',
-                                '#7BD3EA','#1572A1','#5D6EC7','#9F71DB'
-                            ]
+                            legend: {position: 'right'},
+                            colors: colorSet
                         };
 
                         let chart = new google.visualization.ColumnChart(document.getElementById('category_chart_day'));
@@ -99,6 +54,91 @@
                     }
                 </script>
                 <div id="category_chart_day" style="width: 100%; height: 700px;"></div>
+
+                <!--<div id="category-chart-day"></div>
+                <script th:inline="javascript">
+                    var year = [[${year}]];
+                    var chartTitle = [[${categoryTitle}]];
+                    var chartTable = [[${categoryChartDay}]];
+
+                    var categories = [];
+                    var data = []
+                    for(var i=0; i<chartTable.length; i++){
+                        categories.push(chartTable[i].localDate);
+                    }
+                    chartTitle.forEach((item,index) => {
+                        var title = item.name;
+                        var tasks = [];
+                        for(var j=0; j<chartTable.length; j++){
+                            tasks.push(chartTable[j].taskOnTrouble[index]);
+                        }
+                        data.push({
+                            name: title,
+                            data: tasks
+                        });
+                    });
+
+                    var options = {
+                        series: data,
+                        chart: {
+                            type: 'bar',
+                            height: 480,
+                            stacked: true,
+                            toolbar: {
+                                show: true
+                            },
+                            zoom: {
+                                enabled: true
+                            },
+                            animations: {
+                                enabled: false // Отключите анимации
+                            }
+                        },
+                        colors: colorSet,
+
+                        responsive: [{
+                            breakpoint: 480,
+                            options: {
+                                legend: {
+                                    position: 'bottom',
+                                    offsetX: -10,
+                                    offsetY: 0
+                                }
+                            }
+                        }],
+                        plotOptions: {
+                            bar: {
+                                horizontal: false,
+                                borderRadius: 2,
+                                borderRadiusApplication: 'end', // 'around', 'end'
+                                borderRadiusWhenStacked: 'last', // 'all', 'last'
+                                dataLabels: {
+                                    total: {
+                                        enabled: true,
+                                        style: {
+                                            fontSize: '8px',
+                                            fontWeight: 900
+                                        }
+                                    }
+                                }
+                            },
+                        },
+                        xaxis: {
+                            type: 'datetime',
+                            categories: categories
+                        },
+                        legend: {
+                            position: 'right',
+                            offsetY: 40
+                        },
+                        fill: {
+                            opacity: 1
+                        }
+                    };
+
+                    var chart = new ApexCharts(document.querySelector("#category-chart-day"), options);
+                    chart.render();
+                </script>-->
             </div>
         </div>
     </div>
@@ -136,12 +176,8 @@
                             connectSteps: true,
                             vAxis: {title: 'Всего выполненною'},
                             isStacked: true,
-                            legend: {position: 'top'},
-                            colors: [
-                                '#F46060','#F09872','#F3D179','#DCE8BA',
-                                '#B0D9B1','#618264','#79AC78',
-                                '#7BD3EA','#1572A1','#5D6EC7','#9F71DB'
-                            ]
+                            legend: {position: 'right'},
+                            colors: colorSet
                         };
 
                         let chart = new google.visualization.ColumnChart(document.getElementById('category_chart_week'));
@@ -186,12 +222,8 @@
                             connectSteps: true,
                             vAxis: {title: 'Всего выполненною'},
                             isStacked: true,
-                            legend: {position: 'top'},
-                            colors: [
-                                '#F46060','#F09872','#F3D179','#DCE8BA',
-                                '#B0D9B1','#618264','#79AC78',
-                                '#7BD3EA','#1572A1','#5D6EC7','#9F71DB'
-                            ]
+                            legend: {position: 'right'},
+                            colors: colorSet
                         };
 
                         let chart = new google.visualization.ColumnChart(document.getElementById('category_chart_month'));
@@ -209,11 +241,11 @@
                 google.charts.setOnLoadCallback(drawVisualization);
 
                 function drawVisualization() {
-                    let year = [[${year}]];
-                    let chartTitle = [[${troubleTitle}]]; console.log(chartTitle);
-                    let chartTable = [[${troubleChart}]]; console.log(chartTable);
+                    var year = [[${year}]];
+                    var chartTitle = [[${troubleTitle}]];
+                    var chartTable = [[${troubleChart}]];
 
-                    let dataTable = new google.visualization.DataTable();
+                    var dataTable = new google.visualization.DataTable();
                     dataTable.addColumn('string','дата')
                     for(let i=0; i<chartTitle.length; i++){
                         dataTable.addColumn('number',chartTitle[i].name);
