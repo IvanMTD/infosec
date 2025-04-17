@@ -1,7 +1,7 @@
 package net.security.infosec.models;
 
 public enum Role {
-    WORKER("Сотрудник"),MANAGER("Управляющий"),DIRECTOR("Контролирующий"),ADMIN("Администратор");
+    WORKER("Сотрудник"),MANAGER("Управляющий"),DIRECTOR("Контролирующий"),ADMIN("Администратор"),GUIDE_ADMIN("Администратор справочника");
 
     private final String title;
 

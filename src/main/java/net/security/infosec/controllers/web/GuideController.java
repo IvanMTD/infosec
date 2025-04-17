@@ -49,7 +49,7 @@ public class GuideController {
     }
 
     @GetMapping("/employee/add/form")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> addEmployeePage(){
         return Mono.just(
                 Rendering.view("template")
@@ -62,7 +62,7 @@ public class GuideController {
     }
 
     @PostMapping("/employee/add")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> addEmployee(@ModelAttribute(name = "employee") @Valid Employee employee, Errors errors){
         if(errors.hasErrors()){
             return Mono.just(
@@ -82,7 +82,7 @@ public class GuideController {
     }
 
     @GetMapping("/employee/edit/page")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> editEmployeePage(@RequestParam(name = "employee") long id){
         return Mono.just(
                 Rendering.view("template")
@@ -95,7 +95,7 @@ public class GuideController {
     }
 
     @PostMapping("/employee/edit")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> editEmployee(@ModelAttribute(name = "employee") @Valid Employee employee, Errors errors){
         if(errors.hasErrors()){
             return Mono.just(
@@ -116,7 +116,7 @@ public class GuideController {
     }
 
     @GetMapping("/employee/delete")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> deleteEmployee(@RequestParam(name = "employee") long id){
         return employeeService.deleteBy(id).flatMap(deleted -> {
             log.info("employee has been deleted from db [{}]", deleted);
@@ -125,7 +125,7 @@ public class GuideController {
     }
 
     @GetMapping("/division/add/form")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> addDivisionPage(){
         return Mono.just(
                 Rendering.view("template")
@@ -138,7 +138,7 @@ public class GuideController {
     }
 
     @PostMapping("/division/add")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> addDivision(@ModelAttribute(name = "division") @Valid Division division, Errors errors){
         if(errors.hasErrors()){
             return Mono.just(
@@ -161,7 +161,7 @@ public class GuideController {
     }
 
     @GetMapping("/division/edit/page")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> editDivisionPage(@RequestParam(name = "division") long id){
         return Mono.just(
                 Rendering.view("template")
@@ -174,7 +174,7 @@ public class GuideController {
     }
 
     @PostMapping("/division/edit")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> editDivision(@ModelAttribute(name = "division") @Valid Division division, Errors errors){
         if(errors.hasErrors()){
             return Mono.just(
@@ -200,7 +200,7 @@ public class GuideController {
     }
 
     @GetMapping("/division/delete")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> deleteDivision(@RequestParam(name = "division") long id){
         return removeDivision(id).flatMap(deleted -> {
             return departmentService.removeDivision(deleted).flatMap(department -> {
@@ -213,7 +213,7 @@ public class GuideController {
     }
 
     @GetMapping("/department/add/form")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> addDepartmentPage(){
         return Mono.just(
                 Rendering.view("template")
@@ -225,7 +225,7 @@ public class GuideController {
     }
 
     @PostMapping("/department/add")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> addDepartment(@ModelAttribute(name = "department") @Valid Department department, Errors errors){
         if(errors.hasErrors()){
             return Mono.just(
@@ -244,7 +244,7 @@ public class GuideController {
     }
 
     @GetMapping("/department/edit/page")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> editDepartmentPage(@RequestParam(name = "department") long id){
         return Mono.just(
                 Rendering.view("template")
@@ -256,7 +256,7 @@ public class GuideController {
     }
 
     @PostMapping("/department/edit")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> editDepartment(@ModelAttribute(name = "department") @Valid Department department, Errors errors){
         if(errors.hasErrors()){
             return Mono.just(
@@ -275,7 +275,7 @@ public class GuideController {
     }
 
     @GetMapping("/department/delete")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> deleteDepartment(@RequestParam(name = "department") long id){
         return departmentService.deleteBy(id).flatMap(deleted -> {
             log.info("department deleted from db [{}]",deleted);

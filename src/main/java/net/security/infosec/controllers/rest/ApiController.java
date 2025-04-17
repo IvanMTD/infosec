@@ -6,6 +6,7 @@ import net.security.infosec.dto.EmployeeDTO;
 import net.security.infosec.dto.PersonDTO;
 import net.security.infosec.models.Employee;
 import net.security.infosec.services.EmployeeService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,6 +22,7 @@ public class ApiController {
 
     private final EmployeeService employeeService;
 
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     @PostMapping("/add/employee")
     public Mono<EmployeeDTO> addEmployee(@RequestBody PersonDTO personDTO){
         log.info("controller request on \"/api/add/employee\" with data [{}]",personDTO);
@@ -42,6 +44,7 @@ public class ApiController {
         }).flatMapSequential(employee -> Mono.just(new EmployeeDTO(employee)));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     @GetMapping("/pinout/employee")
     public Mono<EmployeeDTO> pinOut(@RequestParam(name = "employeeId") long id){
         return employeeService.pinOut(id).flatMap(employee -> {
@@ -61,6 +64,7 @@ public class ApiController {
         });
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     @GetMapping("/auth/employee/update")
     public Mono<EmployeeDTO> updateEmployee(@ModelAttribute(name = "employee") EmployeeDTO employeeDTO){
         return employeeService.getBy(employeeDTO.getId()).flatMap(employee -> {

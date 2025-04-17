@@ -92,6 +92,19 @@ public class SecurityControllerAdvice {
         }
     }
 
+    @ModelAttribute(name = "gAdmin")
+    public Mono<Boolean> isGuideAdmin(@AuthenticationPrincipal Implementer implementer){
+        if(implementer != null){
+            if(implementer.getRole().equals(Role.GUIDE_ADMIN)){
+                return Mono.just(true);
+            }else{
+                return Mono.just(false);
+            }
+        }else{
+            return Mono.just(false);
+        }
+    }
+
     @ModelAttribute(name = "current_year")
     public Mono<Integer> year(){
         return Mono.just(LocalDate.now().getYear());
