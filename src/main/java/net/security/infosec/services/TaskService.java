@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import net.security.infosec.dto.DateDTO;
 import net.security.infosec.dto.TaskDTO;
 import net.security.infosec.dto.TaskDataTransferObject;
+import net.security.infosec.models.DepartmentRole;
 import net.security.infosec.models.Implementer;
 import net.security.infosec.models.Task;
 import net.security.infosec.repositories.TaskRepository;

@@ -8,6 +8,7 @@ import net.security.infosec.dto.ImplementerDataTransferObject;
 import net.security.infosec.dto.TicketDataTransferObject;
 import net.security.infosec.dto.TroubleDTO;
 import net.security.infosec.models.Department;
+import net.security.infosec.models.DepartmentRole;
 import net.security.infosec.models.Role;
 import net.security.infosec.models.Trouble;
 import net.security.infosec.services.*;
@@ -56,6 +57,7 @@ public class AdminController {
                         .modelAttribute("users", implementerService.getAll())
                         .modelAttribute("implementer", new ImplementerDataTransferObject())
                         .modelAttribute("roles",Role.values())
+                        .modelAttribute("departmentRoles", DepartmentRole.values())
                         .build()
         );
     }
@@ -141,6 +143,7 @@ public class AdminController {
             categoryDTO.setId(category.getId());
             categoryDTO.setTitle(category.getName());
             categoryDTO.setDescription(category.getDescription());
+            categoryDTO.setDepartmentRole(category.getDepartmentRole());
             return troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(tl -> {
                 List<TroubleDTO> troubleDTOList = new ArrayList<>();
                 for(Trouble trouble : tl){
@@ -148,6 +151,7 @@ public class AdminController {
                     troubleDTO.setId(trouble.getId());
                     troubleDTO.setTitle(trouble.getName());
                     troubleDTO.setDescription(trouble.getDescription());
+                    troubleDTO.setDepartmentRole(trouble.getDepartmentRole());
                     troubleDTOList.add(troubleDTO);
                 }
                 categoryDTO.setTroubles(troubleDTOList);
@@ -165,6 +169,7 @@ public class AdminController {
                         .modelAttribute("categories", categoryFlux)
                         .modelAttribute("ticket", new TicketDataTransferObject())
                         .modelAttribute("categories2", troubleTicketService.getAllCategories())
+                        .modelAttribute("departmentRoles", DepartmentRole.values())
                         .build()
         );
     }
@@ -254,6 +259,7 @@ public class AdminController {
                 Rendering.view("template")
                         .modelAttribute("title","Category edit page")
                         .modelAttribute("index","category-edit-page")
+                        .modelAttribute("departmentRoles", DepartmentRole.values())
                         .modelAttribute("ticket", troubleTicketService.getCategoryDTOById(id))
                         .build()
         );
@@ -267,6 +273,7 @@ public class AdminController {
                     Rendering.view("template")
                             .modelAttribute("title","Category edit page")
                             .modelAttribute("index","category-edit-page")
+                            .modelAttribute("departmentRoles", DepartmentRole.values())
                             .modelAttribute("ticket", ticketDTO)
                             .build()
             );

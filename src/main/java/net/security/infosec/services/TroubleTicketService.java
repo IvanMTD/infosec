@@ -7,6 +7,7 @@ import net.security.infosec.dto.TaskDTO;
 import net.security.infosec.dto.TicketDataTransferObject;
 import net.security.infosec.dto.TroubleTicketDataTransferObject;
 import net.security.infosec.models.Category;
+import net.security.infosec.models.DepartmentRole;
 import net.security.infosec.models.Task;
 import net.security.infosec.models.Trouble;
 import net.security.infosec.repositories.CategoryRepository;
@@ -41,26 +42,31 @@ public class TroubleTicketService {
     }
 
     public Mono<Category> saveTroubleInCategory(TicketDataTransferObject dto) {
-        return troubleRepository.save(new Trouble(dto)).flatMap(trouble -> {
-            log.info("Trouble saved: " + trouble.toString());
-            return categoryRepository.findById(trouble.getCategoryId()).flatMap(category -> {
+        return categoryRepository.findById(dto.getCategoryId()).flatMap(category -> {
+            dto.setDepartmentRole(category.getDepartmentRole());
+            return troubleRepository.save(new Trouble(dto)).flatMap(trouble -> {
+                log.info("Trouble saved: " + trouble.toString());
                 category.addTrouble(trouble);
                 return categoryRepository.save(category);
             });
         });
     }
 
-    public Flux<TroubleTicketDataTransferObject> getTroubleTickets() {
+    public Flux<TroubleTicketDataTransferObject> getTroubleTickets(DepartmentRole departmentRole) {
         return categoryRepository.findAll().flatMap(category -> {
-            TroubleTicketDataTransferObject dto = new TroubleTicketDataTransferObject();
-            dto.setCategoryId(category.getId());
-            dto.setCategoryName(category.getName());
-            dto.setCategoryDescription(category.getDescription());
-            return troubleRepository.findAllByIdIn(category.getTroubleIds()).collectList().flatMap(l -> {
-                l = l.stream().sorted(Comparator.comparing(Trouble::getName)).collect(Collectors.toList());
-                dto.setTroubles(l);
-                return Mono.just(dto);
-            });
+            if(category.getDepartmentRole() == departmentRole) {
+                TroubleTicketDataTransferObject dto = new TroubleTicketDataTransferObject();
+                dto.setCategoryId(category.getId());
+                dto.setCategoryName(category.getName());
+                dto.setCategoryDescription(category.getDescription());
+                return troubleRepository.findAllByIdIn(category.getTroubleIds()).collectList().flatMap(l -> {
+                    l = l.stream().sorted(Comparator.comparing(Trouble::getName)).collect(Collectors.toList());
+                    dto.setTroubles(l);
+                    return Mono.just(dto);
+                });
+            }else{
+                return Mono.empty();
+            }
         }).collectList().flatMapMany(l -> {
             l = l.stream().sorted(Comparator.comparing(TroubleTicketDataTransferObject::getCategoryName)).collect(Collectors.toList());
             return Flux.fromIterable(l);
@@ -85,7 +91,14 @@ public class TroubleTicketService {
 
     public Mono<Category> updateCategory(TicketDataTransferObject ticketDTO, int id) {
         return categoryRepository.findById(id).flatMap(category -> {
-            return categoryRepository.save(category.update(ticketDTO));
+            return categoryRepository.save(category.update(ticketDTO)).flatMap(saved -> {
+                return troubleRepository.findAllByIdIn(saved.getTroubleIds()).flatMap(trouble -> {
+                    trouble.setDepartmentRole(saved.getDepartmentRole());
+                    return troubleRepository.save(trouble);
+                }).collectList().flatMap(l -> {
+                    return Mono.just(saved);
+                });
+            });
         });
     }
 

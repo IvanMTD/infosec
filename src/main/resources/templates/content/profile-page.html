@@ -69,6 +69,16 @@
                 <li class="list-group-item">
                     <div class="row">
                         <div class="col-3" style="background: whitesmoke">
+                            <span>Служба</span>
+                        </div>
+                        <div class="col-9">
+                            <span th:text="${user.getDepartmentRole().getTitle()}"></span>
+                        </div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-3" style="background: whitesmoke">
                             <span>Сменить пароль</span>
                         </div>
                         <div class="col-9">

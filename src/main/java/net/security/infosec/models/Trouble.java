@@ -15,6 +15,7 @@ public class Trouble {
      */
     private String name;
     private String description;
+    private DepartmentRole departmentRole;
     /**
      * Связные модели
      */
@@ -24,12 +25,14 @@ public class Trouble {
         setName(dto.getName());
         setDescription(dto.getDescription());
         setCategoryId(dto.getCategoryId());
+        setDepartmentRole(dto.getDepartmentRole());
     }
 
     public Trouble update(TicketDataTransferObject ticketDTO) {
         setName(ticketDTO.getName());
         setDescription(ticketDTO.getDescription());
         setCategoryId(ticketDTO.getCategoryId());
+        setDepartmentRole(ticketDTO.getDepartmentRole());
         return this;
     }
 }

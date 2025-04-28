@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import net.security.infosec.models.Category;
+import net.security.infosec.models.DepartmentRole;
 import net.security.infosec.models.Trouble;
 
 @Data
@@ -16,12 +17,14 @@ public class TicketDataTransferObject {
     private String name;
     @NotBlank(message = "not empty")
     private String description;
+    private DepartmentRole departmentRole;
     private int categoryId;
 
     public TicketDataTransferObject(Category category) {
         setId(category.getId());
         setName(category.getName());
         setDescription(category.getDescription());
+        setDepartmentRole(category.getDepartmentRole());
     }
 
     public TicketDataTransferObject(Trouble trouble) {
@@ -29,5 +32,6 @@ public class TicketDataTransferObject {
         setName(trouble.getName());
         setDescription(trouble.getDescription());
         setCategoryId(trouble.getCategoryId());
+        setDepartmentRole(trouble.getDepartmentRole());
     }
 }

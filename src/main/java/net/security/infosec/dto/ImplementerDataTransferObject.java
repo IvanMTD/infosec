@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import net.security.infosec.models.DepartmentRole;
 import net.security.infosec.models.Implementer;
 import net.security.infosec.models.Role;
 
@@ -34,6 +35,7 @@ public class ImplementerDataTransferObject {
     @NotBlank(message = "Поле не может быть пустым")
     private String officePosition;
     private Role role;
+    private DepartmentRole departmentRole;
 
     public ImplementerDataTransferObject(Implementer implementer) {
         setId(implementer.getId());
@@ -43,6 +45,7 @@ public class ImplementerDataTransferObject {
         setLastname(implementer.getLastname());
         setOfficePosition(implementer.getOfficePosition());
         setRole(implementer.getRole());
+        setDepartmentRole(implementer.getDepartmentRole());
     }
 
     public String getFullName(){

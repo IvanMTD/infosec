@@ -16,12 +16,14 @@ public class Category {
 
     private String name;
     private String description;
+    private DepartmentRole departmentRole;
 
     private Set<Integer> troubleIds = new HashSet<>();
 
     public Category(TicketDataTransferObject dto) {
         setName(dto.getName());
         setDescription(dto.getDescription());
+        setDepartmentRole(dto.getDepartmentRole());
     }
 
     public void addTrouble(Trouble trouble){
@@ -31,6 +33,7 @@ public class Category {
     public Category update(TicketDataTransferObject ticketDTO) {
         setName(ticketDTO.getName());
         setDescription(ticketDTO.getDescription());
+        setDepartmentRole(ticketDTO.getDepartmentRole());
         return this;
     }
 }

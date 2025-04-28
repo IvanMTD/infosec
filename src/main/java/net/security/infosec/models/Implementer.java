@@ -25,6 +25,7 @@ public class Implementer implements UserDetails {
     private String lastname;
     private String officePosition;
     private Role role;
+    private DepartmentRole departmentRole;
     /**
      * Связные модели
      */
@@ -38,6 +39,7 @@ public class Implementer implements UserDetails {
         setLastname(dto.getLastname());
         setOfficePosition(dto.getOfficePosition());
         setRole(dto.getRole());
+        setDepartmentRole(dto.getDepartmentRole());
     }
 
     public Implementer update(ImplementerDataTransferObject implementerDTO) {
@@ -46,6 +48,7 @@ public class Implementer implements UserDetails {
         setLastname(implementerDTO.getLastname());
         setOfficePosition(implementerDTO.getOfficePosition());
         setRole(implementerDTO.getRole());
+        setDepartmentRole(implementerDTO.getDepartmentRole());
         return this;
     }
 

@@ -20,6 +20,14 @@
                         </div>
                     </li>
                     <li class="list-group-item">
+                        <div class="input-group">
+                            <span class="input-group-text">Служба</span>
+                            <select class="form-select" th:field="*{departmentRole}">
+                                <option th:each="departmentRole : ${departmentRoles}" th:value="${departmentRole}" th:text="${departmentRole.getTitle()}"></option>
+                            </select>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
                         <input class="btn btn-primary" type="submit"value="Обновить">
                     </li>
                 </ul>

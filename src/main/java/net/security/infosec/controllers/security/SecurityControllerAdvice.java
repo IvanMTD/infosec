@@ -109,4 +109,13 @@ public class SecurityControllerAdvice {
     public Mono<Integer> year(){
         return Mono.just(LocalDate.now().getYear());
     }
+
+    @ModelAttribute(name = "dRole")
+    public Mono<String> dRole(@AuthenticationPrincipal Implementer implementer){
+        if(implementer == null){
+            return Mono.just("");
+        }else{
+            return Mono.just(implementer.getDepartmentRole().toString());
+        }
+    }
 }

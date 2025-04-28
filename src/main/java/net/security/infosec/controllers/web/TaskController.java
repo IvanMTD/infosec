@@ -937,12 +937,12 @@ public class TaskController {
     }
 
     @GetMapping("/new/reg")
-    public Mono<Rendering> taskReg(){
+    public Mono<Rendering> taskReg(@AuthenticationPrincipal Implementer user){
         return Mono.just(
                 Rendering.view("template")
                         .modelAttribute("title","Task completed page")
                         .modelAttribute("index","task-completed-page")
-                        .modelAttribute("troubleTickets", troubleTicketService.getTroubleTickets())
+                        .modelAttribute("troubleTickets", troubleTicketService.getTroubleTickets(user.getDepartmentRole()))
                         .modelAttribute("task", new TaskDataTransferObject())
                         .build()
         );
@@ -955,7 +955,7 @@ public class TaskController {
                     Rendering.view("template")
                             .modelAttribute("title","Task completed page")
                             .modelAttribute("index","task-completed-page")
-                            .modelAttribute("troubleTickets", troubleTicketService.getTroubleTickets())
+                            .modelAttribute("troubleTickets", troubleTicketService.getTroubleTickets(implementer.getDepartmentRole()))
                             .modelAttribute("task", task)
                             .build()
             );

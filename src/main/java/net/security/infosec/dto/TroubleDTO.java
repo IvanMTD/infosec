@@ -2,6 +2,7 @@ package net.security.infosec.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.security.infosec.models.DepartmentRole;
 import net.security.infosec.models.Trouble;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ public class TroubleDTO {
     private int id;
     private String title;
     private String description;
+    private DepartmentRole departmentRole;
     private List<TaskDTO> tasks = new ArrayList<>();
     private boolean show = true;
 
@@ -22,6 +24,7 @@ public class TroubleDTO {
         setId(trouble.getId());
         setTitle(trouble.getName());
         setDescription(trouble.getDescription());
+        setDepartmentRole(trouble.getDepartmentRole());
     }
 
     public void addTask(TaskDTO task){

@@ -42,11 +42,20 @@ public class HomeController {
 
     private final PasswordValidation passwordValidation;
     @GetMapping("/")
-    public Mono<Rendering> homePage(){
+    public Mono<Rendering> homePage(@AuthenticationPrincipal Implementer user){
+        log.info("user is : [{}]", user);
         /**
          * CATEGORY DAY
          */
-        Flux<ChartDTO> chartCategoryFluxDay = taskService.getYear().collectList().flatMapMany(tasks -> {
+        Flux<ChartDTO> chartCategoryFluxDay = taskService.getYear().flatMap(task -> {
+            return troubleTicketService.getTroubleById(task.getTroubleId()).flatMap(trouble -> {
+                if(trouble.getDepartmentRole() == user.getDepartmentRole()){
+                    return Mono.just(task);
+                }else {
+                    return Mono.empty();
+                }
+            });
+        }).collectList().flatMapMany(tasks -> {
             Set<LocalDate> localDates = new HashSet<>();
             for(Task task : tasks){
                 localDates.add(task.getExecuteDate());
@@ -57,7 +66,13 @@ public class HomeController {
         }).flatMapSequential(localDate -> {
             ChartDTO chart = new ChartDTO();
             chart.setLocalDate(localDate);
-            return troubleTicketService.getAllCategories().collectList().flatMap(categories -> taskService.getTasksByLocalDate(localDate).collectList().flatMap(tasks -> {
+            return troubleTicketService.getAllCategories().flatMap(c -> {
+                if(c.getDepartmentRole() == user.getDepartmentRole()){
+                    return Mono.just(c);
+                }else{
+                    return Mono.empty();
+                }
+            }).collectList().flatMap(categories -> taskService.getTasksByLocalDate(localDate).collectList().flatMap(tasks -> {
                 List<Category> list = categories.stream().sorted(Comparator.comparing(Category::getId)).collect(Collectors.toList());
                 for(Category category : list){
                     int tCount = 0;
@@ -102,21 +117,25 @@ public class HomeController {
         Flux<ConstructDTO> chartCategoryFluxWeek = Flux.empty();
         for(Integer key : weeks.keySet()){
             Flux<ConstructDTO> chartFluxWeek = troubleTicketService.getAllCategories().flatMap(category -> {
-                ChartDTO chart = new ChartDTO();
-                chart.setTitle(category.getName());
-                chart.setCId(category.getId());
-                chart.setStatus("Неделя " + key);
-                chart.setDescription(category.getDescription());
-                return taskService.getFromDate(weeks.get(key)).collectList().flatMap(dateTasks -> {
-                    int count = 0;
-                    for (Task task : dateTasks) {
-                        if (category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())) {
-                            count++;
+                if(category.getDepartmentRole() == user.getDepartmentRole()){
+                    ChartDTO chart = new ChartDTO();
+                    chart.setTitle(category.getName());
+                    chart.setCId(category.getId());
+                    chart.setStatus("Неделя " + key);
+                    chart.setDescription(category.getDescription());
+                    return taskService.getFromDate(weeks.get(key)).collectList().flatMap(dateTasks -> {
+                        int count = 0;
+                        for (Task task : dateTasks) {
+                            if (category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())) {
+                                count++;
+                            }
                         }
-                    }
-                    chart.setTaskCount(count);
-                    return Mono.just(chart);
-                });
+                        chart.setTaskCount(count);
+                        return Mono.just(chart);
+                    });
+                }else{
+                    return Mono.empty();
+                }
             }).collectList().flatMapMany(l -> {
                 l = l.stream().sorted(Comparator.comparing(ChartDTO::getCId)).collect(Collectors.toList());
                 return Flux.fromIterable(l);
@@ -160,21 +179,25 @@ public class HomeController {
         Flux<ConstructDTO> chartCategoryFluxMonth = Flux.empty();
         for(Integer key : months.keySet()){
             Flux<ConstructDTO> chartFluxMonth = troubleTicketService.getAllCategories().flatMap(category -> {
-                ChartDTO chart = new ChartDTO();
-                chart.setTitle(category.getName());
-                chart.setCId(category.getId());
-                chart.setStatus("Неделя " + key);
-                chart.setDescription(category.getDescription());
-                return taskService.getFromDate(months.get(key)).collectList().flatMap(dateTasks -> {
-                    int count = 0;
-                    for (Task task : dateTasks) {
-                        if (category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())) {
-                            count++;
+                if(category.getDepartmentRole() == user.getDepartmentRole()){
+                    ChartDTO chart = new ChartDTO();
+                    chart.setTitle(category.getName());
+                    chart.setCId(category.getId());
+                    chart.setStatus("Неделя " + key);
+                    chart.setDescription(category.getDescription());
+                    return taskService.getFromDate(months.get(key)).collectList().flatMap(dateTasks -> {
+                        int count = 0;
+                        for (Task task : dateTasks) {
+                            if (category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())) {
+                                count++;
+                            }
                         }
-                    }
-                    chart.setTaskCount(count);
-                    return Mono.just(chart);
-                });
+                        chart.setTaskCount(count);
+                        return Mono.just(chart);
+                    });
+                }else{
+                    return Mono.empty();
+                }
             }).collectList().flatMapMany(l -> {
                 l = l.stream().sorted(Comparator.comparing(ChartDTO::getCId)).collect(Collectors.toList());
                 return Flux.fromIterable(l);
@@ -223,6 +246,7 @@ public class HomeController {
                         .modelAttribute("title","Home Page")
                         .modelAttribute("categoryTitle", troubleTicketService.getAllCategories().collectList().flatMap(l -> {
                             l = l.stream().sorted(Comparator.comparing(Category::getId)).collect(Collectors.toList());
+                            l = l.stream().filter(c -> c.getDepartmentRole() == user.getDepartmentRole()).toList();
                             return Mono.just(l);
                         }))
                         .modelAttribute("categoryChartDay", chartCategoryFluxDay)

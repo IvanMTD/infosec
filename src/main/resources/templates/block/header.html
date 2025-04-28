@@ -5,8 +5,17 @@
                 <i class="bi bi-file-lock2" style="font-size: 64px"></i>
             </a>
         </div>
-        <div class="col-6 text-center">
+        <div class="col-6 text-center" th:if="${dRole} == 'ALL'">
+            <h1>Мониторинг</h1>
+        </div>
+        <div class="col-6 text-center" th:if="${dRole} == 'IB'">
             <h1>Служба информационной безопасности</h1>
+        </div>
+        <div class="col-6 text-center" th:if="${dRole} == 'IT'">
+            <h1>Служба технической поддержки</h1>
+        </div>
+        <div class="col-6 text-center" th:if="${dRole} == ''">
+            <h1>Система учета заявок</h1>
         </div>
         <div class="col">
             <form id="logoutForm" method="post" th:action="@{/logout}"></form>
