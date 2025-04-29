@@ -2,7 +2,7 @@
     <div class="row py-5">
         <div class="col-4">
             <select id="my-select" class="form-select" aria-label="Default select example" onchange="setupLinks(this.value)">
-                <option value="0">Все</option>
+                <option th:each="dr : ${departmentRoles}" th:value="${dr.getType()}" th:text="${dr.getTitle()}"></option>
                 <option th:each="user : ${users}" th:value="${user.getId()}" th:text="${user.getFullName()}" th:if="${user.getRole().getTitle()} != 'Администратор' AND ${user.getRole().getTitle()} != 'Контролирующий'"></option>
             </select>
             <script th:inline="javascript">
