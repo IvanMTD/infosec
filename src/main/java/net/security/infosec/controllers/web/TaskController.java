@@ -351,38 +351,42 @@ public class TaskController {
             }).flatMapSequential(Mono::just);
 
             Flux<CategoryDTO> statistics = troubleTicketService.getAllCategories().flatMap(category -> {
-                CategoryDTO categoryDTO = new CategoryDTO();
-                categoryDTO.setTitle(category.getName());
-                return implementerService.getAll().collectList().flatMap(implementers -> troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
-                    for (Trouble trouble : troubles) {
-                        TroubleDTO troubleDTO = new TroubleDTO();
-                        troubleDTO.setTitle(trouble.getName());
-                        troubleDTO.setId(trouble.getId());
-                        categoryDTO.addTrouble(troubleDTO);
-                    }
-                    return taskService.getWeek().collectList().flatMap(tasks -> {
-                        for (TroubleDTO troubleDTO : categoryDTO.getTroubles()) {
-                            for (Task task : tasks) {
-                                if (task.getTroubleId() == troubleDTO.getId()) {
-                                    TaskDTO taskDTO = new TaskDTO();
-                                    taskDTO.setId(task.getId());
-                                    taskDTO.setTitle(task.getTitle());
-                                    taskDTO.setContent(task.getDescription());
-                                    taskDTO.setPlacedAt(task.getExecuteDate());
-                                    troubleDTO.addTask(taskDTO);
-                                    for (Implementer implementer : implementers) {
-                                        if (task.getImplementerId() == implementer.getId()) {
-                                            taskDTO.setUsername(implementer.getFullName());
+                if(category.getDepartmentRole().getType() == userId || userId == 0) {
+                    CategoryDTO categoryDTO = new CategoryDTO();
+                    categoryDTO.setTitle(category.getName());
+                    return implementerService.getAll().collectList().flatMap(implementers -> troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
+                        for (Trouble trouble : troubles) {
+                            TroubleDTO troubleDTO = new TroubleDTO();
+                            troubleDTO.setTitle(trouble.getName());
+                            troubleDTO.setId(trouble.getId());
+                            categoryDTO.addTrouble(troubleDTO);
+                        }
+                        return taskService.getWeek().collectList().flatMap(tasks -> {
+                            for (TroubleDTO troubleDTO : categoryDTO.getTroubles()) {
+                                for (Task task : tasks) {
+                                    if (task.getTroubleId() == troubleDTO.getId()) {
+                                        TaskDTO taskDTO = new TaskDTO();
+                                        taskDTO.setId(task.getId());
+                                        taskDTO.setTitle(task.getTitle());
+                                        taskDTO.setContent(task.getDescription());
+                                        taskDTO.setPlacedAt(task.getExecuteDate());
+                                        troubleDTO.addTask(taskDTO);
+                                        for (Implementer implementer : implementers) {
+                                            if (task.getImplementerId() == implementer.getId()) {
+                                                taskDTO.setUsername(implementer.getFullName());
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        categoryDTO.reconstruct();
-                        categoryDTO.doSort();
-                        return Mono.just(categoryDTO);
-                    });
-                }));
+                            categoryDTO.reconstruct();
+                            categoryDTO.doSort();
+                            return Mono.just(categoryDTO);
+                        });
+                    }));
+                }else{
+                    return Mono.empty();
+                }
             }).collectList().flatMapMany(l -> {
                 l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
                 return Flux.fromIterable(l);
@@ -503,38 +507,42 @@ public class TaskController {
             }).flatMapSequential(Mono::just);
 
             Flux<CategoryDTO> statistics = troubleTicketService.getAllCategories().flatMap(category -> {
-                CategoryDTO categoryDTO = new CategoryDTO();
-                categoryDTO.setTitle(category.getName());
-                return implementerService.getAll().collectList().flatMap(implementers -> troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
-                    for (Trouble trouble : troubles) {
-                        TroubleDTO troubleDTO = new TroubleDTO();
-                        troubleDTO.setTitle(trouble.getName());
-                        troubleDTO.setId(trouble.getId());
-                        categoryDTO.addTrouble(troubleDTO);
-                    }
-                    return taskService.getMonth().collectList().flatMap(tasks -> {
-                        for (TroubleDTO troubleDTO : categoryDTO.getTroubles()) {
-                            for (Task task : tasks) {
-                                if (task.getTroubleId() == troubleDTO.getId()) {
-                                    TaskDTO taskDTO = new TaskDTO();
-                                    taskDTO.setId(task.getId());
-                                    taskDTO.setTitle(task.getTitle());
-                                    taskDTO.setContent(task.getDescription());
-                                    taskDTO.setPlacedAt(task.getExecuteDate());
-                                    troubleDTO.addTask(taskDTO);
-                                    for (Implementer implementer : implementers) {
-                                        if (task.getImplementerId() == implementer.getId()) {
-                                            taskDTO.setUsername(implementer.getFullName());
+                if(category.getDepartmentRole().getType() == userId || userId == 0) {
+                    CategoryDTO categoryDTO = new CategoryDTO();
+                    categoryDTO.setTitle(category.getName());
+                    return implementerService.getAll().collectList().flatMap(implementers -> troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
+                        for (Trouble trouble : troubles) {
+                            TroubleDTO troubleDTO = new TroubleDTO();
+                            troubleDTO.setTitle(trouble.getName());
+                            troubleDTO.setId(trouble.getId());
+                            categoryDTO.addTrouble(troubleDTO);
+                        }
+                        return taskService.getMonth().collectList().flatMap(tasks -> {
+                            for (TroubleDTO troubleDTO : categoryDTO.getTroubles()) {
+                                for (Task task : tasks) {
+                                    if (task.getTroubleId() == troubleDTO.getId()) {
+                                        TaskDTO taskDTO = new TaskDTO();
+                                        taskDTO.setId(task.getId());
+                                        taskDTO.setTitle(task.getTitle());
+                                        taskDTO.setContent(task.getDescription());
+                                        taskDTO.setPlacedAt(task.getExecuteDate());
+                                        troubleDTO.addTask(taskDTO);
+                                        for (Implementer implementer : implementers) {
+                                            if (task.getImplementerId() == implementer.getId()) {
+                                                taskDTO.setUsername(implementer.getFullName());
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        categoryDTO.reconstruct();
-                        categoryDTO.doSort();
-                        return Mono.just(categoryDTO);
-                    });
-                }));
+                            categoryDTO.reconstruct();
+                            categoryDTO.doSort();
+                            return Mono.just(categoryDTO);
+                        });
+                    }));
+                }else{
+                    return Mono.empty();
+                }
             }).collectList().flatMapMany(l -> {
                 l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
                 return Flux.fromIterable(l);
@@ -655,38 +663,42 @@ public class TaskController {
             }).flatMapSequential(Mono::just);
 
             Flux<CategoryDTO> statistics = troubleTicketService.getAllCategories().flatMap(category -> {
-                CategoryDTO categoryDTO = new CategoryDTO();
-                categoryDTO.setTitle(category.getName());
-                return implementerService.getAll().collectList().flatMap(implementers -> troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
-                    for (Trouble trouble : troubles) {
-                        TroubleDTO troubleDTO = new TroubleDTO();
-                        troubleDTO.setTitle(trouble.getName());
-                        troubleDTO.setId(trouble.getId());
-                        categoryDTO.addTrouble(troubleDTO);
-                    }
-                    return taskService.getYear().collectList().flatMap(tasks -> {
-                        for (TroubleDTO troubleDTO : categoryDTO.getTroubles()) {
-                            for (Task task : tasks) {
-                                if (task.getTroubleId() == troubleDTO.getId()) {
-                                    TaskDTO taskDTO = new TaskDTO();
-                                    taskDTO.setId(task.getId());
-                                    taskDTO.setTitle(task.getTitle());
-                                    taskDTO.setContent(task.getDescription());
-                                    taskDTO.setPlacedAt(task.getExecuteDate());
-                                    troubleDTO.addTask(taskDTO);
-                                    for (Implementer implementer : implementers) {
-                                        if (task.getImplementerId() == implementer.getId()) {
-                                            taskDTO.setUsername(implementer.getFullName());
+                if(category.getDepartmentRole().getType() == userId || userId == 0) {
+                    CategoryDTO categoryDTO = new CategoryDTO();
+                    categoryDTO.setTitle(category.getName());
+                    return implementerService.getAll().collectList().flatMap(implementers -> troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
+                        for (Trouble trouble : troubles) {
+                            TroubleDTO troubleDTO = new TroubleDTO();
+                            troubleDTO.setTitle(trouble.getName());
+                            troubleDTO.setId(trouble.getId());
+                            categoryDTO.addTrouble(troubleDTO);
+                        }
+                        return taskService.getYear().collectList().flatMap(tasks -> {
+                            for (TroubleDTO troubleDTO : categoryDTO.getTroubles()) {
+                                for (Task task : tasks) {
+                                    if (task.getTroubleId() == troubleDTO.getId()) {
+                                        TaskDTO taskDTO = new TaskDTO();
+                                        taskDTO.setId(task.getId());
+                                        taskDTO.setTitle(task.getTitle());
+                                        taskDTO.setContent(task.getDescription());
+                                        taskDTO.setPlacedAt(task.getExecuteDate());
+                                        troubleDTO.addTask(taskDTO);
+                                        for (Implementer implementer : implementers) {
+                                            if (task.getImplementerId() == implementer.getId()) {
+                                                taskDTO.setUsername(implementer.getFullName());
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        categoryDTO.reconstruct();
-                        categoryDTO.doSort();
-                        return Mono.just(categoryDTO);
-                    });
-                }));
+                            categoryDTO.reconstruct();
+                            categoryDTO.doSort();
+                            return Mono.just(categoryDTO);
+                        });
+                    }));
+                }else{
+                    return Mono.empty();
+                }
             }).collectList().flatMapMany(l -> {
                 l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
                 return Flux.fromIterable(l);
@@ -824,38 +836,42 @@ public class TaskController {
             }).flatMapSequential(Mono::just);
 
             Flux<CategoryDTO> statistics = troubleTicketService.getAllCategories().flatMap(category -> {
-                CategoryDTO categoryDTO = new CategoryDTO();
-                categoryDTO.setTitle(category.getName());
-                return implementerService.getAll().collectList().flatMap(implementers -> troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
-                    for (Trouble trouble : troubles) {
-                        TroubleDTO troubleDTO = new TroubleDTO();
-                        troubleDTO.setTitle(trouble.getName());
-                        troubleDTO.setId(trouble.getId());
-                        categoryDTO.addTrouble(troubleDTO);
-                    }
-                    return taskService.getFromDate(dateDTO).collectList().flatMap(tasks -> {
-                        for (TroubleDTO troubleDTO : categoryDTO.getTroubles()) {
-                            for (Task task : tasks) {
-                                if (task.getTroubleId() == troubleDTO.getId()) {
-                                    TaskDTO taskDTO = new TaskDTO();
-                                    taskDTO.setId(task.getId());
-                                    taskDTO.setTitle(task.getTitle());
-                                    taskDTO.setContent(task.getDescription());
-                                    taskDTO.setPlacedAt(task.getExecuteDate());
-                                    troubleDTO.addTask(taskDTO);
-                                    for (Implementer implementer : implementers) {
-                                        if (task.getImplementerId() == implementer.getId()) {
-                                            taskDTO.setUsername(implementer.getFullName());
+                if(category.getDepartmentRole().getType() == userId || userId == 0) {
+                    CategoryDTO categoryDTO = new CategoryDTO();
+                    categoryDTO.setTitle(category.getName());
+                    return implementerService.getAll().collectList().flatMap(implementers -> troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
+                        for (Trouble trouble : troubles) {
+                            TroubleDTO troubleDTO = new TroubleDTO();
+                            troubleDTO.setTitle(trouble.getName());
+                            troubleDTO.setId(trouble.getId());
+                            categoryDTO.addTrouble(troubleDTO);
+                        }
+                        return taskService.getFromDate(dateDTO).collectList().flatMap(tasks -> {
+                            for (TroubleDTO troubleDTO : categoryDTO.getTroubles()) {
+                                for (Task task : tasks) {
+                                    if (task.getTroubleId() == troubleDTO.getId()) {
+                                        TaskDTO taskDTO = new TaskDTO();
+                                        taskDTO.setId(task.getId());
+                                        taskDTO.setTitle(task.getTitle());
+                                        taskDTO.setContent(task.getDescription());
+                                        taskDTO.setPlacedAt(task.getExecuteDate());
+                                        troubleDTO.addTask(taskDTO);
+                                        for (Implementer implementer : implementers) {
+                                            if (task.getImplementerId() == implementer.getId()) {
+                                                taskDTO.setUsername(implementer.getFullName());
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        categoryDTO.reconstruct();
-                        categoryDTO.doSort();
-                        return Mono.just(categoryDTO);
-                    });
-                }));
+                            categoryDTO.reconstruct();
+                            categoryDTO.doSort();
+                            return Mono.just(categoryDTO);
+                        });
+                    }));
+                }else{
+                    return Mono.empty();
+                }
             }).collectList().flatMapMany(l -> {
                 l = l.stream().sorted(Comparator.comparing(CategoryDTO::getTitle)).collect(Collectors.toList());
                 return Flux.fromIterable(l);
