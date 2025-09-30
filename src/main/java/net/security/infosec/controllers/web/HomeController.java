@@ -107,6 +107,7 @@ public class HomeController {
                 weekCount++;
             }
         }
+
         if(!startWeek.equals(LocalDate.now())){
             DateDTO dateDTO = new DateDTO();
             dateDTO.setBegin(startWeek);
