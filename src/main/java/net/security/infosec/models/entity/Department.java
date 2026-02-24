@@ -1,7 +1,6 @@
-package net.security.infosec.models;
+package net.security.infosec.models.entity;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;

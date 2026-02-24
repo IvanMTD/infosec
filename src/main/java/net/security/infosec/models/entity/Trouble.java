@@ -1,8 +1,8 @@
-package net.security.infosec.models;
+package net.security.infosec.models.entity;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import net.security.infosec.dto.TicketDataTransferObject;
+import net.security.infosec.models.dto.TicketDataTransferObject;
 import org.springframework.data.annotation.Id;
 
 @Data

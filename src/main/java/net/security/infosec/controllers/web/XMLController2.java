@@ -2,7 +2,7 @@ package net.security.infosec.controllers.web;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.security.infosec.models.Employee;
+import net.security.infosec.models.entity.Employee;
 import net.security.infosec.repositories.DepartmentRepository;
 import net.security.infosec.repositories.DivisionRepository;
 import net.security.infosec.services.EmployeeService;

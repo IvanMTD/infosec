@@ -1,12 +1,10 @@
-package net.security.infosec.dto;
+package net.security.infosec.models.dto;
 
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.security.infosec.models.Task;
+import net.security.infosec.models.entity.Task;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;

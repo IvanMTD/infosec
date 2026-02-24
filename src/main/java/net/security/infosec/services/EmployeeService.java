@@ -2,13 +2,11 @@ package net.security.infosec.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.security.infosec.dto.EmployeeDTO;
-import net.security.infosec.dto.PersonDTO;
-import net.security.infosec.models.Department;
-import net.security.infosec.models.Division;
-import net.security.infosec.models.Employee;
+import net.security.infosec.models.dto.PersonDTO;
+import net.security.infosec.models.entity.Department;
+import net.security.infosec.models.entity.Division;
+import net.security.infosec.models.entity.Employee;
 import net.security.infosec.repositories.EmployeeRepository;
-import net.security.infosec.utils.Checker;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

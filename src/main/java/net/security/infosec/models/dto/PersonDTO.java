@@ -1,4 +1,4 @@
-package net.security.infosec.dto;
+package net.security.infosec.models.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

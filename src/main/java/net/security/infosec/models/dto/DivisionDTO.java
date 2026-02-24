@@ -1,9 +1,8 @@
-package net.security.infosec.dto;
+package net.security.infosec.models.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.security.infosec.models.Division;
-import net.security.infosec.models.Employee;
+import net.security.infosec.models.entity.Division;
 
 import java.util.ArrayList;
 import java.util.List;

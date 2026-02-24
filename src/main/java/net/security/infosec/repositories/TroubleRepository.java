@@ -1,6 +1,6 @@
 package net.security.infosec.repositories;
 
-import net.security.infosec.models.Trouble;
+import net.security.infosec.models.entity.Trouble;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 

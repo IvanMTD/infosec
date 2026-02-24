@@ -49,6 +49,11 @@
                         </select>
                     </li>
                     <li class="list-group-item">
+                        <select class="form-select" th:field="*{departmentRole}">
+                            <option th:each="r : ${departments}" th:text="${r.getTitle()}" th:value="${r}"></option>
+                        </select>
+                    </li>
+                    <li class="list-group-item">
                         <input class="btn btn-primary" type="submit" value="Обновить">
                     </li>
                 </ul>

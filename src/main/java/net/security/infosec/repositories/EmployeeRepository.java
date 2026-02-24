@@ -1,6 +1,6 @@
 package net.security.infosec.repositories;
 
-import net.security.infosec.models.Employee;
+import net.security.infosec.models.entity.Employee;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import reactor.core.publisher.Flux;

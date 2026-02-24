@@ -1,23 +1,19 @@
 package net.security.infosec.services;
 
 import lombok.RequiredArgsConstructor;
-import net.security.infosec.dto.DateDTO;
-import net.security.infosec.dto.TaskDTO;
-import net.security.infosec.dto.TaskDataTransferObject;
-import net.security.infosec.models.DepartmentRole;
-import net.security.infosec.models.Implementer;
-import net.security.infosec.models.Task;
+import net.security.infosec.models.dto.DateDTO;
+import net.security.infosec.models.dto.TaskDTO;
+import net.security.infosec.models.dto.TaskDataTransferObject;
+import net.security.infosec.models.entity.Implementer;
+import net.security.infosec.models.entity.Task;
 import net.security.infosec.repositories.TaskRepository;
-import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Comparator;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service

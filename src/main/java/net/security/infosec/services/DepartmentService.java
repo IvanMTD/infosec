@@ -2,12 +2,10 @@ package net.security.infosec.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.security.infosec.models.Department;
-import net.security.infosec.models.Division;
-import net.security.infosec.models.Employee;
+import net.security.infosec.models.entity.Department;
+import net.security.infosec.models.entity.Division;
 import net.security.infosec.repositories.DepartmentRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

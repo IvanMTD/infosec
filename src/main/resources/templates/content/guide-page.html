@@ -752,7 +752,7 @@
 
     function employeeAppend(employee){
         var cardBody = `
-            <button class="card mx-1 my-3 zoom w-100" onclick="showDepartmentAndDivision('${employee.id}')">
+            <div class="card mx-1 my-3 zoom w-100" onclick="showDepartmentAndDivision('${employee.id}')">
                 <div class="row rounded-4 shadow m-2">
                     <div class="col" id="col-${employee.id}">
                         <div class="row border-bottom">
@@ -786,7 +786,7 @@
                         </div>
                     </div>
                 </div>
-            </button>
+            </div>
         `;
         $('#guide-card-col').append(cardBody);
         if(admin){

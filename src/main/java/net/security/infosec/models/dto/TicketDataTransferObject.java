@@ -1,11 +1,11 @@
-package net.security.infosec.dto;
+package net.security.infosec.models.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import net.security.infosec.models.Category;
-import net.security.infosec.models.DepartmentRole;
-import net.security.infosec.models.Trouble;
+import net.security.infosec.models.entity.Category;
+import net.security.infosec.models.entity.DepartmentRole;
+import net.security.infosec.models.entity.Trouble;
 
 @Data
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package net.security.infosec.dto;
+package net.security.infosec.models.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -6,9 +6,9 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import net.security.infosec.models.DepartmentRole;
-import net.security.infosec.models.Implementer;
-import net.security.infosec.models.Role;
+import net.security.infosec.models.entity.DepartmentRole;
+import net.security.infosec.models.entity.Implementer;
+import net.security.infosec.models.entity.Role;
 
 @Data
 @RequiredArgsConstructor

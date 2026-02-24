@@ -3,14 +3,13 @@ package net.security.infosec.controllers.web;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.security.infosec.dto.CategoryDTO;
-import net.security.infosec.dto.ImplementerDataTransferObject;
-import net.security.infosec.dto.TicketDataTransferObject;
-import net.security.infosec.dto.TroubleDTO;
-import net.security.infosec.models.Department;
-import net.security.infosec.models.DepartmentRole;
-import net.security.infosec.models.Role;
-import net.security.infosec.models.Trouble;
+import net.security.infosec.models.dto.CategoryDTO;
+import net.security.infosec.models.dto.ImplementerDataTransferObject;
+import net.security.infosec.models.dto.TicketDataTransferObject;
+import net.security.infosec.models.dto.TroubleDTO;
+import net.security.infosec.models.entity.DepartmentRole;
+import net.security.infosec.models.entity.Role;
+import net.security.infosec.models.entity.Trouble;
 import net.security.infosec.services.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -105,6 +104,7 @@ public class AdminController {
                         .modelAttribute("index","user-edit-page")
                         .modelAttribute("implementer", implementerService.getUserDtoById(id))
                         .modelAttribute("roles", Role.values())
+                        .modelAttribute("departments", DepartmentRole.values())
                         .build()
         );
     }
@@ -119,6 +119,7 @@ public class AdminController {
                             .modelAttribute("index","user-edit-page")
                             .modelAttribute("implementer", implementerDTO)
                             .modelAttribute("roles", Role.values())
+                            .modelAttribute("departments", DepartmentRole.values())
                             .build()
             );
         }

@@ -2,19 +2,15 @@ package net.security.infosec.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.security.infosec.dto.CategoryDTO;
-import net.security.infosec.dto.TaskDTO;
-import net.security.infosec.dto.TicketDataTransferObject;
-import net.security.infosec.dto.TroubleTicketDataTransferObject;
-import net.security.infosec.models.Category;
-import net.security.infosec.models.DepartmentRole;
-import net.security.infosec.models.Task;
-import net.security.infosec.models.Trouble;
+import net.security.infosec.models.dto.TicketDataTransferObject;
+import net.security.infosec.models.dto.TroubleTicketDataTransferObject;
+import net.security.infosec.models.entity.Category;
+import net.security.infosec.models.entity.DepartmentRole;
+import net.security.infosec.models.entity.Task;
+import net.security.infosec.models.entity.Trouble;
 import net.security.infosec.repositories.CategoryRepository;
 import net.security.infosec.repositories.TroubleRepository;
-import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

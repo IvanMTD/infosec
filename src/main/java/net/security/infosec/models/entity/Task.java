@@ -1,9 +1,9 @@
-package net.security.infosec.models;
+package net.security.infosec.models.entity;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import net.security.infosec.dto.TaskDTO;
-import net.security.infosec.dto.TaskDataTransferObject;
+import net.security.infosec.models.dto.TaskDTO;
+import net.security.infosec.models.dto.TaskDataTransferObject;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDate;

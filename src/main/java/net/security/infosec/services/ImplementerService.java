@@ -1,10 +1,10 @@
 package net.security.infosec.services;
 
 import lombok.RequiredArgsConstructor;
-import net.security.infosec.dto.ImplementerDataTransferObject;
-import net.security.infosec.dto.PasswordDTO;
-import net.security.infosec.models.Implementer;
-import net.security.infosec.models.Task;
+import net.security.infosec.models.dto.ImplementerDataTransferObject;
+import net.security.infosec.models.dto.PasswordDTO;
+import net.security.infosec.models.entity.Implementer;
+import net.security.infosec.models.entity.Task;
 import net.security.infosec.repositories.ImplementerRepository;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;

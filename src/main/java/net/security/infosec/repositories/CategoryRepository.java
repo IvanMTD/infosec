@@ -1,6 +1,6 @@
 package net.security.infosec.repositories;
 
-import net.security.infosec.models.Category;
+import net.security.infosec.models.entity.Category;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;

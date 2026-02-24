@@ -1,8 +1,8 @@
-package net.security.infosec.models;
+package net.security.infosec.models.entity;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import net.security.infosec.dto.ImplementerDataTransferObject;
+import net.security.infosec.models.dto.ImplementerDataTransferObject;
 import org.springframework.data.annotation.Id;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

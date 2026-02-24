@@ -1,8 +1,8 @@
-package net.security.infosec.dto;
+package net.security.infosec.models.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.security.infosec.models.Department;
+import net.security.infosec.models.entity.Department;
 
 import java.util.ArrayList;
 import java.util.HashSet;

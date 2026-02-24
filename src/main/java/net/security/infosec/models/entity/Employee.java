@@ -1,4 +1,4 @@
-package net.security.infosec.models;
+package net.security.infosec.models.entity;
 
 /*
 create table if not exists employee(
@@ -18,8 +18,7 @@ create table if not exists employee(
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.security.infosec.dto.EmployeeDTO;
-import net.security.infosec.dto.PersonDTO;
+import net.security.infosec.models.dto.PersonDTO;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 

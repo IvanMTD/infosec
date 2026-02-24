@@ -1,8 +1,8 @@
-package net.security.infosec.dto;
+package net.security.infosec.models.dto;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import net.security.infosec.models.Task;
+import net.security.infosec.models.entity.Task;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

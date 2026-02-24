@@ -63,6 +63,9 @@
         <div th:insert="~{content/structure-edit-page}" th:if="${index} == 'structure-edit-page'"></div>
         <div th:insert="~{content/division-edit-page}" th:if="${index} == 'division-edit-page'"></div>
         <div th:insert="~{content/employee-edit-page}" th:if="${index} == 'employee-edit-page'"></div>
+
+        <main th:insert="~{content/testing}" th:if="${index} == 'page-testing'"></main>
+
         <footer th:insert="~{block/footer}"></footer>
 
         <script src="/fw/@popperjs/core/dist/umd/popper.min.js"></script>

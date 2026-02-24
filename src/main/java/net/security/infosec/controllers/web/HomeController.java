@@ -3,14 +3,14 @@ package net.security.infosec.controllers.web;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.security.infosec.dto.ChartDTO;
-import net.security.infosec.dto.ConstructDTO;
-import net.security.infosec.dto.DateDTO;
-import net.security.infosec.dto.PasswordDTO;
-import net.security.infosec.models.Category;
-import net.security.infosec.models.Implementer;
-import net.security.infosec.models.Task;
-import net.security.infosec.models.Trouble;
+import net.security.infosec.models.dto.ChartDTO;
+import net.security.infosec.models.dto.ConstructDTO;
+import net.security.infosec.models.dto.DateDTO;
+import net.security.infosec.models.dto.PasswordDTO;
+import net.security.infosec.models.entity.Category;
+import net.security.infosec.models.entity.Implementer;
+import net.security.infosec.models.entity.Task;
+import net.security.infosec.models.entity.Trouble;
 import net.security.infosec.services.ImplementerService;
 import net.security.infosec.services.TaskService;
 import net.security.infosec.services.TroubleTicketService;
@@ -306,5 +306,15 @@ public class HomeController {
             log.info("user password updated! " + impl.getPassword());
             return Mono.just(Rendering.redirectTo("/profile").build());
         });
+    }
+
+    @GetMapping("/testing")
+    public Mono<Rendering> testingPage(){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","testing")
+                        .modelAttribute("index","page-testing")
+                        .build()
+        );
     }
 }

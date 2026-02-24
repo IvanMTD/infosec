@@ -1,6 +1,6 @@
 package net.security.infosec.repositories;
 
-import net.security.infosec.models.Implementer;
+import net.security.infosec.models.entity.Implementer;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import reactor.core.publisher.Mono;

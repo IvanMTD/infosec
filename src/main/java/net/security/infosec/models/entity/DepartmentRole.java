@@ -1,7 +1,9 @@
-package net.security.infosec.models;
+package net.security.infosec.models.entity;
 
 public enum DepartmentRole {
-    ALL("Все",0), IB("Информационная безопасность",-2), IT("Техническая поддержка",-1);
+    ALL("Все",0),
+    IB("Информационная безопасность",-2),
+    IT("Техническая поддержка",-1);
     private final String title;
     private final int type;
 

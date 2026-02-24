@@ -2,9 +2,10 @@ package net.security.infosec.controllers.rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.security.infosec.dto.EmployeeDTO;
-import net.security.infosec.dto.PersonDTO;
-import net.security.infosec.models.Employee;
+import net.security.infosec.models.dto.DivisionNode;
+import net.security.infosec.models.dto.EmployeeDTO;
+import net.security.infosec.models.dto.PersonDTO;
+import net.security.infosec.models.entity.Employee;
 import net.security.infosec.services.EmployeeService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -80,5 +82,11 @@ public class ApiController {
             employee.setEmail(employeeDTO.getEmail());
             return employeeService.save(employee).flatMap(e -> Mono.just(new EmployeeDTO(e)));
         });
+    }
+
+    @GetMapping("/guide/pdf")
+    public Mono<String> guidePDF(@ModelAttribute List<DivisionNode> list){
+        log.info("incoming {}: ",list);
+        return Mono.just("PDF");
     }
 }

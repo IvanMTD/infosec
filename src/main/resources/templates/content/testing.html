@@ -1,0 +1,349 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #dropArea {
+        border: 3px dashed #ccc;
+        border-radius: 10px;
+        padding: 40px;
+        text-align: center;
+        margin-bottom: 20px;
+        background: #f9f9f9;
+    }
+    #dropArea.highlight { border-color: #4CAF50; background: #e8f5e9; }
+    pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow: auto; }
+</style>
+
+<div class="row">
+    <div class="col-12" id="container-test">
+        <h2>📄 Загрузите PDF-файл для анализа</h2>
+        <p>Перетащите файл в зону ниже или выберите его.</p>
+
+        <div id="dropArea">
+            <p>Перетащите PDF-файл сюда или <input type="file" id="fileInput" accept=".pdf"></p>
+        </div>
+
+        <h3>Результат анализа:</h3>
+        <div id="output">
+            <p>Здесь появится текст и структура из PDF...</p>
+            <pre id="textOutput"></pre>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Получаем элементы DOM
+    const dropArea = document.getElementById('dropArea');
+    const fileInput = document.getElementById('fileInput');
+    const textOutput = document.getElementById('textOutput');
+
+    // Обработчики для Drag & Drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+    });
+    function highlight() { dropArea.classList.add('highlight'); }
+    function unhighlight() { dropArea.classList.remove('highlight'); }
+
+    dropArea.addEventListener('drop', handleDrop, false);
+    fileInput.addEventListener('change', handleFileSelect, false);
+
+    // Основная функция обработки файла
+    async function parsePdf(file) {
+        textOutput.textContent = '⏳ Идёт загрузка и анализ PDF...';
+
+        let show = false;
+
+        // 1. Преобразуем файл в ArrayBuffer (бинарные данные)
+        const arrayBuffer = await file.arrayBuffer();
+
+        // 2. Загружаем PDF-документ с помощью PDF.js
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+        let fullOutput = '';
+
+        // 3. Выводим общую информацию о документе
+        fullOutput += `=== ОБЩАЯ ИНФОРМАЦИЯ О ДОКУМЕНТЕ ===\n`;
+        fullOutput += `Количество страниц: ${pdf.numPages}\n`;
+        const metadata = await pdf.getMetadata();
+        if (metadata.info) {
+            fullOutput += `Название: ${metadata.info.Title || 'не указано'}\n`;
+            fullOutput += `Автор: ${metadata.info.Author || 'не указан'}\n`;
+            fullOutput += `Создан: ${metadata.info.CreationDate || 'не указана'}\n`;
+        }
+        fullOutput += `\n`;
+
+        let department = [];
+        let personCounter = 0;
+        let personStrokeCounter = 0;
+        let person = {
+            fio:'',
+            post:'',
+            workPhone:'',
+            innerPhone:'',
+            selfPhone:'',
+            email:''
+        }
+        // 4. Извлекаем текст с КАЖДОЙ страницы
+        for (let pageNum = 1; pageNum <= pdf.numPages - 1; pageNum++) {
+            fullOutput += `\n--- Страница ${pageNum} ---\n`;
+
+            const page = await pdf.getPage(pageNum);
+
+            // 4a. Пробуем получить "сырой" текст (самый простой способ)
+            const textContent = await page.getTextContent();
+
+            let itemList = textContent.items;
+            itemList.forEach((item,index) => {
+                if(item.str !== '' && item.str !== ' ' && item.str !== '-'){
+                    const regex = /^[А-ЯЁ\s!"№;%:?*()_+=\-,/\\]+$/;
+                    if (regex.test(item.str)) {
+                        let data = {
+                            title : item.str,
+                            divisionNode : [],
+                            persons: []
+                        }
+                        department.push(data);
+                    }else{
+                        const regex = /\b(отдел|служба|приемная)\b/i;
+                        const regexStrict = /(^|[^а-яёa-z])(отдел|служба|при[её]мная)([^а-яёa-z]|$)/i;
+                        if(regexStrict.test(item.str)){
+                            let data = {
+                                title: item.str,
+                                divisionNode: [],
+                                persons: []
+                            }
+                            let lastDepartment = department.length > 0 ? department[department.length - 1] : null;
+                            lastDepartment.divisionNode.push(data);
+                        }else{
+                            if(isValidStringAlternative(item.str)){
+                                console.log(item.str);
+                                if(personStrokeCounter === 0 || personStrokeCounter === 1){
+                                    if(personStrokeCounter === 0){
+                                        person.fio += item.str;
+                                    }else{
+                                        person.fio += ' ' + item.str;
+                                    }
+                                }
+
+                                if(personStrokeCounter === 2 || personStrokeCounter === 3 || personStrokeCounter === 4){
+                                    if(personStrokeCounter === 2){
+                                        person.post += item.str;
+                                    }else if(personStrokeCounter === 3){
+                                        if (/^[А-Яа-я ]+$/.test(item.str)) {
+                                            person.post += ' ' + item.str;
+                                        }else{
+                                            person.workPhone = item.str;
+                                        }
+                                    }else if(personStrokeCounter === 4){
+                                        if (/^[А-Яа-я ]+$/.test(item.str)) {
+                                            person.post += ' ' + item.str;
+                                        }else{
+                                            if(/^\d\d\d/.test(item.str)){
+                                                person.innerPhone = item.str;
+                                            }else{
+                                                person.workPhone = item.str;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if(personStrokeCounter === 5 || personStrokeCounter === 6 || personStrokeCounter === 7){
+                                    if(personStrokeCounter === 5){
+                                        if(/^\d\d\d/.test(item.str)){
+                                            person.innerPhone = item.str;
+                                        }else{
+                                            if(item.str.includes('499')){
+                                                person.workPhone = item.str;
+                                            }else{
+                                                person.selfPhone = item.str;
+                                            }
+                                        }
+                                    }else if(personStrokeCounter === 6){
+                                        if(!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(item.str)){
+                                            if(/^\d\d\d/.test(item.str)){
+                                                person.innerPhone = item.str;
+                                            }else{
+                                                if(item.str.includes('499')){
+                                                    person.workPhone = item.str;
+                                                }else{
+                                                    person.selfPhone = item.str;
+                                                }
+                                            }
+                                        }
+                                    }else if(personStrokeCounter === 7){
+                                        if(!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(item.str)){
+                                            if(/^\d\d\d/.test(item.str)){
+                                                person.innerPhone = item.str;
+                                            }else{
+                                                if(item.str.includes('499')){
+                                                    person.workPhone = item.str;
+                                                }else{
+                                                    person.selfPhone = item.str;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                let email = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+                                if(email.test(item.str)){
+                                    person.email = item.str;
+                                    let lastDepartment = department[department.length -1];
+                                    if(lastDepartment.divisionNode.length === 0){
+                                        lastDepartment.persons.push(person);
+                                    }else{
+                                        let lastDivision = lastDepartment.divisionNode[lastDepartment.divisionNode.length -1];
+                                        lastDivision.persons.push(person);
+                                    }
+
+                                    person = {
+                                        fio:'',
+                                        post:'',
+                                        workPhone:'',
+                                        innerPhone:'',
+                                        selfPhone:'',
+                                        email:''
+                                    };
+                                    personCounter++;
+                                    personStrokeCounter = 0;
+                                }else{
+                                    personStrokeCounter++;
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+
+            // Объединяем все текстовые элементы
+            let pageText = textContent.items.map(item => item.str).join(' ');
+            fullOutput += `[ТЕКСТ]: ${pageText.substring(0, 500)}${pageText.length > 500 ? '...' : ''}\n`;
+
+            // 4b. Показываем структуру: сколько текстовых элементов, их стили
+            fullOutput += `[СТРУКТУРА]: Найдено ${textContent.items.length} текстовых элементов.\n`;
+
+            // 4c. Выводим первые несколько элементов с подробностями (для понимания структуры)
+            if (textContent.items.length > 0) {
+                fullOutput += `Пример первых 3 элементов:\n`;
+                for (let i = 0; i < Math.min(3, textContent.items.length); i++) {
+                    const item = textContent.items[i];
+                    fullOutput += `  ${i+1}. Текст: "${item.str}" | Шрифт: ${item.fontName} | Размер: ${item.height}\n`;
+                }
+            }
+
+            // 4d. Показываем размеры страницы (может указывать на ориентацию)
+            const viewport = page.getViewport({ scale: 1 });
+            fullOutput += `[РАЗМЕР СТРАНИЦЫ]: ${viewport.width} x ${viewport.height} пикселей\n`;
+        }
+
+        console.log('Всего сотрудников ' + personCounter);
+        department.forEach((d) => {
+            console.log(d);
+        })
+
+        // Отправляем данные на сервер
+        try {
+            // Создаем FormData для отправки через @ModelAttribute
+            const formData = new FormData();
+
+            // Добавляем каждый элемент как отдельный параметр
+            department.forEach((item, index) => {
+                // Если у вас сложная структура, нужно сериализовать
+                formData.append('list', JSON.stringify(item));
+            });
+
+            // Или отправляем как JSON (но тогда нужно изменить контроллер)
+            await sendDataToServer(department);
+
+            // Если используете FormData:
+            // await sendDataAsFormData(department);
+
+        } catch (error) {
+            console.error('Ошибка:', error);
+        }
+
+        // 5. Выводим всё в консоль и на экран
+        /*console.log('=== РАЗВЕДКА PDF ЗАВЕРШЕНА ===');
+        console.log(fullOutput);*/
+        textOutput.textContent = fullOutput;
+    }
+
+    async function sendDataToServer(department) {
+        try {
+            const response = await fetch('/api/guide/pdf', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // Отправляем как query parameters (для @ModelAttribute)
+                // Можно также изменить на POST и отправлять как JSON
+            });
+
+            const result = await response.text();
+            console.log('Ответ от сервера:', result);
+            return result;
+        } catch (error) {
+            console.error('Ошибка при отправке данных:', error);
+            throw error;
+        }
+    }
+
+    function isValidStringAlternative(str) {
+        const trimmedStr = str.trim();
+
+        if (!trimmedStr) return false;
+
+        // Список запрещенных строк (без учета регистра)
+        const forbiddenStrings = [
+            'Телефонный справочник ФГБУ ФЦПСР',
+            'Поиск по справочнику CTRL+F',
+            'Ф.И.О.',
+            'Должность',
+            'Городской',
+            'телефон',
+            'Внутр.',
+            'ном.',
+            'Мобильный',
+            'Электронная почта'
+        ];
+
+        // Проверка на соответствие запрещенным строкам (без учета регистра)
+        const lowerTrimmedStr = trimmedStr.toLowerCase();
+        for (const forbidden of forbiddenStrings) {
+            if (lowerTrimmedStr === forbidden.toLowerCase()) {
+                return false;
+            }
+        }
+
+        let numRegex = /^(?:[1-9]|1[0-9]|2[0-9]|30)$/
+        if(numRegex.test(str)){
+            return false;
+        }
+
+        return true;
+    }
+
+    // Обработчики событий для файлов
+    function handleDrop(e) {
+        const files = e.dataTransfer.files;
+        if (files[0] && files[0].type === 'application/pdf') {
+            parsePdf(files[0]);
+        } else {
+            alert('Пожалуйста, загрузите PDF-файл.');
+        }
+    }
+
+    function handleFileSelect(e) {
+        const file = e.target.files[0];
+        if (file && file.type === 'application/pdf') {
+            parsePdf(file);
+        }
+    }
+</script>

@@ -1,4 +1,4 @@
-package net.security.infosec.models;
+package net.security.infosec.models.entity;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

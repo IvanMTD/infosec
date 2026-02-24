@@ -1,8 +1,8 @@
 package net.security.infosec.controllers.security;
 
 import lombok.RequiredArgsConstructor;
-import net.security.infosec.models.Implementer;
-import net.security.infosec.models.Role;
+import net.security.infosec.models.entity.Implementer;
+import net.security.infosec.models.entity.Role;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.reactive.result.view.CsrfRequestDataValueProcessor;
 import org.springframework.security.web.server.csrf.CsrfToken;

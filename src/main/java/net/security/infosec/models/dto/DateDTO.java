@@ -1,4 +1,4 @@
-package net.security.infosec.dto;
+package net.security.infosec.models.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

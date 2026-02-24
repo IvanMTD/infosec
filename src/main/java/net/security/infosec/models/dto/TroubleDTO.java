@@ -1,9 +1,9 @@
-package net.security.infosec.dto;
+package net.security.infosec.models.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.security.infosec.models.DepartmentRole;
-import net.security.infosec.models.Trouble;
+import net.security.infosec.models.entity.DepartmentRole;
+import net.security.infosec.models.entity.Trouble;
 
 import java.util.ArrayList;
 import java.util.Comparator;

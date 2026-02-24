@@ -1,8 +1,8 @@
-package net.security.infosec.dto;
+package net.security.infosec.models.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.security.infosec.models.Employee;
+import net.security.infosec.models.entity.Employee;
 
 @Data
 @NoArgsConstructor
