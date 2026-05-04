@@ -2,16 +2,17 @@ package net.security.infosec.controllers.rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.security.infosec.models.dto.DivisionNode;
-import net.security.infosec.models.dto.EmployeeDTO;
-import net.security.infosec.models.dto.PersonDTO;
-import net.security.infosec.models.entity.Employee;
+import net.security.infosec.models.dto.*;
+import net.security.infosec.models.entity.*;
+import net.security.infosec.services.DepartmentService;
+import net.security.infosec.services.DivisionService;
 import net.security.infosec.services.EmployeeService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +24,8 @@ import java.util.stream.Collectors;
 public class ApiController {
 
     private final EmployeeService employeeService;
+    private final DepartmentService departmentService;
+    private final DivisionService divisionService;
 
     @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     @PostMapping("/add/employee")
@@ -88,5 +91,125 @@ public class ApiController {
     public Mono<String> guidePDF(@ModelAttribute List<DivisionNode> list){
         log.info("incoming {}: ",list);
         return Mono.just("PDF");
+    }
+
+    // ==================== DEPARTMENT CRUD ====================
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/department/add")
+    public Mono<DepartmentDTO> addDepartment(@RequestBody Department department){
+        log.info("add department [{}]", department);
+        return departmentService.create(department).flatMap(saved ->
+            Mono.just(new DepartmentDTO(saved))
+        );
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/department/edit")
+    public Mono<DepartmentDTO> editDepartment(@RequestBody Department department){
+        log.info("edit department [{}]", department);
+        return departmentService.update(department).flatMap(updated ->
+            Mono.just(new DepartmentDTO(updated))
+        );
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/department/{id}")
+    public Mono<String> deleteDepartment(@PathVariable long id){
+        log.info("delete department id=[{}]", id);
+        return departmentService.getBy(id).flatMap(department -> {
+            // удаляем все отделы департамента
+            return divisionService.getAllBy(department.getDivisionIds()).flatMap(division ->
+                employeeService.removeDivision(division).collectList().flatMap(employees -> {
+                    log.info("unpinned {} employees from division [{}]", employees.size(), division.getId());
+                    return divisionService.deleteBy(division.getId());
+                })
+            ).collectList().flatMap(divisions -> {
+                log.info("deleted {} divisions", divisions.size());
+                // отвязываем сотрудников департамента
+                return employeeService.removeDepartment(department).collectList().flatMap(employees -> {
+                    log.info("unpinned {} employees from department", employees.size());
+                    return departmentService.deleteBy(department.getId());
+                });
+            });
+        }).flatMap(deleted -> Mono.just("OK"));
+    }
+
+    // ==================== DIVISION CRUD ====================
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/division/add")
+    public Mono<DivisionDTO> addDivision(@RequestBody Division division){
+        log.info("add division [{}]", division);
+        return divisionService.create(division).flatMap(saved ->
+            departmentService.addDivision(saved).flatMap(department ->
+                Mono.just(new DivisionDTO(saved))
+            )
+        );
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/division/edit")
+    public Mono<DivisionDTO> editDivision(@RequestBody Division division){
+        log.info("edit division [{}]", division);
+        return divisionService.getBy(division.getId()).flatMap(original ->
+            divisionService.update(division).flatMap(updated ->
+                departmentService.resetDivision(original, updated).flatMap(dep ->
+                    Mono.just(new DivisionDTO(updated))
+                )
+            )
+        );
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/division/{id}")
+    public Mono<String> deleteDivision(@PathVariable long id){
+        log.info("delete division id=[{}]", id);
+        return divisionService.getBy(id).flatMap(division ->
+            employeeService.removeDivision(division).collectList().flatMap(employees -> {
+                log.info("unpinned {} employees from division", employees.size());
+                return divisionService.deleteBy(division.getId()).flatMap(deleted ->
+                    departmentService.removeDivision(deleted).flatMap(dep -> {
+                        log.info("division removed from department [{}]", dep.getId());
+                        return Mono.just("OK");
+                    })
+                );
+            })
+        );
+    }
+
+    // ==================== REORDER ====================
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/department/reorder")
+    public Mono<String> reorderDepartments(@RequestBody List<Department> departments){
+        return Flux.fromIterable(departments).flatMap(d ->
+            departmentService.getBy(d.getId()).flatMap(original -> {
+                original.setNumber(d.getNumber());
+                return departmentService.create(original);
+            })
+        ).collectList().flatMap(l -> Mono.just("OK"));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/division/reorder")
+    public Mono<String> reorderDivisions(@RequestBody List<Division> divisions){
+        return Flux.fromIterable(divisions).flatMap(d ->
+            divisionService.getBy(d.getId()).flatMap(original -> {
+                original.setNumber(d.getNumber());
+                return divisionService.create(original);
+            })
+        ).collectList().flatMap(l -> Mono.just("OK"));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/employee/reorder")
+    public Mono<String> reorderEmployees(@RequestBody List<Employee> employees){
+        return Flux.fromIterable(employees).flatMap(e ->
+            employeeService.getBy(e.getId()).flatMap(original -> {
+                original.setNumber(e.getNumber());
+                return employeeService.save(original);
+            })
+        ).collectList().flatMap(l -> Mono.just("OK"));
     }
 }

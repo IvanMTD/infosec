@@ -27,30 +27,73 @@
         <div class="col-sm-6 col-md-5 col-lg-5 mt-4 d-none d-md-block">
             <div class="row mx-2">
                 <div class="col">
-                    <div class="d-grid gap-2">
-                        <button th:each="department, dps : ${guide.departments}" th:text="${department.title}" th:id="'btn-dep-' + ${dps.index}" th:my-data="${department.id}" class="btn btn-sm btn-outline-secondary department text-start" type="button" onclick="selectDepartment(this.id)"></button>
-                        <script>
-                            document.getElementById('btn-dep-0').setAttribute('class',"btn btn-sm btn-secondary department text-start")
+                    <div class="d-grid gap-2" id="department-grid">
+                        <th:block th:each="department, dps : ${guide.departments}">
+                            <th:block th:if="${admin}">
+                                <div class="shadow-sm rounded">
+                                    <button th:id="'btn-dep-' + ${dps.index}" th:my-data="${department.id}" class="btn btn-sm btn-outline-secondary department text-start w-100 rounded-bottom-0 d-flex align-items-center" type="button" onclick="selectDepartment(this.id)">
+                                        <i class="bi bi-grip-vertical text-secondary me-2 grip-handle" style="cursor: grab;"></i>
+                                        <span th:text="${department.title}"></span>
+                                    </button>
+                                    <div class="bg-primary-subtle rounded-bottom d-flex">
+                                        <div class="btn-group m-auto py-1">
+                                            <button class="btn btn-sm btn-outline-secondary" th:onclick="'editDepartment(' + ${department.id} + ')'"><i class="bi bi-pencil-square"></i> Редактировать</button>
+                                            <button class="btn btn-sm btn-outline-secondary" th:onclick="'deleteDepartment(' + ${department.id} + ')'"><i class="bi bi-trash"></i> Удалить</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th:block>
+                            <th:block th:unless="${admin}">
+                                <button th:text="${department.title}" th:id="'btn-dep-' + ${dps.index}" th:my-data="${department.id}" class="btn btn-sm btn-outline-secondary department text-start w-100" type="button" onclick="selectDepartment(this.id)"></button>
+                            </th:block>
+                        </th:block>
+                        <script th:if="${admin}">
+                            document.getElementById('btn-dep-0').setAttribute('class',"btn btn-sm btn-secondary department text-start w-100 rounded-bottom-0 d-flex align-items-center")
+                        </script>
+                        <script th:unless="${admin}">
+                            document.getElementById('btn-dep-0').setAttribute('class',"btn btn-sm btn-secondary department text-start w-100")
                         </script>
                     </div>
-                    <div class="row" th:if="${admin}">
-                        <div class="col mt-2 d-flex">
-                            <div class="btn-group mx-auto" role="group">
-                                <button type="button" class="btn btn-outline-secondary" disabled><i class="bi bi-plus-square"></i></button>
-                                <button type="button" class="btn btn-outline-secondary" disabled><i class="bi bi-pencil-square"></i></button>
-                                <button type="button" class="btn btn-outline-secondary" disabled><i class="bi bi-trash"></i></button>
-                            </div>
-                        </div>
+                    <div th:if="${admin}" class="d-grid gap-2 mt-2">
+                        <button class="btn btn-sm btn-outline-secondary text-start" onclick="addDepartment()">
+                            <i class="bi bi-plus-square"></i> Добавить департамент
+                        </button>
                     </div>
                 </div>
                 <div class="col">
                     <div th:if="${guide.getDepartments().size()} != 0">
                         <div class="d-grid gap-2" id="division-grid">
-                            <button th:each="division, dvs : ${guide.departments[0].divisions}" th:text="${division.title}" th:id="'btn-div-0-' + ${dvs.index}" th:my-data="${division.id}" class="btn btn-sm btn-outline-secondary division text-start" type="button" onclick="selectDivision(this.id)"></button>
-                            <script>
-                                document.getElementById('btn-div-0-0').setAttribute('class',"btn btn-sm btn-secondary division text-start")
+                            <th:block th:each="division, dvs : ${guide.departments[0].divisions}">
+                                <th:block th:if="${admin}">
+                                    <div class="shadow-sm rounded">
+                                        <button th:id="'btn-div-0-' + ${dvs.index}" th:my-data="${division.id}" class="btn btn-sm btn-outline-secondary division text-start w-100 rounded-bottom-0 d-flex align-items-center" type="button" onclick="selectDivision(this.id)">
+                                            <i class="bi bi-grip-vertical text-secondary me-2 grip-handle" style="cursor: grab;"></i>
+                                            <span th:text="${division.title}"></span>
+                                        </button>
+                                        <div class="bg-primary-subtle rounded-bottom d-flex">
+                                            <div class="btn-group m-auto py-1">
+                                                <button class="btn btn-sm btn-outline-secondary" th:onclick="'editDivision(' + ${division.id} + ')'"><i class="bi bi-pencil-square"></i> Редактировать</button>
+                                                <button class="btn btn-sm btn-outline-secondary" th:onclick="'deleteDivision(' + ${division.id} + ')'"><i class="bi bi-trash"></i> Удалить</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th:block>
+                                <th:block th:unless="${admin}">
+                                    <button th:text="${division.title}" th:id="'btn-div-0-' + ${dvs.index}" th:my-data="${division.id}" class="btn btn-sm btn-outline-secondary division text-start w-100" type="button" onclick="selectDivision(this.id)"></button>
+                                </th:block>
+                            </th:block>
+                            <script th:if="${admin}">
+                                document.getElementById('btn-div-0-0').setAttribute('class',"btn btn-sm btn-secondary division text-start w-100 rounded-bottom-0 d-flex align-items-center")
+                            </script>
+                            <script th:unless="${admin}">
+                                document.getElementById('btn-div-0-0').setAttribute('class',"btn btn-sm btn-secondary division text-start w-100")
                             </script>
                         </div>
+                    </div>
+                    <div th:if="${admin}" class="d-grid gap-2 mt-2">
+                        <button class="btn btn-sm btn-outline-secondary text-start" onclick="addDivision()">
+                            <i class="bi bi-plus-square"></i> Добавить отдел
+                        </button>
                     </div>
                 </div>
             </div>
@@ -62,57 +105,6 @@
 
                 <div class="col">
                     <div id="guide-card-col" class="mb-5 pb-3">
-                        <div th:if="${guide.getDepartments().size()} != 0">
-                            <div th:if="${guide.getDepartments[0].getDivisions().size()} != 0">
-                                <div th:if="${guide.departments[0].employees.size()} != 0">
-                                    <div class="card mx-1 my-3 zoom" th:each="employee : ${guide.departments[0].divisions[0].employees}">
-                                        <div class="row rounded-4 shadow m-2">
-                                            <div class="col">
-                                                <div class="row border-bottom">
-                                                    <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
-                                                        <div class="m-0 p-1">
-                                                            <b>
-                                                                <p class="m-0 p-0 ps-2 text-sm-start text-md-center text-lg-center" th:text="${employee.position}"></p>
-                                                            </b>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
-                                                        <div class="m-0 p-1">
-                                                            <p class="m-0 p-0 px-2" th:text="${employee.fullName}"></p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
-                                                        <div class="m-0 p-1">
-                                                            <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center" th:text="${employee.email}"></p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
-                                                        <div class="m-0 p-1">
-                                                            <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center text-secondary"><i style="font-size: 14px">8 (499) 550-94-74 — </i><span class="text-dark" th:text="${employee.phone}"></span></p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
-                                                        <div class="m-0 p-1">
-                                                            <p class="m-0 p-0 px-2 user-select-none cursor-pointer blur text-sm-start text-md-end text-lg-end" th:text="${employee.personalPhone}"></p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row" th:if="${admin}">
-                                                    <div class="col-sm-12 col-md-12 col-lg-12 d-flex bg-primary-subtle rounded-bottom-4" th:if="${admin}">
-                                                        <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">
-                                                            <button type="button" th:id="'pin-out-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle">Открепить</i></button>
-                                                            <button type="button" th:id="'edit-' + ${employee.id}" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)"><i class="bi bi-pencil">Редактор</i></button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -138,18 +130,6 @@
                                 </div>
                                 <hr>
                                 <div class="row">
-                                    <div class="col-2">
-                                        <div class="form-floating">
-                                            <input type="number" class="form-control" id="number" placeholder="number" required>
-                                            <label for="number">№</label>
-                                            <div class="valid-feedback">
-                                                Все хорошо
-                                            </div>
-                                            <div class="invalid-feedback">
-                                                Укажите п/н
-                                            </div>
-                                        </div>
-                                    </div>
                                     <div class="col">
                                         <div class="form-floating">
                                             <input type="text" class="form-control" id="lastname" placeholder="lastname" required>
@@ -355,7 +335,7 @@
         for(var i=0; i<divBtn.length; i++){
             var data = divBtn[i].getAttribute('my-data');
             if(data == divId){
-                divBtn[i].setAttribute('class','btn btn-sm btn-secondary division text-start');
+                divBtn[i].setAttribute('class','btn btn-sm btn-secondary division text-start w-100' + (admin ? ' rounded-bottom-0 d-flex align-items-center' : ''));
             }
         }
     }
@@ -366,22 +346,38 @@
         var department = departments[id];
         var divisions = department.divisions;
 
+        var deptClass = admin ? 'btn btn-sm btn-outline-secondary department text-start w-100 rounded-bottom-0 d-flex align-items-center' : 'btn btn-sm btn-outline-secondary department text-start w-100';
+        var deptActiveClass = admin ? 'btn btn-sm btn-secondary department text-start w-100 rounded-bottom-0 d-flex align-items-center' : 'btn btn-sm btn-secondary department text-start w-100';
+
         var activeButtons = document.querySelectorAll('.department');
         activeButtons.forEach(function(button) {
-            button.setAttribute('class', 'btn btn-sm btn-outline-secondary department text-start');
+            button.setAttribute('class', deptClass);
         });
 
         var selectedButton = document.getElementById(buttonId);
-        selectedButton.setAttribute('class','btn btn-sm btn-secondary department text-start');
+        selectedButton.setAttribute('class', deptActiveClass);
 
         var count = 0;
         $('#division-grid').empty();
         divisions.forEach(function (division){
-            $('#division-grid').append(
-                '<button id="btn-div-' + id + '-' + count + '" my-data="' + division.id + '" class="btn btn-sm btn-outline-secondary division text-start" type="button" onclick="selectDivision(this.id)">' + division.title + '</button>'
-            );
+            var html = '<div class="shadow-sm rounded">';
+            html += '<button id="btn-div-' + id + '-' + count + '" my-data="' + division.id + '" class="btn btn-sm btn-outline-secondary division text-start w-100' + (admin ? ' rounded-bottom-0 d-flex align-items-center' : '') + '" type="button" onclick="selectDivision(this.id)">';
+            if(admin){
+                html += '<i class="bi bi-grip-vertical text-secondary me-2 grip-handle" style="cursor: grab;"></i>';
+            }
+            html += division.title + '</button>';
+            if(admin){
+                html += '<div class="bg-primary-subtle rounded-bottom d-flex">';
+                html += '<div class="btn-group m-auto py-1">';
+                html += '<button class="btn btn-sm btn-outline-secondary" onclick="editDivision(' + division.id + ')"><i class="bi bi-pencil-square"></i> Редактировать</button>';
+                html += '<button class="btn btn-sm btn-outline-secondary" onclick="deleteDivision(' + division.id + ')"><i class="bi bi-trash"></i> Удалить</button>';
+                html += '</div></div>';
+            }
+            html += '</div>';
+            $('#division-grid').append(html);
             count++;
         });
+        initDivisionSortable();
     }
 
     function selectDepartment(buttonId){
@@ -390,20 +386,35 @@
         var department = departments[id];
         var divisions = department.divisions;
 
+        var deptClass = admin ? 'btn btn-sm btn-outline-secondary department text-start w-100 rounded-bottom-0 d-flex align-items-center' : 'btn btn-sm btn-outline-secondary department text-start w-100';
+        var deptActiveClass = admin ? 'btn btn-sm btn-secondary department text-start w-100 rounded-bottom-0 d-flex align-items-center' : 'btn btn-sm btn-secondary department text-start w-100';
+
         var activeButtons = document.querySelectorAll('.department');
         activeButtons.forEach(function(button) {
-            button.setAttribute('class', 'btn btn-sm btn-outline-secondary department text-start');
+            button.setAttribute('class', deptClass);
         });
 
         var selectedButton = document.getElementById(buttonId);
-        selectedButton.setAttribute('class','btn btn-sm btn-secondary department text-start');
+        selectedButton.setAttribute('class', deptActiveClass);
 
         var count = 0;
         $('#division-grid').empty();
         divisions.forEach(function (division){
-            $('#division-grid').append(
-                '<button id="btn-div-' + id + '-' + count + '" my-data="' + division.id + '" class="btn btn-sm btn-outline-secondary division text-start" type="button" onclick="selectDivision(this.id)">' + division.title + '</button>'
-            );
+            var html = '<div class="shadow-sm rounded">';
+            html += '<button id="btn-div-' + id + '-' + count + '" my-data="' + division.id + '" class="btn btn-sm btn-outline-secondary division text-start w-100' + (admin ? ' rounded-bottom-0 d-flex align-items-center' : '') + '" type="button" onclick="selectDivision(this.id)">';
+            if(admin){
+                html += '<i class="bi bi-grip-vertical text-secondary me-2 grip-handle" style="cursor: grab;"></i>';
+            }
+            html += division.title + '</button>';
+            if(admin){
+                html += '<div class="bg-primary-subtle rounded-bottom d-flex">';
+                html += '<div class="btn-group m-auto py-1">';
+                html += '<button class="btn btn-sm btn-outline-secondary" onclick="editDivision(' + division.id + ')"><i class="bi bi-pencil-square"></i> Редактировать</button>';
+                html += '<button class="btn btn-sm btn-outline-secondary" onclick="deleteDivision(' + division.id + ')"><i class="bi bi-trash"></i> Удалить</button>';
+                html += '</div></div>';
+            }
+            html += '</div>';
+            $('#division-grid').append(html);
             count++;
         });
 
@@ -411,6 +422,7 @@
         department.employees.forEach(function (employee){
             employeeAppend(employee);
         });
+        initEmployeeSortable();
     }
 
     function selectDivision(buttonId){
@@ -420,18 +432,22 @@
         var department = departments[departmentId];
         var division = department.divisions[divisionId];
 
+        var divClass = admin ? 'btn btn-sm btn-outline-secondary division text-start w-100 rounded-bottom-0 d-flex align-items-center' : 'btn btn-sm btn-outline-secondary division text-start w-100';
+        var divActiveClass = admin ? 'btn btn-sm btn-secondary division text-start w-100 rounded-bottom-0 d-flex align-items-center' : 'btn btn-sm btn-secondary division text-start w-100';
+
         var activeButtons = document.querySelectorAll('.division');
         activeButtons.forEach(function(button) {
-            button.setAttribute('class', 'btn btn-sm btn-outline-secondary division text-start');
+            button.setAttribute('class', divClass);
         });
 
         var selectedButton = document.getElementById(buttonId);
-        selectedButton.setAttribute('class','btn btn-sm btn-secondary division text-start');
+        selectedButton.setAttribute('class', divActiveClass);
 
         $('#guide-card-col').empty();
         division.employees.forEach(function (employee){
             employeeAppend(employee);
         });
+        initEmployeeSortable();
     }
 
     function sendEmployeeData(employeeData){
@@ -443,7 +459,6 @@
         if(employeeData != null){
             request = {
                 id: employeeData.id,
-                number: employeeData.number,
                 lastname: employeeData.lastname,
                 name: employeeData.name,
                 middleName: employeeData.middleName,
@@ -468,7 +483,6 @@
 
             request = {
                 id: 0,
-                number: $('#number').val(),
                 lastname: $('#lastname').val(),
                 name: $('#name').val(),
                 middleName: $('#middleName').val(),
@@ -638,11 +652,7 @@
                         </div>
                         <div class="modal-body">
                             <div class="row g-2">
-                                <div class="col-sm-12 col-md-3 col-lg-3 form-floating">
-                                    <input type="number" class="form-control" id="employee-number" placeholder="employee-number" value="${employee.number}">
-                                    <label for="employee-number" class="ms-2">№</label>
-                                </div>
-                                <div class="col-sm-12 col-md-3 col-lg-3 form-floating">
+                                <div class="col-sm-12 col-md-4 col-lg-4 form-floating">
                                     <input type="text" class="form-control" id="employee-lastname" placeholder="employee-lastname" value="${employee.lastname}">
                                     <label for="employee-lastname" class="ms-2">Фамилия</label>
                                 </div>
@@ -700,7 +710,6 @@
     function updateEmployee(id){
         let employee = {
             id: id,
-            number: $('#employee-number').val(),
             lastname: $('#employee-lastname').val(),
             name: $('#employee-name').val(),
             middleName: $('#employee-middle-name').val(),
@@ -752,8 +761,9 @@
 
     function employeeAppend(employee){
         var cardBody = `
-            <div class="card mx-1 my-3 zoom w-100" onclick="showDepartmentAndDivision('${employee.id}')">
+            <div class="card mx-1 my-3 zoom w-100" data-id="${employee.id}">
                 <div class="row rounded-4 shadow m-2">
+                    ${admin ? '<div class="col-auto d-flex align-items-center px-2 grip-handle" style="cursor: grab;"><i class="bi bi-grip-vertical text-secondary"></i></div>' : ''}
                     <div class="col" id="col-${employee.id}">
                         <div class="row border-bottom">
                             <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
@@ -891,4 +901,425 @@
             $('#guide-card-col').append(cardBody);
         }*/
     }
+
+    // ==================== DEPARTMENT CRUD ====================
+
+    function addDepartment(){
+        let modal = $('#edit-modal-field');
+        modal.empty();
+        modal.append(`
+            <div class="modal fade" id="department-modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Добавить департамент</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row g-2">
+                                <div class="col-12 form-floating">
+                                    <input type="text" class="form-control" id="dep-title" placeholder="title">
+                                    <label for="dep-title" class="ms-2">Название</label>
+                                </div>
+                            </div>
+                            <div class="row pt-2 g-2">
+                                <div class="col-12 form-floating">
+                                    <input type="text" class="form-control" id="dep-description" placeholder="description">
+                                    <label for="dep-description" class="ms-2">Описание</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="submitDepartment(null)">Добавить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+        let m = new bootstrap.Modal(document.getElementById('department-modal'));
+        m.show();
+    }
+
+    function editDepartment(id){
+        let dept = null;
+        for(let i=0; i<departments.length; i++){
+            if(departments[i].id == id){ dept = departments[i]; break; }
+        }
+        if(!dept) return;
+
+        let modal = $('#edit-modal-field');
+        modal.empty();
+        modal.append(`
+            <div class="modal fade" id="department-modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Редактировать — ${dept.title}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row g-2">
+                                <div class="col-12 form-floating">
+                                    <input type="text" class="form-control" id="dep-title" placeholder="title" value="${dept.title}">
+                                    <label for="dep-title" class="ms-2">Название</label>
+                                </div>
+                            </div>
+                            <div class="row pt-2 g-2">
+                                <div class="col-12 form-floating">
+                                    <input type="text" class="form-control" id="dep-description" placeholder="description" value="${dept.description}">
+                                    <label for="dep-description" class="ms-2">Описание</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="submitDepartment(${id})">Сохранить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+        let m = new bootstrap.Modal(document.getElementById('department-modal'));
+        m.show();
+    }
+
+    function submitDepartment(id){
+        let data = {
+            title: $('#dep-title').val(),
+            description: $('#dep-description').val()
+        };
+
+        let url, method;
+        if(id){
+            data.id = id;
+            url = '/api/department/edit';
+            method = 'POST';
+        } else {
+            url = '/api/department/add';
+            method = 'POST';
+        }
+
+        $.ajax({
+            url: url,
+            type: method,
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(){
+                location.reload();
+            }
+        });
+    }
+
+    function deleteDepartment(id){
+        let dept = null;
+        for(let i=0; i<departments.length; i++){
+            if(departments[i].id == id){ dept = departments[i]; break; }
+        }
+        if(!dept) return;
+
+        let modal = $('#edit-modal-field');
+        modal.empty();
+        modal.append(`
+            <div class="modal fade" id="delete-department-modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger-subtle">
+                            <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Удаление департамента</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Вы собираетесь удалить департамент <b>«${dept.title}»</b>.</p>
+                            <p class="text-danger">Будут удалены ВСЕ отделы этого департамента и отвязаны ВСЕ сотрудники.</p>
+                            <p>Это действие нельзя отменить.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                            <button type="button" class="btn btn-danger" onclick="confirmDeleteDepartment(${id})">Удалить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+        let m = new bootstrap.Modal(document.getElementById('delete-department-modal'));
+        m.show();
+    }
+
+    function confirmDeleteDepartment(id){
+        $.ajax({
+            url: '/api/department/' + id,
+            type: 'DELETE',
+            success: function(){
+                location.reload();
+            }
+        });
+    }
+
+    // ==================== DIVISION CRUD ====================
+
+    function addDivision(){
+        // отдел добавляется в текущий выбранный департамент
+        let activeDep = document.querySelector('.department.btn-secondary');
+        let depId = activeDep ? activeDep.getAttribute('my-data') : '';
+
+        let modal = $('#edit-modal-field');
+        modal.empty();
+        modal.append(`
+            <div class="modal fade" id="division-modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Добавить отдел</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row g-2">
+                                <div class="col-12 form-floating">
+                                    <input type="text" class="form-control" id="div-title" placeholder="title">
+                                    <label for="div-title" class="ms-2">Название</label>
+                                </div>
+                            </div>
+                            <div class="row pt-2 g-2">
+                                <div class="col-12 form-floating">
+                                    <input type="text" class="form-control" id="div-description" placeholder="description">
+                                    <label for="div-description" class="ms-2">Описание</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="submitDivision(null, ${depId})">Добавить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+        let m = new bootstrap.Modal(document.getElementById('division-modal'));
+        m.show();
+    }
+
+    function editDivision(id){
+        let div = null;
+        let depId = null;
+        for(let i=0; i<departments.length; i++){
+            for(let j=0; j<departments[i].divisions.length; j++){
+                if(departments[i].divisions[j].id == id){
+                    div = departments[i].divisions[j];
+                    depId = departments[i].id;
+                    break;
+                }
+            }
+            if(div) break;
+        }
+        if(!div) return;
+
+        let depOptions = departments.map(function(d){
+            let sel = d.id == depId ? 'selected' : '';
+            return '<option value="' + d.id + '" ' + sel + '>' + d.title + '</option>';
+        }).join('');
+
+        let modal = $('#edit-modal-field');
+        modal.empty();
+        modal.append(`
+            <div class="modal fade" id="division-modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Редактировать — ${div.title}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row g-2">
+                                <div class="col-12 form-floating">
+                                    <input type="text" class="form-control" id="div-title" placeholder="title" value="${div.title}">
+                                    <label for="div-title" class="ms-2">Название</label>
+                                </div>
+                            </div>
+                            <div class="row pt-2 g-2">
+                                <div class="col-12 form-floating">
+                                    <input type="text" class="form-control" id="div-description" placeholder="description" value="${div.description}">
+                                    <label for="div-description" class="ms-2">Описание</label>
+                                </div>
+                            </div>
+                            <div class="row pt-2 g-2">
+                                <div class="col-12 form-floating">
+                                    <select class="form-select" id="div-department">
+                                        ${depOptions}
+                                    </select>
+                                    <label for="div-department" class="ms-2">Департамент</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="submitDivision(${id})">Сохранить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+        let m = new bootstrap.Modal(document.getElementById('division-modal'));
+        m.show();
+    }
+
+    function submitDivision(id, forceDepId){
+        let data = {
+            title: $('#div-title').val(),
+            description: $('#div-description').val(),
+            departmentId: forceDepId || $('#div-department').val()
+        };
+
+        let url;
+        if(id){
+            data.id = id;
+            url = '/api/division/edit';
+        } else {
+            url = '/api/division/add';
+        }
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(){
+                location.reload();
+            }
+        });
+    }
+
+    function deleteDivision(id){
+        let div = null;
+        for(let i=0; i<departments.length; i++){
+            for(let j=0; j<departments[i].divisions.length; j++){
+                if(departments[i].divisions[j].id == id){
+                    div = departments[i].divisions[j];
+                    break;
+                }
+            }
+            if(div) break;
+        }
+        if(!div) return;
+
+        let modal = $('#edit-modal-field');
+        modal.empty();
+        modal.append(`
+            <div class="modal fade" id="delete-division-modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger-subtle">
+                            <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Удаление отдела</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Вы собираетесь удалить отдел <b>«${div.title}»</b>.</p>
+                            <p class="text-danger">Все сотрудники этого отдела будут отвязаны.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                            <button type="button" class="btn btn-danger" onclick="confirmDeleteDivision(${id})">Удалить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+        let m = new bootstrap.Modal(document.getElementById('delete-division-modal'));
+        m.show();
+    }
+
+    function confirmDeleteDivision(id){
+        $.ajax({
+            url: '/api/division/' + id,
+            type: 'DELETE',
+            success: function(){
+                location.reload();
+            }
+        });
+    }
+
+    // ==================== DRAG & DROP ====================
+
+    function initDeptSortable(){
+        if(!admin) return;
+        var grid = document.getElementById('department-grid');
+        if(!grid) return;
+        Sortable.create(grid, {
+            handle: '.grip-handle',
+            animation: 150,
+            onEnd: function(){
+                var items = document.querySelectorAll('#department-grid .department');
+                var order = [];
+                items.forEach(function(item, index){
+                    order.push({ id: parseInt(item.getAttribute('my-data')), number: index });
+                });
+                $.ajax({
+                    url: '/api/department/reorder',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(order)
+                });
+            }
+        });
+    }
+
+    function initDivisionSortable(){
+        if(!admin) return;
+        var grid = document.getElementById('division-grid');
+        if(!grid) return;
+        Sortable.create(grid, {
+            handle: '.grip-handle',
+            animation: 150,
+            onEnd: function(){
+                var items = document.querySelectorAll('#division-grid .division');
+                var order = [];
+                items.forEach(function(item, index){
+                    order.push({ id: parseInt(item.getAttribute('my-data')), number: index });
+                });
+                $.ajax({
+                    url: '/api/division/reorder',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(order)
+                });
+            }
+        });
+    }
+
+    function initEmployeeSortable(){
+        if(!admin) return;
+        var grid = document.getElementById('guide-card-col');
+        if(!grid) return;
+        Sortable.create(grid, {
+            handle: '.grip-handle',
+            animation: 150,
+            onEnd: function(){
+                var items = document.querySelectorAll('#guide-card-col .card[data-id]');
+                var order = [];
+                items.forEach(function(item, index){
+                    order.push({ id: parseInt(item.getAttribute('data-id')), number: index });
+                });
+                $.ajax({
+                    url: '/api/employee/reorder',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(order)
+                });
+            }
+        });
+    }
+
+    function initAllSortable(){
+        initDeptSortable();
+        initDivisionSortable();
+        initEmployeeSortable();
+    }
+
+    // инициализация при загрузке
+    document.addEventListener('DOMContentLoaded', function(){
+        initAllSortable();
+        // отрисовать сотрудников первого отдела
+        if(departments.length > 0 && departments[0].divisions.length > 0){
+            selectDivision('btn-div-0-0');
+        }
+    });
 </script>

@@ -3,15 +3,17 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="_csrf" th:content="${_csrf.token}"/>
+        <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
         <title th:text="${title}">title</title>
 
         <script src="/fw/jquery/dist/jquery.js"></script>
-        <script src="https://www.google.com/jsapi"></script>
 
         <link rel="stylesheet" href="/css/main.css">
         <link href="/fw/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="/fw/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Finlandica:ital,wght@0,400..700;1,400..700&display=swap');
@@ -23,12 +25,14 @@
             }
         </style>
         <script>
-            let colorSet = [
-                '#983232', '#CC623A', '#CC9F51', '#CCCC5C',
-                '#A0CC72', '#87CC55', '#6DCC6D', '#62CC62',
-                '#55CC9F', '#72CCB5', '#66CCCC', '#5CB2CC',
-                '#9bc0d1'
-            ]
+            function generateColors(count) {
+                var colors = [];
+                for (var i = 0; i < count; i++) {
+                    var hue = count > 1 ? Math.round((270 / (count - 1)) * i) : 0;
+                    colors.push('hsl(' + hue + ', 65%, 50%)');
+                }
+                return colors;
+            }
         </script>
     </head>
 
@@ -49,7 +53,6 @@
         <div th:insert="~{content/trouble-edit-page}" th:if="${index} == 'trouble-edit-page'"></div>
         <div th:insert="~{content/task-page}" th:if="${index} == 'task-page'"></div>
         <div th:insert="~{content/task-info-page}" th:if="${index} == 'task-info-page'"></div>
-        <div th:insert="~{content/task-graph-page}" th:if="${index} == 'task-graph-page'"></div>
         <div th:insert="~{content/task-stat-page}" th:if="${index} == 'task-stat-page'"></div>
         <div th:insert="~{content/task-completed-page}" th:if="${index} == 'task-completed-page'"></div>
         <div th:insert="~{content/task-edit-page}" th:if="${index} == 'task-edit-page'"></div>
@@ -70,5 +73,15 @@
 
         <script src="/fw/@popperjs/core/dist/umd/popper.min.js"></script>
         <script src="/fw/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script th:inline="javascript">
+            // CSRF-токен для всех AJAX-запросов
+            var csrfToken = $("meta[name='_csrf']").attr("content");
+            var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+            $(document).ajaxSend(function(e, xhr) {
+                if (csrfToken && csrfHeader) {
+                    xhr.setRequestHeader(csrfHeader, csrfToken);
+                }
+            });
+        </script>
     </body>
 </html>

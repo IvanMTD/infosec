@@ -48,32 +48,52 @@
         </div>
         <div class="col-6">
             <script th:inline="javascript">
-                google.charts.load("current", {packages:["corechart"]});
-                google.charts.setOnLoadCallback(drawChart);
-                function drawChart() {
+                document.addEventListener('DOMContentLoaded', function() {
                     let charts = [[${charts}]];
-                    let dataTable = new google.visualization.DataTable();
-                    dataTable.addColumn('string','Категория');
-                    dataTable.addColumn('number','Количество');
-                    dataTable.addColumn({type: 'string', role: 'tooltip'});
-                    for(let i=0; i<charts.length; i++){
-                        let row = [];
-                        row[0] = charts[i].title;
-                        row[1] = charts[i].taskCount;
-                        row[2] = charts[i].title + '\n' + charts[i].description + '\n' + 'Всего: ' + charts[i].taskCount;
-                        dataTable.addRows([row]);
-                    }
 
-                    let options = {
-                        /*is3D: true,*/
-                        title: 'Выполнено за ' + charts[0].status,
-                        pieHole: 0.4,
-                        colors: colorSet
+                    if (!charts || charts.length === 0) return;
+
+                    var options = {
+                        series: charts.map(function(c) { return c.taskCount; }),
+                        labels: charts.map(function(c) { return c.title; }),
+                        chart: {
+                            type: 'donut',
+                            height: 500,
+                            redrawOnWindowResize: true,
+                            animations: { enabled: true, easing: 'easeinout', speed: 500 }
+                        },
+                        colors: generateColors(charts.length),
+                        title: {
+                            text: 'Выполнено за ' + charts[0].status,
+                            align: 'center',
+                            style: { fontSize: '16px', fontWeight: 'bold' }
+                        },
+                        plotOptions: {
+                            pie: {
+                                donut: { size: '40%' }
+                            }
+                        },
+                        legend: { position: 'right' },
+                        tooltip: {
+                            y: {
+                                formatter: function(val, opts) {
+                                    var idx = opts.seriesIndex;
+                                    var desc = (charts[idx] && charts[idx].description)
+                                        ? charts[idx].description
+                                        : '';
+                                    return desc + '\nВсего: ' + val;
+                                }
+                            }
+                        },
+                        responsive: [{
+                            breakpoint: 768,
+                            options: { legend: { position: 'bottom' } }
+                        }]
                     };
 
-                    let chart = new google.visualization.PieChart(document.getElementById('donut_chart'));
-                    chart.draw(dataTable, options);
-                }
+                    var chart = new ApexCharts(document.querySelector('#donut_chart'), options);
+                    chart.render();
+                });
             </script>
             <div id="donut_chart" style="width: 100%; height: 500px"></div>
         </div>

@@ -2,339 +2,202 @@
     <div class="row">
         <div class="col"></div>
         <div class="col-6 text-center">
-            <div class="btn-group" role="group" aria-label="Basic example">
-                <button type="button" class="btn btn-primary" onclick="setupChart(1)">День</button>
-                <button type="button" class="btn btn-primary" onclick="setupChart(2)">Неделя</button>
-                <button type="button" class="btn btn-primary" onclick="setupChart(3)">Месяц</button>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-primary active" id="btn-day" onclick="setupChart('day')">День</button>
+                <button type="button" class="btn btn-primary" id="btn-week" onclick="setupChart('week')">Неделя</button>
+                <button type="button" class="btn btn-primary" id="btn-month" onclick="setupChart('month')">Месяц</button>
             </div>
         </div>
         <div class="col"></div>
     </div>
-
-    <div class="row">
+    <div class="row mt-3">
         <div class="col-12">
-            <div id="day">
-                <script th:inline="javascript">
-                    google.charts.load('current', {'packages':['corechart']});
-                    google.charts.setOnLoadCallback(drawChart);
-
-                    function drawChart() {
-                        let year = [[${year}]];
-                        let chartTitle = [[${categoryTitle}]];
-                        let chartTable = [[${categoryChartDay}]];
-
-                        let dataTable = new google.visualization.DataTable();
-                        dataTable.addColumn('string','дата')
-                        for(let i=0; i<chartTitle.length; i++){
-                            dataTable.addColumn('number',chartTitle[i].name);
-                            dataTable.addColumn({type: 'string', role: 'tooltip'});
-                        }
-                        for(let i=0; i<chartTable.length; i++){
-                            let row = [];
-                            row[0] = chartTable[i].date;
-                            let tasks = chartTable[i].taskOnTrouble;
-                            for(let j=0; j<tasks.length; j++){
-                                row[(j+1) + j] = tasks[j];
-                                row[(j+2) + j] = chartTitle[j].name + '\n' + chartTitle[j].description + '\n' + 'Всего: ' + tasks[j];
-                            }
-                            dataTable.addRows([row]);
-                        }
-
-                        let options = {
-                            title: 'Общая статистика по дням за ' + year + ' год',
-                            connectSteps: true,
-                            vAxis: {title: 'Всего выполненною'},
-                            isStacked: true,
-                            legend: {position: 'right'},
-                            colors: colorSet
-                        };
-
-                        let chart = new google.visualization.ColumnChart(document.getElementById('category_chart_day'));
-                        chart.draw(dataTable, options);
-                    }
-                </script>
-                <div id="category_chart_day" style="width: 100%; height: 700px;"></div>
-
-                <!--<div id="category-chart-day"></div>
-                <script th:inline="javascript">
-                    var year = [[${year}]];
-                    var chartTitle = [[${categoryTitle}]];
-                    var chartTable = [[${categoryChartDay}]];
-
-                    var categories = [];
-                    var data = []
-                    for(var i=0; i<chartTable.length; i++){
-                        categories.push(chartTable[i].localDate);
-                    }
-                    chartTitle.forEach((item,index) => {
-                        var title = item.name;
-                        var tasks = [];
-                        for(var j=0; j<chartTable.length; j++){
-                            tasks.push(chartTable[j].taskOnTrouble[index]);
-                        }
-                        data.push({
-                            name: title,
-                            data: tasks
-                        });
-                    });
-
-                    var options = {
-                        series: data,
-                        chart: {
-                            type: 'bar',
-                            height: 480,
-                            stacked: true,
-                            toolbar: {
-                                show: true
-                            },
-                            zoom: {
-                                enabled: true
-                            },
-                            animations: {
-                                enabled: false // Отключите анимации
-                            }
-                        },
-                        colors: colorSet,
-
-                        responsive: [{
-                            breakpoint: 480,
-                            options: {
-                                legend: {
-                                    position: 'bottom',
-                                    offsetX: -10,
-                                    offsetY: 0
-                                }
-                            }
-                        }],
-                        plotOptions: {
-                            bar: {
-                                horizontal: false,
-                                borderRadius: 2,
-                                borderRadiusApplication: 'end', // 'around', 'end'
-                                borderRadiusWhenStacked: 'last', // 'all', 'last'
-                                dataLabels: {
-                                    total: {
-                                        enabled: true,
-                                        style: {
-                                            fontSize: '8px',
-                                            fontWeight: 900
-                                        }
-                                    }
-                                }
-                            },
-                        },
-                        xaxis: {
-                            type: 'datetime',
-                            categories: categories
-                        },
-                        legend: {
-                            position: 'right',
-                            offsetY: 40
-                        },
-                        fill: {
-                            opacity: 1
-                        }
-                    };
-
-                    var chart = new ApexCharts(document.querySelector("#category-chart-day"), options);
-                    chart.render();
-                </script>-->
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <div id="week">
-                <script th:inline="javascript">
-                    google.charts.load('current', {'packages':['corechart']});
-                    google.charts.setOnLoadCallback(drawChart);
-
-                    function drawChart() {
-                        let year = [[${year}]];
-                        let chartTitle = [[${categoryTitle}]];
-                        let chartTable = [[${categoryChartWeek}]];
-
-                        let dataTable = new google.visualization.DataTable();
-                        dataTable.addColumn('string','Неделя')
-                        for(let i=0; i<chartTitle.length; i++){
-                            dataTable.addColumn('number',chartTitle[i].name);
-                            dataTable.addColumn({type: 'string', role: 'tooltip'});
-                        }
-                        for(let i=0; i<chartTable.length; i++){
-                            let row = [];
-                            row[0] = chartTable[i].title;
-                            let chartList = chartTable[i].charts;
-                            for(let j=0; j<chartList.length; j++){
-                                row[(j+1) + j] = chartList[j].taskCount;
-                                row[(j+2) + j] = chartTitle[j].name + '\n' + chartTitle[j].description + '\n' + 'Всего: ' + chartList[j].taskCount;
-                            }
-                            dataTable.addRows([row]);
-                        }
-
-                        let options = {
-                            title: 'Общая статистика по неделям за ' + year + ' год',
-                            connectSteps: true,
-                            vAxis: {title: 'Всего выполненною'},
-                            isStacked: true,
-                            legend: {position: 'right'},
-                            colors: colorSet
-                        };
-
-                        let chart = new google.visualization.ColumnChart(document.getElementById('category_chart_week'));
-                        chart.draw(dataTable, options);
-                    }
-                </script>
-                <div id="category_chart_week" style="width: 100%; height: 700px;"></div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <div id="month">
-                <script th:inline="javascript">
-                    google.charts.load('current', {'packages':['corechart']});
-                    google.charts.setOnLoadCallback(drawChart);
-
-                    function drawChart() {
-                        let year = [[${year}]];
-                        let chartTitle = [[${categoryTitle}]];
-                        let chartTable = [[${categoryChartMonth}]];
-
-                        let dataTable = new google.visualization.DataTable();
-                        dataTable.addColumn('string','Неделя')
-                        for(let i=0; i<chartTitle.length; i++){
-                            dataTable.addColumn('number',chartTitle[i].name);
-                            dataTable.addColumn({type: 'string', role: 'tooltip'});
-                        }
-                        for(let i=0; i<chartTable.length; i++){
-                            let row = [];
-                            row[0] = chartTable[i].title;
-                            let chartList = chartTable[i].charts;
-                            for(let j=0; j<chartList.length; j++){
-                                row[(j+1) + j] = chartList[j].taskCount;
-                                row[(j+2) + j] = chartTitle[j].name + '\n' + chartTitle[j].description + '\n' + 'Всего: ' + chartList[j].taskCount;
-                            }
-                            dataTable.addRows([row]);
-                        }
-
-                        let options = {
-                            title: 'Общая статистика по месяцам за ' + year + ' год',
-                            connectSteps: true,
-                            vAxis: {title: 'Всего выполненною'},
-                            isStacked: true,
-                            legend: {position: 'right'},
-                            colors: colorSet
-                        };
-
-                        let chart = new google.visualization.ColumnChart(document.getElementById('category_chart_month'));
-                        chart.draw(dataTable, options);
-                    }
-                </script>
-                <div id="category_chart_month" style="width: 100%; height: 700px;"></div>
-            </div>
+            <div id="category-chart" style="width: 100%; height: 700px;"></div>
         </div>
     </div>
     <div class="row" hidden>
         <div class="col">
-            <script th:inline="javascript">
-                google.charts.load('current', {'packages': ['corechart']});
-                google.charts.setOnLoadCallback(drawVisualization);
-
-                function drawVisualization() {
-                    var year = [[${year}]];
-                    var chartTitle = [[${troubleTitle}]];
-                    var chartTable = [[${troubleChart}]];
-
-                    var dataTable = new google.visualization.DataTable();
-                    dataTable.addColumn('string','дата')
-                    for(let i=0; i<chartTitle.length; i++){
-                        dataTable.addColumn('number',chartTitle[i].name);
-                        dataTable.addColumn({type: 'string', role: 'tooltip'});
-                    }
-                    for(let i=0; i<chartTable.length; i++){
-                        let row = [];
-                        row[0] = chartTable[i].date;
-                        let tasks = chartTable[i].taskOnTrouble;
-                        for(let j=0; j<tasks.length; j++){
-                            row[(j+1) + j] = tasks[j];
-                            row[(j+2) + j] = chartTitle[j].name + '\n' + chartTitle[j].description + '\n' + 'Всего: ' + tasks[j];
-                        }
-                        dataTable.addRows([row]);
-                    }
-
-                    let options = {
-                        title: 'Работы выполненные в ' + year + ' году',
-                        curveType: 'function',
-                        lineWidth: 3,
-                        legend: {position: 'bottom'}
-                    };
-
-                    let chart = new google.visualization.ComboChart(document.getElementById('task-chart'));
-                    chart.draw(dataTable, options);
-                }
-            </script>
-            <div id="task-chart" style="width: 100%; height: 700px"></div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <!--<script type="text/javascript">
-                google.charts.load('current', {packages:["orgchart"]});
-                google.charts.setOnLoadCallback(drawChart);
-
-                function drawChart() {
-                    var data = new google.visualization.DataTable();
-                    data.addColumn('string', 'Name');
-                    data.addColumn('string', 'Manager');
-                    data.addColumn('string', 'ToolTip');
-
-                    // For each orgchart box, provide the name, manager, and tooltip to show.
-                    data.addRows([
-                        ['Директор', '', 'The President'],
-                        [{'v':'Зам.директора', 'f':'Зам.директора<div style="color:red; font-style:italic">По цифровым технологиям</div>'},
-                            'Директор', 'VP'],
-                        ['Alice', 'Директор', ''],
-                        ['Bob', 'Зам.директора', 'Bob Sponge'],
-                        ['Carol', 'Bob', '']
-                    ]);
-
-                    let options = {
-                        allowHtml: true,
-                        allowCollapse: true,
-                        compactRows: true,
-                        size: 'large'
-                    };
-
-                    // Create the chart.
-                    var chart = new google.visualization.OrgChart(document.getElementById('chart_div'));
-                    // Draw the chart, setting the allowHtml option to true for the tooltips.
-                    chart.draw(data, options);
-                }
-            </script>
-            <div id="chart_div"></div>-->
+            <div id="trouble-chart" style="width: 100%; height: 700px;"></div>
         </div>
     </div>
 </div>
 
 <script th:inline="javascript">
-    setTimeout(function (){
-        document.getElementById('day').hidden = false;
-        document.getElementById('week').hidden = true;
-        document.getElementById('month').hidden = true;
-    },500)
-    function setupChart(action){
-        if(action == 1){
-            document.getElementById('day').hidden = false;
-            document.getElementById('week').hidden = true;
-            document.getElementById('month').hidden = true;
-        }else if(action == 2){
-            document.getElementById('day').hidden = true;
-            document.getElementById('week').hidden = false;
-            document.getElementById('month').hidden = true;
-        }else if(action == 3) {
-            document.getElementById('day').hidden = true;
-            document.getElementById('week').hidden = true;
-            document.getElementById('month').hidden = false;
+    /* ===== ДАННЫЕ ИЗ МОДЕЛИ ===== */
+    var year = [[${year}]];
+    var categoryTitle = [[${categoryTitle}]];
+    var chartDay = [[${categoryChartDay}]];
+    var chartWeek = [[${categoryChartWeek}]];
+    var chartMonth = [[${categoryChartMonth}]];
+    var troubleTitle = [[${troubleTitle}]];
+    var troubleChartData = [[${troubleChart}]];
+
+    /* ===== ТЕКУЩИЙ ЭКЗЕМПЛЯР ГРАФИКА ===== */
+    var currentChart = null;
+    var currentTroubleChart = null;
+
+    /* ===== ПОСТРОЕНИЕ СЕРИЙ ДЛЯ РАЗНЫХ РЕЖИМОВ ===== */
+    function buildDaySeries() {
+        var series = [];
+        for (var i = 0; i < categoryTitle.length; i++) {
+            var data = [];
+            for (var j = 0; j < chartDay.length; j++) {
+                data.push(chartDay[j].taskOnTrouble[i]);
+            }
+            series.push({
+                name: categoryTitle[i].name,
+                data: data
+            });
         }
+        return series;
     }
+
+    function buildDayCategories() {
+        return chartDay.map(function(item) { return item.date; });
+    }
+
+    function buildWeekSeries() {
+        var series = [];
+        for (var i = 0; i < categoryTitle.length; i++) {
+            var data = [];
+            for (var j = 0; j < chartWeek.length; j++) {
+                data.push(chartWeek[j].charts[i].taskCount);
+            }
+            series.push({
+                name: categoryTitle[i].name,
+                data: data
+            });
+        }
+        return series;
+    }
+
+    function buildWeekCategories() {
+        return chartWeek.map(function(item) { return item.title; });
+    }
+
+    function buildMonthSeries() {
+        var series = [];
+        for (var i = 0; i < categoryTitle.length; i++) {
+            var data = [];
+            for (var j = 0; j < chartMonth.length; j++) {
+                data.push(chartMonth[j].charts[i].taskCount);
+            }
+            series.push({
+                name: categoryTitle[i].name,
+                data: data
+            });
+        }
+        return series;
+    }
+
+    function buildMonthCategories() {
+        return chartMonth.map(function(item) { return item.title; });
+    }
+
+    /* ===== ЗАГОЛОВОК ГРАФИКА ===== */
+    function getChartTitle(mode) {
+        if (mode === 'day') return 'Общая статистика по дням за ' + year + ' год';
+        if (mode === 'week') return 'Общая статистика по неделям за ' + year + ' год';
+        return 'Общая статистика по месяцам за ' + year + ' год';
+    }
+
+    /* ===== ОСНОВНАЯ ФУНКЦИЯ ОТРИСОВКИ ===== */
+    function drawChart(mode) {
+        if (currentChart) {
+            currentChart.destroy();
+            currentChart = null;
+        }
+
+        var series, categories;
+        if (mode === 'day') {
+            series = buildDaySeries();
+            categories = buildDayCategories();
+        } else if (mode === 'week') {
+            series = buildWeekSeries();
+            categories = buildWeekCategories();
+        } else {
+            series = buildMonthSeries();
+            categories = buildMonthCategories();
+        }
+
+        var options = {
+            series: series,
+            chart: {
+                type: 'bar',
+                height: 700,
+                stacked: true,
+                toolbar: { show: false },
+                redrawOnWindowResize: true,
+                animations: { enabled: true, easing: 'easeinout', speed: 500 }
+            },
+            colors: generateColors(categoryTitle.length),
+            title: {
+                text: getChartTitle(mode),
+                align: 'center',
+                style: { fontSize: '16px', fontWeight: 'bold' }
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    borderRadius: 2,
+                    borderRadiusApplication: 'end',
+                    borderRadiusWhenStacked: 'last',
+                    columnWidth: '70%'
+                }
+            },
+            dataLabels: { enabled: false },
+            stroke: { width: 0 },
+            xaxis: {
+                categories: categories,
+                labels: {
+                    rotate: -45,
+                    style: { fontSize: '11px' }
+                }
+            },
+            yaxis: {
+                title: { text: 'Всего выполнено' },
+                allowDecimals: false
+            },
+            legend: { position: 'bottom', horizontalAlign: 'center' },
+            tooltip: {
+                shared: true,
+                intersect: false,
+                y: {
+                    formatter: function(val, opts) {
+                        var idx = opts.seriesIndex;
+                        var desc = (categoryTitle[idx] && categoryTitle[idx].description)
+                            ? categoryTitle[idx].description
+                            : '';
+                        return desc + '\nВсего: ' + val;
+                    }
+                }
+            },
+            responsive: [{
+                breakpoint: 768,
+                options: {
+                    legend: { position: 'bottom' },
+                    xaxis: { labels: { rotate: -90, style: { fontSize: '10px' } } }
+                }
+            }]
+        };
+
+        currentChart = new ApexCharts(document.querySelector('#category-chart'), options);
+        currentChart.render();
+
+        document.querySelectorAll('.btn-group .btn').forEach(function(btn) {
+            btn.classList.remove('active');
+        });
+        var activeBtn = document.getElementById('btn-' + mode);
+        if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    /* ===== ФУНКЦИЯ ПЕРЕКЛЮЧЕНИЯ ===== */
+    function setupChart(mode) {
+        drawChart(mode);
+    }
+
+    /* ===== ПЕРВИЧНАЯ ОТРИСОВКА ===== */
+    document.addEventListener('DOMContentLoaded', function() {
+        drawChart('day');
+    });
 </script>
