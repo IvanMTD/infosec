@@ -29,7 +29,7 @@
                 <div class="col">
                     <div class="d-grid gap-2" id="department-grid">
                         <th:block th:each="department, dps : ${guide.departments}">
-                            <th:block th:if="${admin}">
+                            <th:block th:if="${admin || gAdmin}">
                                 <div class="shadow-sm rounded">
                                     <button th:id="'btn-dep-' + ${dps.index}" th:my-data="${department.id}" class="btn btn-sm btn-outline-secondary department text-start w-100 rounded-bottom-0 d-flex align-items-center" type="button" onclick="selectDepartment(this.id)">
                                         <i class="bi bi-grip-vertical text-secondary me-2 grip-handle" style="cursor: grab;"></i>
@@ -43,18 +43,18 @@
                                     </div>
                                 </div>
                             </th:block>
-                            <th:block th:unless="${admin}">
+                            <th:block th:unless="${admin || gAdmin}">
                                 <button th:text="${department.title}" th:id="'btn-dep-' + ${dps.index}" th:my-data="${department.id}" class="btn btn-sm btn-outline-secondary department text-start w-100" type="button" onclick="selectDepartment(this.id)"></button>
                             </th:block>
                         </th:block>
-                        <script th:if="${admin}">
+                        <script th:if="${admin || gAdmin}">
                             document.getElementById('btn-dep-0').setAttribute('class',"btn btn-sm btn-secondary department text-start w-100 rounded-bottom-0 d-flex align-items-center")
                         </script>
-                        <script th:unless="${admin}">
+                        <script th:unless="${admin || gAdmin}">
                             document.getElementById('btn-dep-0').setAttribute('class',"btn btn-sm btn-secondary department text-start w-100")
                         </script>
                     </div>
-                    <div th:if="${admin}" class="d-grid gap-2 mt-2">
+                    <div th:if="${admin || gAdmin}" class="d-grid gap-2 mt-2">
                         <button class="btn btn-sm btn-outline-secondary text-start" onclick="addDepartment()">
                             <i class="bi bi-plus-square"></i> Добавить департамент
                         </button>
@@ -64,7 +64,7 @@
                     <div th:if="${guide.getDepartments().size()} != 0">
                         <div class="d-grid gap-2" id="division-grid">
                             <th:block th:each="division, dvs : ${guide.departments[0].divisions}">
-                                <th:block th:if="${admin}">
+                                <th:block th:if="${admin || gAdmin}">
                                     <div class="shadow-sm rounded">
                                         <button th:id="'btn-div-0-' + ${dvs.index}" th:my-data="${division.id}" class="btn btn-sm btn-outline-secondary division text-start w-100 rounded-bottom-0 d-flex align-items-center" type="button" onclick="selectDivision(this.id)">
                                             <i class="bi bi-grip-vertical text-secondary me-2 grip-handle" style="cursor: grab;"></i>
@@ -78,19 +78,19 @@
                                         </div>
                                     </div>
                                 </th:block>
-                                <th:block th:unless="${admin}">
+                                <th:block th:unless="${admin || gAdmin}">
                                     <button th:text="${division.title}" th:id="'btn-div-0-' + ${dvs.index}" th:my-data="${division.id}" class="btn btn-sm btn-outline-secondary division text-start w-100" type="button" onclick="selectDivision(this.id)"></button>
                                 </th:block>
                             </th:block>
-                            <script th:if="${admin}">
+                            <script th:if="${admin || gAdmin}">
                                 document.getElementById('btn-div-0-0').setAttribute('class',"btn btn-sm btn-secondary division text-start w-100 rounded-bottom-0 d-flex align-items-center")
                             </script>
-                            <script th:unless="${admin}">
+                            <script th:unless="${admin || gAdmin}">
                                 document.getElementById('btn-div-0-0').setAttribute('class',"btn btn-sm btn-secondary division text-start w-100")
                             </script>
                         </div>
                     </div>
-                    <div th:if="${admin}" class="d-grid gap-2 mt-2">
+                    <div th:if="${admin || gAdmin}" class="d-grid gap-2 mt-2">
                         <button class="btn btn-sm btn-outline-secondary text-start" onclick="addDivision()">
                             <i class="bi bi-plus-square"></i> Добавить отдел
                         </button>
@@ -110,7 +110,7 @@
 
             </div>
             <div class="position-absolute bottom-0 end-0 rounded-4 border" style="margin-right: 30px; margin-bottom: 10px">
-                <button type="button" class="btn btn-outline-secondary rounded-circle shadow m-1" data-bs-toggle="modal" data-bs-target="#person-modal" th:if="${admin}"><i class="bi bi-person-add"></i></button>
+                <button type="button" class="btn btn-outline-secondary rounded-circle shadow m-1" data-bs-toggle="modal" data-bs-target="#person-modal" th:if="${admin || gAdmin}"><i class="bi bi-person-add"></i></button>
                 <div class="modal fade" id="person-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-xl">
                         <form id="person-modal-form" class="modal-content" novalidate>
@@ -289,7 +289,7 @@
 
 <script th:inline="javascript">
     let departments = [[${guide}]].departments;
-    let admin = [[${admin}]];
+    let admin = [[${admin}]] || [[${gAdmin}]];
 
     function showDepartmentAndDivision(eid){
         var depId = 0;

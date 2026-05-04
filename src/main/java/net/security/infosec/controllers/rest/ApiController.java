@@ -95,7 +95,7 @@ public class ApiController {
 
     // ==================== DEPARTMENT CRUD ====================
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     @PostMapping("/department/add")
     public Mono<DepartmentDTO> addDepartment(@RequestBody Department department){
         log.info("add department [{}]", department);
@@ -104,7 +104,7 @@ public class ApiController {
         );
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     @PostMapping("/department/edit")
     public Mono<DepartmentDTO> editDepartment(@RequestBody Department department){
         log.info("edit department [{}]", department);
@@ -113,7 +113,7 @@ public class ApiController {
         );
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     @DeleteMapping("/department/{id}")
     public Mono<String> deleteDepartment(@PathVariable long id){
         log.info("delete department id=[{}]", id);
@@ -137,7 +137,7 @@ public class ApiController {
 
     // ==================== DIVISION CRUD ====================
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     @PostMapping("/division/add")
     public Mono<DivisionDTO> addDivision(@RequestBody Division division){
         log.info("add division [{}]", division);
@@ -148,7 +148,7 @@ public class ApiController {
         );
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     @PostMapping("/division/edit")
     public Mono<DivisionDTO> editDivision(@RequestBody Division division){
         log.info("edit division [{}]", division);
@@ -161,7 +161,7 @@ public class ApiController {
         );
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     @DeleteMapping("/division/{id}")
     public Mono<String> deleteDivision(@PathVariable long id){
         log.info("delete division id=[{}]", id);
@@ -180,7 +180,7 @@ public class ApiController {
 
     // ==================== REORDER ====================
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     @PostMapping("/department/reorder")
     public Mono<String> reorderDepartments(@RequestBody List<Department> departments){
         return Flux.fromIterable(departments).flatMap(d ->
@@ -191,7 +191,7 @@ public class ApiController {
         ).collectList().flatMap(l -> Mono.just("OK"));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     @PostMapping("/division/reorder")
     public Mono<String> reorderDivisions(@RequestBody List<Division> divisions){
         return Flux.fromIterable(divisions).flatMap(d ->
@@ -202,7 +202,7 @@ public class ApiController {
         ).collectList().flatMap(l -> Mono.just("OK"));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     @PostMapping("/employee/reorder")
     public Mono<String> reorderEmployees(@RequestBody List<Employee> employees){
         return Flux.fromIterable(employees).flatMap(e ->

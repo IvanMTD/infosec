@@ -176,7 +176,7 @@ public class AdminController {
     }
 
     @GetMapping("/departments")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> departmentSettings(){
         return Mono.just(
                 Rendering.view("template")
@@ -188,7 +188,7 @@ public class AdminController {
     }
 
     @GetMapping("/divisions")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> divisionSettings(){
         return Mono.just(
                 Rendering.view("template")
@@ -200,7 +200,7 @@ public class AdminController {
     }
 
     @GetMapping("/employees")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     public Mono<Rendering> employeeSettings(){
         return Mono.just(
                 Rendering.view("template")
