@@ -34,10 +34,7 @@ public class DepartmentService {
     }
 
     public Mono<Department> addDivision(Division division) {
-        return departmentRepository.findById(division.getDepartmentId()).flatMap(department -> {
-            department.getDivisionIds().add(division.getId());
-            return departmentRepository.save(department);
-        });
+        return departmentRepository.findById(division.getDepartmentId());
     }
 
     public Mono<Department> getBy(long id) {
@@ -54,19 +51,7 @@ public class DepartmentService {
     }
 
     public Mono<Department> resetDivision(Division original, Division division) {
-        return departmentRepository.findById(original.getDepartmentId()).flatMap(before -> {
-            before.getDivisionIds().remove(original.getId());
-            return departmentRepository.save(before).flatMap(previousDepartment -> {
-                log.info("division has been removed from department [{}]",previousDepartment);
-                return departmentRepository.findById(division.getDepartmentId());
-            });
-        }).flatMap(after -> {
-            after.getDivisionIds().add(division.getId());
-            return departmentRepository.save(after).flatMap(departmentNext -> {
-                log.info("division has been added in department [{}]", departmentNext);
-                return Mono.just(departmentNext);
-            });
-        });
+        return departmentRepository.findById(division.getDepartmentId());
     }
 
     public Mono<Department> getByIn(long divisionId) {
@@ -74,10 +59,7 @@ public class DepartmentService {
     }
 
     public Mono<Department> removeDivision(Division deleted) {
-        return departmentRepository.findById(deleted.getDepartmentId()).flatMap(department -> {
-            department.getDivisionIds().remove(deleted.getId());
-            return departmentRepository.save(department);
-        }).switchIfEmpty(Mono.just(new Department()));
+        return departmentRepository.findById(deleted.getDepartmentId()).switchIfEmpty(Mono.just(new Department()));
     }
 
     public Mono<Department> deleteBy(long id) {

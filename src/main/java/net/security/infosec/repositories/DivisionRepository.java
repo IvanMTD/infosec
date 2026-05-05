@@ -8,4 +8,5 @@ import java.util.Set;
 
 public interface DivisionRepository extends ReactiveCrudRepository<Division,Long> {
     Flux<Division> findAllByIdIn(Set<Long> divisionIds);
+    Flux<Division> findAllByDepartmentId(Long departmentId);
 }

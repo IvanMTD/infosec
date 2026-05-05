@@ -761,14 +761,15 @@
 
     function employeeAppend(employee){
         var cardBody = `
-            <div class="card mx-1 my-3 zoom w-100" data-id="${employee.id}">
+            <div class="card mx-1 my-3 zoom w-100" data-id="${employee.id}" onclick="showDepartmentAndDivision('${employee.id}')">
                 <div class="row rounded-4 shadow m-2">
                     ${admin ? '<div class="col-auto d-flex align-items-center px-2 grip-handle" style="cursor: grab;"><i class="bi bi-grip-vertical text-secondary"></i></div>' : ''}
                     <div class="col" id="col-${employee.id}">
                         <div class="row border-bottom">
-                            <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
-                                <div class="m-0 p-1">
-                                    <p class="m-0 p-0 text-sm-start text-md-center text-lg-center ps-2"><b>${employee.position}</b></p>
+                            <div class="col-10 col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
+                                <div class="m-0 p-1 d-flex justify-content-between align-items-center">
+                                    <p class="m-0 p-0 ps-2"><b>${employee.position}</b></p>
+                                    <button class="btn btn-sm btn-outline-secondary border-0 me-1" onclick="event.stopPropagation(); showDepartmentAndDivision('${employee.id}')" title="Показать в структуре"><i class="bi bi-eye"></i></button>
                                 </div>
                             </div>
                         </div>

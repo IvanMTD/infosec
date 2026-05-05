@@ -26,10 +26,7 @@ public class ImplementerService implements ReactiveUserDetailsService {
     }
 
     public Mono<Implementer> updateImplementerTask(Implementer implementer, Task task) {
-        return implementerRepository.findById(implementer.getId()).flatMap(i -> {
-            i.addTask(task);
-            return implementerRepository.save(i);
-        });
+        return implementerRepository.findById(implementer.getId());
     }
 
     public Mono<Implementer> getUserById(int id) {
@@ -65,16 +62,10 @@ public class ImplementerService implements ReactiveUserDetailsService {
     }
 
     public Mono<Implementer> removeTaskFromImplementer(Task originalTask) {
-        return implementerRepository.findById(originalTask.getImplementerId()).flatMap(implementer -> {
-            implementer.getTaskIds().remove(originalTask.getId());
-            return implementerRepository.save(implementer);
-        });
+        return implementerRepository.findById(originalTask.getImplementerId());
     }
 
     public Mono<Implementer> addTaskInImplementer(Task task) {
-        return implementerRepository.findById(task.getImplementerId()).flatMap(implementer -> {
-            implementer.addTask(task);
-            return implementerRepository.save(implementer);
-        });
+        return implementerRepository.findById(task.getImplementerId());
     }
 }

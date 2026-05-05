@@ -15,9 +15,6 @@ import java.util.*;
 public class Implementer implements UserDetails {
     @Id
     private int id;
-    /**
-     * Описание пользователя
-     */
     private String email;
     private String password;
     private String firstname;
@@ -26,10 +23,6 @@ public class Implementer implements UserDetails {
     private String officePosition;
     private Role role;
     private DepartmentRole departmentRole;
-    /**
-     * Связные модели
-     */
-    private Set<Integer> taskIds = new HashSet<>();
 
     public Implementer(ImplementerDataTransferObject dto){
         setEmail(dto.getEmail());
@@ -53,7 +46,7 @@ public class Implementer implements UserDetails {
     }
 
     public void addTask(Task task){
-        taskIds.add(task.getId());
+        // связь через task.implementerId — поле taskIds удалено
     }
 
     public String getFullName(){

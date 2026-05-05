@@ -119,7 +119,7 @@ public class ApiController {
         log.info("delete department id=[{}]", id);
         return departmentService.getBy(id).flatMap(department -> {
             // удаляем все отделы департамента
-            return divisionService.getAllBy(department.getDivisionIds()).flatMap(division ->
+            return divisionService.getAllByDepartmentId(department.getId()).flatMap(division ->
                 employeeService.removeDivision(division).collectList().flatMap(employees -> {
                     log.info("unpinned {} employees from division [{}]", employees.size(), division.getId());
                     return divisionService.deleteBy(division.getId());

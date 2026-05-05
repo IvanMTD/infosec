@@ -145,7 +145,7 @@ public class AdminController {
             categoryDTO.setTitle(category.getName());
             categoryDTO.setDescription(category.getDescription());
             categoryDTO.setDepartmentRole(category.getDepartmentRole());
-            return troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(tl -> {
+            return troubleTicketService.getTroublesByCategoryId(category.getId()).collectList().flatMap(tl -> {
                 List<TroubleDTO> troubleDTOList = new ArrayList<>();
                 for(Trouble trouble : tl){
                     TroubleDTO troubleDTO = new TroubleDTO();

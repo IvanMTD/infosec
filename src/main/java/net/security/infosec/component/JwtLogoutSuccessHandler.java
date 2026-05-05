@@ -15,11 +15,15 @@ public class JwtLogoutSuccessHandler extends RedirectServerLogoutSuccessHandler 
 
         response.addCookie(ResponseCookie.from(NamingUtil.getInstance().getAccessName(), "")
                 .httpOnly(true)
+                .secure(true)
+                .sameSite("Strict")
                 .path("/")
                 .maxAge(0)
                 .build());
         response.addCookie(ResponseCookie.from(NamingUtil.getInstance().getRefreshName(), "")
                 .httpOnly(true)
+                .secure(true)
+                .sameSite("Strict")
                 .path("/")
                 .maxAge(0)
                 .build());

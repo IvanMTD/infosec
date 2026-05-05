@@ -9,7 +9,6 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
-import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -19,7 +18,6 @@ import java.time.Duration;
 public class JwtAuthenticationSuccessHandler implements ServerAuthenticationSuccessHandler {
 
     private final JWT jwt;
-    private final ServerRequestCache requestCache;
 
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
@@ -29,14 +27,17 @@ public class JwtAuthenticationSuccessHandler implements ServerAuthenticationSucc
         String accessToken = jwt.generateAccessToken(username, digitalSignature);
         String refreshToken = jwt.generateRefreshToken(username, digitalSignature);
 
-        // Add tokens to cookies
         ResponseCookie accessCookie = ResponseCookie.from(NamingUtil.getInstance().getAccessName(), accessToken)
                 .httpOnly(true)
+                .secure(true)
+                .sameSite("Strict")
                 .maxAge(Duration.ofHours(1))
                 .path("/")
                 .build();
         ResponseCookie refreshCookie = ResponseCookie.from(NamingUtil.getInstance().getRefreshName(), refreshToken)
                 .httpOnly(true)
+                .secure(true)
+                .sameSite("Strict")
                 .maxAge(Duration.ofDays(1))
                 .path("/")
                 .build();
@@ -45,12 +46,8 @@ public class JwtAuthenticationSuccessHandler implements ServerAuthenticationSucc
         response.addCookie(accessCookie);
         response.addCookie(refreshCookie);
 
-        return requestCache.getRedirectUri(webFilterExchange.getExchange())
-                .defaultIfEmpty(URI.create("/"))
-                .flatMap(redirectUri -> {
-                    response.setStatusCode(HttpStatus.FOUND);
-                    webFilterExchange.getExchange().getResponse().getHeaders().setLocation(redirectUri);
-                    return webFilterExchange.getExchange().getResponse().setComplete();
-                });
+        response.setStatusCode(HttpStatus.FOUND);
+        response.getHeaders().setLocation(URI.create("/"));
+        return response.setComplete();
     }
 }

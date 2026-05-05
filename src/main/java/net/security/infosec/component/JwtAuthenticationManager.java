@@ -27,42 +27,56 @@ public class JwtAuthenticationManager implements ReactiveAuthenticationManager {
         String accessToken = authentication.getPrincipal().toString();
         String refreshToken = authentication.getCredentials().toString();
 
-        if(jwt.validateToken(accessToken)){
-            return userService.findByUsername(jwt.getUsernameFromToken(accessToken)).flatMap(user -> Mono.just(new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities())));
-        }else if(jwt.validateToken(refreshToken)){
-            return Mono.deferContextual(contextView -> {
-                ServerWebExchange exchange = contextView.get(ServerWebExchange.class);
+        return Mono.deferContextual(contextView -> {
+            ServerWebExchange exchange = contextView.get(ServerWebExchange.class);
+            String userAgent = exchange.getRequest().getHeaders().getFirst("User-Agent");
+
+            if(jwt.validateToken(accessToken)){
+                // проверяем digital_signature
+                String tokenSignature = jwt.getDigitalSignatureFromToken(accessToken);
+                if(tokenSignature != null && tokenSignature.equals(userAgent)){
+                    return userService.findByUsername(jwt.getUsernameFromToken(accessToken))
+                            .flatMap(user -> Mono.just(new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities())));
+                }
+                // сигнатура не совпадает — токен украден? fallback к refresh
+            }
+
+            if(jwt.validateToken(refreshToken)){
                 return userService.findByUsername(jwt.getUsernameFromToken(refreshToken)).flatMap(user -> {
                     String username = user.getUsername();
-                    String digitalSignature = exchange.getRequest().getHeaders().getFirst("User-Agent");
-                    String newAccessToken = jwt.generateAccessToken(username, digitalSignature);
-                    String newRefreshToken = jwt.generateRefreshToken(username, digitalSignature);
+                    String newAccessToken = jwt.generateAccessToken(username, userAgent);
+                    String newRefreshToken = jwt.generateRefreshToken(username, userAgent);
                     ResponseCookie accessCookie = ResponseCookie.from(NamingUtil.getInstance().getAccessName(), newAccessToken)
                             .httpOnly(true)
+                            .secure(true)
+                            .sameSite("Strict")
                             .maxAge(Duration.ofHours(1))
                             .path("/")
                             .build();
                     ResponseCookie refreshCookie = ResponseCookie.from(NamingUtil.getInstance().getRefreshName(), newRefreshToken)
                             .httpOnly(true)
+                            .secure(true)
+                            .sameSite("Strict")
                             .maxAge(Duration.ofDays(1))
                             .path("/")
                             .build();
 
                     exchange.getResponse().addCookie(accessCookie);
                     exchange.getResponse().addCookie(refreshCookie);
-                    return Mono.just(new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities()));
+                    return Mono.just(new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()));
                 }).switchIfEmpty(Mono.error(new BadCredentialsException("Authentication failed")));
-            });
-        }else{
+            }
+
+            // fallback: логин/пароль
             String username = authentication.getPrincipal().toString();
             String password = authentication.getCredentials().toString();
             return userService.findByUsername(username).flatMap(user -> {
-                if(encoder.matches(password,user.getPassword())){
-                    return Mono.just(new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities()));
+                if(encoder.matches(password, user.getPassword())){
+                    return Mono.just(new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()));
                 } else{
                     return Mono.error(new BadCredentialsException("Authentication failed"));
                 }
             }).cast(Authentication.class).switchIfEmpty(Mono.error(new BadCredentialsException("Authentication failed")));
-        }
+        });
     }
 }

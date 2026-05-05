@@ -8,4 +8,5 @@ import java.util.Set;
 
 public interface TroubleRepository extends ReactiveCrudRepository<Trouble,Integer> {
     Flux<Trouble> findAllByIdIn(Set<Integer> ids);
+    Flux<Trouble> findAllByCategoryId(Integer categoryId);
 }

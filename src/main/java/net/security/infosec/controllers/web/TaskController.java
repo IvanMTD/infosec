@@ -44,6 +44,7 @@ public class TaskController {
     @GetMapping("/info/week")
     @PreAuthorize("hasAnyRole('WORKER','MANAGER','ADMIN')")
     public Mono<Rendering> getInfo(@AuthenticationPrincipal Implementer implementer){
+        return troubleTicketService.getTroubleCategoryMap().flatMap(troubleCategoryMap -> {
         Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
             ChartDTO chart = new ChartDTO();
             chart.setTitle(category.getName());
@@ -53,7 +54,7 @@ public class TaskController {
             return implementerService.getUserById(implementer.getId()).flatMap(impl -> taskService.getImplementerTasksForWeek(impl).collectList().flatMap(tasks -> {
                 int count = 0;
                 for(Task task : tasks){
-                    if(category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())){
+                        if(troubleCategoryMap.containsKey(task.getTroubleId()) && troubleCategoryMap.get(task.getTroubleId()) == category.getId()){
                         count++;
                     }
                 }
@@ -68,7 +69,7 @@ public class TaskController {
         Flux<CategoryDTO> statistics = troubleTicketService.getAllCategories().flatMap(category -> {
             CategoryDTO categoryDTO = new CategoryDTO();
             categoryDTO.setTitle(category.getName());
-            return troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
+            return troubleTicketService.getTroublesByCategoryId(category.getId()).collectList().flatMap(troubles -> {
                 for(Trouble trouble : troubles){
                     TroubleDTO troubleDTO = new TroubleDTO();
                     troubleDTO.setTitle(trouble.getName());
@@ -109,11 +110,13 @@ public class TaskController {
                         .modelAttribute("dates", new DateDTO())
                         .build()
         );
+        });
     }
 
     @GetMapping("/info/month")
     @PreAuthorize("hasAnyRole('WORKER','MANAGER','ADMIN')")
     public Mono<Rendering> getMonth(@AuthenticationPrincipal Implementer implementer){
+        return troubleTicketService.getTroubleCategoryMap().flatMap(troubleCategoryMap -> {
         Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
             ChartDTO chart = new ChartDTO();
             chart.setTitle(category.getName());
@@ -123,7 +126,7 @@ public class TaskController {
             return implementerService.getUserById(implementer.getId()).flatMap(impl -> taskService.getImplementerTasksForMonth(impl).collectList().flatMap(tasks -> {
                 int count = 0;
                 for(Task task : tasks){
-                    if(category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())){
+                        if(troubleCategoryMap.containsKey(task.getTroubleId()) && troubleCategoryMap.get(task.getTroubleId()) == category.getId()){
                         count++;
                     }
                 }
@@ -138,7 +141,7 @@ public class TaskController {
         Flux<CategoryDTO> statistics = troubleTicketService.getAllCategories().flatMap(category -> {
             CategoryDTO categoryDTO = new CategoryDTO();
             categoryDTO.setTitle(category.getName());
-            return troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
+            return troubleTicketService.getTroublesByCategoryId(category.getId()).collectList().flatMap(troubles -> {
                 for(Trouble trouble : troubles){
                     TroubleDTO troubleDTO = new TroubleDTO();
                     troubleDTO.setTitle(trouble.getName());
@@ -179,11 +182,13 @@ public class TaskController {
                         .modelAttribute("dates", new DateDTO())
                         .build()
         );
+        });
     }
 
     @GetMapping("/info/year")
     @PreAuthorize("hasAnyRole('WORKER','MANAGER','ADMIN')")
     public Mono<Rendering> getYear(@AuthenticationPrincipal Implementer implementer){
+        return troubleTicketService.getTroubleCategoryMap().flatMap(troubleCategoryMap -> {
         Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
             ChartDTO chart = new ChartDTO();
             chart.setTitle(category.getName());
@@ -193,7 +198,7 @@ public class TaskController {
             return implementerService.getUserById(implementer.getId()).flatMap(impl -> taskService.getImplementerTasksForYear(impl).collectList().flatMap(tasks -> {
                 int count = 0;
                 for(Task task : tasks){
-                    if(category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())){
+                        if(troubleCategoryMap.containsKey(task.getTroubleId()) && troubleCategoryMap.get(task.getTroubleId()) == category.getId()){
                         count++;
                     }
                 }
@@ -208,7 +213,7 @@ public class TaskController {
         Flux<CategoryDTO> statistics = troubleTicketService.getAllCategories().flatMap(category -> {
             CategoryDTO categoryDTO = new CategoryDTO();
             categoryDTO.setTitle(category.getName());
-            return troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
+            return troubleTicketService.getTroublesByCategoryId(category.getId()).collectList().flatMap(troubles -> {
                 for(Trouble trouble : troubles){
                     TroubleDTO troubleDTO = new TroubleDTO();
                     troubleDTO.setTitle(trouble.getName());
@@ -249,11 +254,13 @@ public class TaskController {
                         .modelAttribute("dates", new DateDTO())
                         .build()
         );
+        });
     }
 
     @PostMapping("/info/date")
     @PreAuthorize("hasAnyRole('WORKER','MANAGER','ADMIN')")
     public Mono<Rendering> getMainFromDate(@AuthenticationPrincipal Implementer implementer, @ModelAttribute(name = "dates") DateDTO dateDTO) {
+        return troubleTicketService.getTroubleCategoryMap().flatMap(troubleCategoryMap -> {
         Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
             ChartDTO chart = new ChartDTO();
             chart.setTitle(category.getName());
@@ -263,7 +270,7 @@ public class TaskController {
             return implementerService.getUserById(implementer.getId()).flatMap(impl -> taskService.getImplementerTasksForDates(impl, dateDTO).collectList().flatMap(tasks -> {
                 int count = 0;
                 for (Task task : tasks) {
-                    if (category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())) {
+                        if(troubleCategoryMap.containsKey(task.getTroubleId()) && troubleCategoryMap.get(task.getTroubleId()) == category.getId()){
                         count++;
                     }
                 }
@@ -278,7 +285,7 @@ public class TaskController {
         Flux<CategoryDTO> statistics = troubleTicketService.getAllCategories().flatMap(category -> {
             CategoryDTO categoryDTO = new CategoryDTO();
             categoryDTO.setTitle(category.getName());
-            return troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
+            return troubleTicketService.getTroublesByCategoryId(category.getId()).collectList().flatMap(troubles -> {
                 for (Trouble trouble : troubles) {
                     TroubleDTO troubleDTO = new TroubleDTO();
                     troubleDTO.setTitle(trouble.getName());
@@ -319,11 +326,13 @@ public class TaskController {
                         .modelAttribute("dates", new DateDTO())
                         .build()
         );
+        });
     }
 
     @GetMapping("/stat/week/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN','DIRECTOR','MANAGER')")
     public Mono<Rendering> taskStatWeek(@PathVariable(name = "userId") int userId){
+        return troubleTicketService.getTroubleCategoryMap().flatMap(troubleCategoryMap -> {
         if(userId <= 0) {
             Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
                 if(category.getDepartmentRole().getType() == userId || userId == 0){
@@ -335,7 +344,7 @@ public class TaskController {
                     return taskService.getWeek().collectList().flatMap(week -> {
                         int count = 0;
                         for (Task task : week) {
-                            if (category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())) {
+                                if(troubleCategoryMap.containsKey(task.getTroubleId()) && troubleCategoryMap.get(task.getTroubleId()) == category.getId()){
                                 count++;
                             }
                         }
@@ -354,7 +363,7 @@ public class TaskController {
                 if(category.getDepartmentRole().getType() == userId || userId == 0) {
                     CategoryDTO categoryDTO = new CategoryDTO();
                     categoryDTO.setTitle(category.getName());
-                    return implementerService.getAll().collectList().flatMap(implementers -> troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
+                    return implementerService.getAll().collectList().flatMap(implementers -> troubleTicketService.getTroublesByCategoryId(category.getId()).collectList().flatMap(troubles -> {
                         for (Trouble trouble : troubles) {
                             TroubleDTO troubleDTO = new TroubleDTO();
                             troubleDTO.setTitle(trouble.getName());
@@ -415,7 +424,7 @@ public class TaskController {
                 return implementerService.getUserById(userId).flatMap(impl -> taskService.getImplementerTasksForWeek(impl).collectList().flatMap(tasks -> {
                     int count = 0;
                     for(Task task : tasks){
-                        if(category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())){
+                            if(troubleCategoryMap.containsKey(task.getTroubleId()) && troubleCategoryMap.get(task.getTroubleId()) == category.getId()){
                             count++;
                         }
                     }
@@ -430,7 +439,7 @@ public class TaskController {
             Flux<CategoryDTO> statistics = troubleTicketService.getAllCategories().flatMap(category -> {
                 CategoryDTO categoryDTO = new CategoryDTO();
                 categoryDTO.setTitle(category.getName());
-                return troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
+                return troubleTicketService.getTroublesByCategoryId(category.getId()).collectList().flatMap(troubles -> {
                     for(Trouble trouble : troubles){
                         TroubleDTO troubleDTO = new TroubleDTO();
                         troubleDTO.setTitle(trouble.getName());
@@ -475,11 +484,13 @@ public class TaskController {
                             .build()
             );
         }
+        });
     }
 
     @GetMapping("/stat/month/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN','DIRECTOR','MANAGER')")
     public Mono<Rendering> taskStatMonth(@PathVariable(name = "userId") int userId){
+        return troubleTicketService.getTroubleCategoryMap().flatMap(troubleCategoryMap -> {
         if(userId <= 0) {
             Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
                 if(category.getDepartmentRole().getType() == userId || userId == 0) {
@@ -491,7 +502,7 @@ public class TaskController {
                     return taskService.getMonth().collectList().flatMap(month -> {
                         int count = 0;
                         for (Task task : month) {
-                            if (category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())) {
+                                if(troubleCategoryMap.containsKey(task.getTroubleId()) && troubleCategoryMap.get(task.getTroubleId()) == category.getId()){
                                 count++;
                             }
                         }
@@ -510,7 +521,7 @@ public class TaskController {
                 if(category.getDepartmentRole().getType() == userId || userId == 0) {
                     CategoryDTO categoryDTO = new CategoryDTO();
                     categoryDTO.setTitle(category.getName());
-                    return implementerService.getAll().collectList().flatMap(implementers -> troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
+                    return implementerService.getAll().collectList().flatMap(implementers -> troubleTicketService.getTroublesByCategoryId(category.getId()).collectList().flatMap(troubles -> {
                         for (Trouble trouble : troubles) {
                             TroubleDTO troubleDTO = new TroubleDTO();
                             troubleDTO.setTitle(trouble.getName());
@@ -571,7 +582,7 @@ public class TaskController {
                 return implementerService.getUserById(userId).flatMap(impl -> taskService.getImplementerTasksForMonth(impl).collectList().flatMap(tasks -> {
                     int count = 0;
                     for(Task task : tasks){
-                        if(category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())){
+                            if(troubleCategoryMap.containsKey(task.getTroubleId()) && troubleCategoryMap.get(task.getTroubleId()) == category.getId()){
                             count++;
                         }
                     }
@@ -586,7 +597,7 @@ public class TaskController {
             Flux<CategoryDTO> statistics = troubleTicketService.getAllCategories().flatMap(category -> {
                 CategoryDTO categoryDTO = new CategoryDTO();
                 categoryDTO.setTitle(category.getName());
-                return troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
+                return troubleTicketService.getTroublesByCategoryId(category.getId()).collectList().flatMap(troubles -> {
                     for(Trouble trouble : troubles){
                         TroubleDTO troubleDTO = new TroubleDTO();
                         troubleDTO.setTitle(trouble.getName());
@@ -631,11 +642,13 @@ public class TaskController {
                             .build()
             );
         }
+        });
     }
 
     @GetMapping("/stat/year/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN','DIRECTOR','MANAGER')")
     public Mono<Rendering> taskStatYear(@PathVariable(name = "userId") int userId){
+        return troubleTicketService.getTroubleCategoryMap().flatMap(troubleCategoryMap -> {
         if(userId <= 0) {
             Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
                 if(category.getDepartmentRole().getType() == userId || userId == 0) {
@@ -647,7 +660,7 @@ public class TaskController {
                     return taskService.getYear().collectList().flatMap(year -> {
                         int count = 0;
                         for (Task task : year) {
-                            if (category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())) {
+                                if(troubleCategoryMap.containsKey(task.getTroubleId()) && troubleCategoryMap.get(task.getTroubleId()) == category.getId()){
                                 count++;
                             }
                         }
@@ -666,7 +679,7 @@ public class TaskController {
                 if(category.getDepartmentRole().getType() == userId || userId == 0) {
                     CategoryDTO categoryDTO = new CategoryDTO();
                     categoryDTO.setTitle(category.getName());
-                    return implementerService.getAll().collectList().flatMap(implementers -> troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
+                    return implementerService.getAll().collectList().flatMap(implementers -> troubleTicketService.getTroublesByCategoryId(category.getId()).collectList().flatMap(troubles -> {
                         for (Trouble trouble : troubles) {
                             TroubleDTO troubleDTO = new TroubleDTO();
                             troubleDTO.setTitle(trouble.getName());
@@ -727,7 +740,7 @@ public class TaskController {
                 return implementerService.getUserById(userId).flatMap(impl -> taskService.getImplementerTasksForYear(impl).collectList().flatMap(tasks -> {
                     int count = 0;
                     for(Task task : tasks){
-                        if(category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())){
+                            if(troubleCategoryMap.containsKey(task.getTroubleId()) && troubleCategoryMap.get(task.getTroubleId()) == category.getId()){
                             count++;
                         }
                     }
@@ -742,7 +755,7 @@ public class TaskController {
             Flux<CategoryDTO> statistics = troubleTicketService.getAllCategories().flatMap(category -> {
                 CategoryDTO categoryDTO = new CategoryDTO();
                 categoryDTO.setTitle(category.getName());
-                return troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
+                return troubleTicketService.getTroublesByCategoryId(category.getId()).collectList().flatMap(troubles -> {
                     for(Trouble trouble : troubles){
                         TroubleDTO troubleDTO = new TroubleDTO();
                         troubleDTO.setTitle(trouble.getName());
@@ -787,11 +800,13 @@ public class TaskController {
                             .build()
             );
         }
+        });
     }
 
     @PostMapping("/stat/date/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN','DIRECTOR','MANAGER')")
     public Mono<Rendering> viewStatFromDate(@PathVariable(name = "userId") int userId, @ModelAttribute(name = "dates") @Valid DateDTO dateDTO, Errors errors){
+        return troubleTicketService.getTroubleCategoryMap().flatMap(troubleCategoryMap -> {
         if(userId <= 0) {
 
             if(errors.hasErrors()){
@@ -820,7 +835,7 @@ public class TaskController {
                     return taskService.getFromDate(dateDTO).collectList().flatMap(dateTasks -> {
                         int count = 0;
                         for (Task task : dateTasks) {
-                            if (category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())) {
+                                if(troubleCategoryMap.containsKey(task.getTroubleId()) && troubleCategoryMap.get(task.getTroubleId()) == category.getId()){
                                 count++;
                             }
                         }
@@ -839,7 +854,7 @@ public class TaskController {
                 if(category.getDepartmentRole().getType() == userId || userId == 0) {
                     CategoryDTO categoryDTO = new CategoryDTO();
                     categoryDTO.setTitle(category.getName());
-                    return implementerService.getAll().collectList().flatMap(implementers -> troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
+                    return implementerService.getAll().collectList().flatMap(implementers -> troubleTicketService.getTroublesByCategoryId(category.getId()).collectList().flatMap(troubles -> {
                         for (Trouble trouble : troubles) {
                             TroubleDTO troubleDTO = new TroubleDTO();
                             troubleDTO.setTitle(trouble.getName());
@@ -917,7 +932,7 @@ public class TaskController {
                 return implementerService.getUserById(userId).flatMap(impl -> taskService.getImplementerTasksForDates(impl,dateDTO).collectList().flatMap(tasks -> {
                     int count = 0;
                     for(Task task : tasks){
-                        if(category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())){
+                            if(troubleCategoryMap.containsKey(task.getTroubleId()) && troubleCategoryMap.get(task.getTroubleId()) == category.getId()){
                             count++;
                         }
                     }
@@ -932,7 +947,7 @@ public class TaskController {
             Flux<CategoryDTO> statistics = troubleTicketService.getAllCategories().flatMap(category -> {
                 CategoryDTO categoryDTO = new CategoryDTO();
                 categoryDTO.setTitle(category.getName());
-                return troubleTicketService.getTroubleByIds(category.getTroubleIds()).collectList().flatMap(troubles -> {
+                return troubleTicketService.getTroublesByCategoryId(category.getId()).collectList().flatMap(troubles -> {
                     for(Trouble trouble : troubles){
                         TroubleDTO troubleDTO = new TroubleDTO();
                         troubleDTO.setTitle(trouble.getName());
@@ -977,6 +992,7 @@ public class TaskController {
                             .build()
             );
         }
+        });
     }
 
     @GetMapping("/new/reg")

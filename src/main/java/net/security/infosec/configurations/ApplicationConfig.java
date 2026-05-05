@@ -10,12 +10,17 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.sql.DataSource;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Iterator;
@@ -24,6 +29,29 @@ import java.util.Objects;
 @Slf4j
 @Configuration
 public class ApplicationConfig {
+
+    @Value("${spring.datasource.url}")
+    private String jdbcUrl;
+    @Value("${spring.datasource.username}")
+    private String jdbcUser;
+    @Value("${spring.datasource.password}")
+    private String jdbcPass;
+
+    @Bean
+    public DataSource flywayDataSource(){
+        return DataSourceBuilder.create()
+                .url(jdbcUrl)
+                .username(jdbcUser)
+                .password(jdbcPass)
+                .driverClassName("org.postgresql.Driver")
+                .build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
     @Bean
     public CommandLineRunner preLoad(DepartmentRepository departmentRepository, DivisionRepository divisionRepository, EmployeeRepository employeeRepository){
         return args -> {
@@ -48,7 +76,7 @@ public class ApplicationConfig {
                 return Mono.just(department);
             });
         }).flatMap(department -> {
-            return divisionRepository.findAllByIdIn(department.getDivisionIds()).flatMap(division -> {
+            return divisionRepository.findAllByDepartmentId(department.getId()).flatMap(division -> {
                 return employeeRepository.findByDivisionId(division.getId()).collectList().flatMapMany(employees -> {
                     int n = 1;
                     for(Employee employee : employees){

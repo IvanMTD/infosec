@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(mvnw *)",
-      "Bash(del *)"
+      "Bash(del *)",
+      "Bash(ren *)",
+      "Bash(findstr *)"
     ]
   },
   "$version": 3

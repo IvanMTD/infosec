@@ -288,7 +288,7 @@ public class GuideController {
                 return Mono.just(deleted);
             });
         }).flatMap(deleted -> {
-            return removeDivisions(deleted.getDivisionIds()).collectList().flatMap(l -> {
+            return removeDivisions(deleted.getId()).collectList().flatMap(l -> {
                 if(l.size() != 0){
                     for(Division division : l){
                         log.info("division has been deleted [{}]", division);
@@ -306,7 +306,7 @@ public class GuideController {
     private Mono<DepartmentDTO> getCompleteDepartment(long id){
         return departmentService.getBy(id).flatMap(department -> {
             DepartmentDTO departmentDTO = new DepartmentDTO(department);
-            return divisionService.getAllBy(department.getDivisionIds()).flatMap(division -> {
+            return divisionService.getAllByDepartmentId(department.getId()).flatMap(division -> {
                 DivisionDTO divisionDTO = new DivisionDTO(division);
                 return Mono.just(divisionDTO);
             }).collectList().flatMap(l -> {
@@ -331,8 +331,8 @@ public class GuideController {
         });
     }
 
-    private Flux<Division> removeDivisions(Set<Long> ids){
-        return divisionService.getAllBy(ids).flatMap(division -> removeDivision(division.getId())).switchIfEmpty(Flux.fromIterable(new ArrayList<>()));
+    private Flux<Division> removeDivisions(Long departmentId){
+        return divisionService.getAllByDepartmentId(departmentId).flatMap(division -> removeDivision(division.getId())).switchIfEmpty(Flux.fromIterable(new ArrayList<>()));
     }
 
     private Mono<Division> removeDivision(long id){
@@ -362,7 +362,7 @@ public class GuideController {
                     return Mono.just(departmentDTO);
                 });
             }).flatMap(departmentDTO -> {
-                return divisionService.getAllBy(departmentDTO.getDivisionIds()).flatMap(division -> {
+                return divisionService.getAllByDepartmentId(departmentDTO.getId()).flatMap(division -> {
                     DivisionDTO divisionDTO = new DivisionDTO(division);
                     return employeeService.getAllByDivisionId(division.getId()).collectList().flatMap(l -> {
                         List<EmployeeDTO> employeeDTOList = new ArrayList<>();

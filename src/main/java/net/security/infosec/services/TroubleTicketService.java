@@ -42,8 +42,7 @@ public class TroubleTicketService {
             dto.setDepartmentRole(category.getDepartmentRole());
             return troubleRepository.save(new Trouble(dto)).flatMap(trouble -> {
                 log.info("Trouble saved: " + trouble.toString());
-                category.addTrouble(trouble);
-                return categoryRepository.save(category);
+                return Mono.just(category);
             });
         });
     }
@@ -55,7 +54,7 @@ public class TroubleTicketService {
                 dto.setCategoryId(category.getId());
                 dto.setCategoryName(category.getName());
                 dto.setCategoryDescription(category.getDescription());
-                return troubleRepository.findAllByIdIn(category.getTroubleIds()).collectList().flatMap(l -> {
+                return troubleRepository.findAllByCategoryId(category.getId()).collectList().flatMap(l -> {
                     l = l.stream().sorted(Comparator.comparing(Trouble::getName)).collect(Collectors.toList());
                     dto.setTroubles(l);
                     return Mono.just(dto);
@@ -88,7 +87,7 @@ public class TroubleTicketService {
     public Mono<Category> updateCategory(TicketDataTransferObject ticketDTO, int id) {
         return categoryRepository.findById(id).flatMap(category -> {
             return categoryRepository.save(category.update(ticketDTO)).flatMap(saved -> {
-                return troubleRepository.findAllByIdIn(saved.getTroubleIds()).flatMap(trouble -> {
+                return troubleRepository.findAllByCategoryId(saved.getId()).flatMap(trouble -> {
                     trouble.setDepartmentRole(saved.getDepartmentRole());
                     return troubleRepository.save(trouble);
                 }).collectList().flatMap(l -> {
@@ -110,14 +109,12 @@ public class TroubleTicketService {
         return troubleRepository.findAllByIdIn(troubleIds);
     }
 
+    public Flux<Trouble> getTroublesByCategoryId(Integer categoryId) {
+        return troubleRepository.findAllByCategoryId(categoryId);
+    }
+
     public Mono<Category> redirectTroubleInCategory(Trouble trouble) {
-        return categoryRepository.findCategoryWhereTroubleIdIn(trouble.getId()).flatMap(category -> {
-            category.getTroubleIds().remove(trouble.getId());
-            return categoryRepository.save(category);
-        }).flatMap(category -> categoryRepository.findById(trouble.getCategoryId()).flatMap(cat -> {
-            cat.addTrouble(trouble);
-            return categoryRepository.save(cat);
-        }));
+        return categoryRepository.findById(trouble.getCategoryId());
     }
 
     public Mono<Trouble> getTroubleById(int troubleId) {
@@ -126,5 +123,15 @@ public class TroubleTicketService {
 
     public Mono<Category> getCategoryById(int categoryId) {
         return categoryRepository.findById(categoryId);
+    }
+
+    public Mono<java.util.Map<Integer, Integer>> getTroubleCategoryMap() {
+        return troubleRepository.findAll().collectList().map(troubles -> {
+            java.util.Map<Integer, Integer> map = new java.util.HashMap<>();
+            for(Trouble t : troubles) {
+                map.put(t.getId(), t.getCategoryId());
+            }
+            return map;
+        });
     }
 }

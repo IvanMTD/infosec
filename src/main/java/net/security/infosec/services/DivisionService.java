@@ -9,7 +9,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Comparator;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,8 +28,8 @@ public class DivisionService {
         return divisionRepository.save(division);
     }
 
-    public Flux<Division> getAllBy(Set<Long> divisionIds) {
-        return divisionRepository.findAllByIdIn(divisionIds);
+    public Flux<Division> getAllByDepartmentId(Long departmentId) {
+        return divisionRepository.findAllByDepartmentId(departmentId);
     }
 
     public Mono<Division> getBy(long id) {

@@ -168,7 +168,7 @@ public class TaskService {
     }
 
     public Flux<Task> getImplementerTasks(Implementer implementer) {
-        return taskRepository.findAllByIdIn(implementer.getTaskIds()).collectList().flatMapMany(l -> {
+        return taskRepository.findAllByImplementerId(implementer.getId()).collectList().flatMapMany(l -> {
             l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate)).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);

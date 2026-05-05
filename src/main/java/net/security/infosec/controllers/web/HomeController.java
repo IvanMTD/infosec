@@ -44,6 +44,8 @@ public class HomeController {
     @GetMapping("/")
     public Mono<Rendering> homePage(@AuthenticationPrincipal Implementer user){
         log.info("user is : [{}]", user);
+
+        return troubleTicketService.getTroubleCategoryMap().flatMap(troubleCategoryMap -> {
         /**
          * CATEGORY DAY
          */
@@ -77,7 +79,8 @@ public class HomeController {
                 for(Category category : list){
                     int tCount = 0;
                     for(Task task : tasks){
-                        if(category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())){
+                        Integer catId = troubleCategoryMap.get(task.getTroubleId());
+                        if(catId != null && catId == category.getId()){
                             tCount++;
                         }
                     }
@@ -127,7 +130,8 @@ public class HomeController {
                     return taskService.getFromDate(weeks.get(key)).collectList().flatMap(dateTasks -> {
                         int count = 0;
                         for (Task task : dateTasks) {
-                            if (category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())) {
+                            Integer catId = troubleCategoryMap.get(task.getTroubleId());
+                            if(catId != null && catId == category.getId()) {
                                 count++;
                             }
                         }
@@ -189,7 +193,8 @@ public class HomeController {
                     return taskService.getFromDate(months.get(key)).collectList().flatMap(dateTasks -> {
                         int count = 0;
                         for (Task task : dateTasks) {
-                            if (category.getTroubleIds().stream().anyMatch(troubleId -> troubleId == task.getTroubleId())) {
+                            Integer catId = troubleCategoryMap.get(task.getTroubleId());
+                            if(catId != null && catId == category.getId()) {
                                 count++;
                             }
                         }
@@ -264,6 +269,7 @@ public class HomeController {
                         .modelAttribute("year", LocalDate.now().getYear())
                         .build()
         );
+        });
     }
 
     @GetMapping("/login")

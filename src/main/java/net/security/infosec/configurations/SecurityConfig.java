@@ -5,7 +5,6 @@ import net.security.infosec.component.JwtAuthenticationConverter;
 import net.security.infosec.component.JwtAuthenticationManager;
 import net.security.infosec.component.JwtAuthenticationSuccessHandler;
 import net.security.infosec.component.JwtLogoutSuccessHandler;
-import net.security.infosec.repositories.ImplementerRepository;
 import net.security.infosec.services.ImplementerService;
 import net.security.infosec.utils.JWT;
 import org.springframework.context.annotation.Bean;
@@ -14,13 +13,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.security.web.server.csrf.ServerCsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.server.savedrequest.ServerRequestCache;
-import org.springframework.security.web.server.savedrequest.WebSessionServerRequestCache;
 
 import java.net.URI;
 
@@ -29,8 +25,9 @@ import java.net.URI;
 @RequiredArgsConstructor
 @EnableReactiveMethodSecurity
 public class SecurityConfig {
-    private final ImplementerRepository implementerRepository;
+    private final ImplementerService implementerService;
     private final JWT jwt;
+    private final PasswordEncoder passwordEncoder;
     @Bean
     public SecurityWebFilterChain filterChain(ServerHttpSecurity http){
         ServerCsrfTokenRequestAttributeHandler requestHandler = new ServerCsrfTokenRequestAttributeHandler();
@@ -50,28 +47,17 @@ public class SecurityConfig {
                 )
                 .formLogin(loginSpec -> loginSpec.loginPage("/login").authenticationSuccessHandler(authenticationSuccessHandler()))
                 .logout(logoutSpec -> logoutSpec.logoutSuccessHandler(logoutSuccessHandler()))
-                .requestCache(requestCacheSpec -> requestCacheSpec.requestCache(serverRequestCache()))
                 .build();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-    @Bean
-    public ServerRequestCache serverRequestCache() {
-        return new WebSessionServerRequestCache();
-    }
-
-    @Bean
     public JwtAuthenticationManager authenticationManager() {
-        return new JwtAuthenticationManager(jwt, implementerService(), passwordEncoder());
+        return new JwtAuthenticationManager(jwt, implementerService, passwordEncoder);
     }
 
     @Bean
     public JwtAuthenticationSuccessHandler authenticationSuccessHandler(){
-        return new JwtAuthenticationSuccessHandler(jwt,serverRequestCache());
+        return new JwtAuthenticationSuccessHandler(jwt);
     }
 
     @Bean
@@ -84,10 +70,5 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationConverter authenticationConverter(){
         return new JwtAuthenticationConverter();
-    }
-
-    @Bean
-    public ImplementerService implementerService(){
-        return new ImplementerService(implementerRepository,passwordEncoder());
     }
 }
