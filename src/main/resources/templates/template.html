@@ -43,7 +43,7 @@
         <div th:insert="~{content/login-page}" th:if="${index} == 'login-page'"></div>
         <div th:insert="~{content/users-page}" th:if="${index} == 'users-page'"></div>
         <div th:insert="~{content/user-edit-page}" th:if="${index} == 'user-edit-page'"></div>
-        <div th:insert="~{content/profile-page}" th:if="${index} == 'profile-page'"></div>
+        <div class="flex-grow-1" th:insert="~{content/profile-page}" th:if="${index} == 'profile-page'"></div>
         <div th:insert="~{content/works-page}" th:if="${index} == 'works-page'"></div>
         <div th:insert="~{content/categories-page}" th:if="${index} == 'categories-page'"></div>
         <div th:insert="~{content/category-reg-page}" th:if="${index} == 'category-reg-page'"></div>
@@ -52,10 +52,10 @@
         <div th:insert="~{content/trouble-reg-page}" th:if="${index} == 'trouble-reg-page'"></div>
         <div th:insert="~{content/trouble-edit-page}" th:if="${index} == 'trouble-edit-page'"></div>
         <div th:insert="~{content/task-page}" th:if="${index} == 'task-page'"></div>
-        <div th:insert="~{content/task-info-page}" th:if="${index} == 'task-info-page'"></div>
-        <div th:insert="~{content/task-stat-page}" th:if="${index} == 'task-stat-page'"></div>
-        <div th:insert="~{content/task-completed-page}" th:if="${index} == 'task-completed-page'"></div>
-        <div th:insert="~{content/task-edit-page}" th:if="${index} == 'task-edit-page'"></div>
+        <div class="flex-grow-1" th:insert="~{content/task-info-page}" th:if="${index} == 'task-info-page'"></div>
+        <div class="flex-grow-1" th:insert="~{content/task-stat-page}" th:if="${index} == 'task-stat-page'"></div>
+        <div class="flex-grow-1" th:insert="~{content/task-completed-page}" th:if="${index} == 'task-completed-page'"></div>
+        <div class="flex-grow-1" th:insert="~{content/task-edit-page}" th:if="${index} == 'task-edit-page'"></div>
         <div th:insert="~{content/guide-page}" th:if="${index} == 'guide-page'"></div>
         <div th:insert="~{content/structures-page}" th:if="${index} == 'structures-page'"></div>
         <div th:insert="~{content/structure-add-page}" th:if="${index} == 'structure-add-page'"></div>

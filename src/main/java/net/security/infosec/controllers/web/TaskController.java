@@ -259,7 +259,19 @@ public class TaskController {
 
     @PostMapping("/info/date")
     @PreAuthorize("hasAnyRole('WORKER','MANAGER','ADMIN')")
-    public Mono<Rendering> getMainFromDate(@AuthenticationPrincipal Implementer implementer, @ModelAttribute(name = "dates") DateDTO dateDTO) {
+    public Mono<Rendering> getMainFromDate(@AuthenticationPrincipal Implementer implementer, @ModelAttribute(name = "dates") @Valid DateDTO dateDTO, Errors errors) {
+        if(errors.hasErrors()){
+            return Mono.just(
+                    Rendering.view("template")
+                            .modelAttribute("title","My task info")
+                            .modelAttribute("index","task-info-page")
+                            .modelAttribute("charts", Flux.empty())
+                            .modelAttribute("statistics", Flux.empty())
+                            .modelAttribute("taskList", Flux.empty())
+                            .modelAttribute("dates", dateDTO)
+                            .build()
+            );
+        }
         return troubleTicketService.getTroubleCategoryMap().flatMap(troubleCategoryMap -> {
         Flux<ChartDTO> chartFlux = troubleTicketService.getAllCategories().flatMap(category -> {
             ChartDTO chart = new ChartDTO();

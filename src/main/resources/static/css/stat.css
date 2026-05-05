@@ -1,0 +1,476 @@
+/* ============================================================
+   Statistics Pages — Smoke Theme
+   Dashboard layout: filters, chart, summary, accordion
+   ============================================================ */
+
+/* --- Page wrapper --- */
+.stat-wrapper {
+    display: flex;
+    align-items: flex-start;
+    padding: 1.5rem 0;
+}
+
+/* ============================================================
+   Filter Bar Card
+   ============================================================ */
+.stat-filter-card {
+    background: #fff;
+    border: 1px solid #d4d4d4;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.02);
+    overflow: visible;
+    margin-bottom: 1.25rem;
+}
+
+.stat-filter-card__header {
+    position: relative;
+    background: linear-gradient(160deg, #0d0d0d 0%, #1a1a1a 50%, #111 100%);
+    color: #e0e0e0;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    overflow: hidden;
+    z-index: 1;
+    border-radius: 12px 12px 0 0;
+}
+
+/* Smoke particles for filter header */
+.stat-filter-card__header::before,
+.stat-filter-card__header::after,
+.stf-b1, .stf-b2, .stf-b3, .stf-b4,
+.stf-m1, .stf-m2, .stf-m3, .stf-m4,
+.stf-f1, .stf-f2, .stf-f3, .stf-f4 {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}
+/* BACK */
+.stat-filter-card__header::before,
+.stat-filter-card__header::after,
+.stf-b1, .stf-b2, .stf-b3, .stf-b4 {
+    filter: blur(12px);
+    z-index: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15) 0%, rgba(200,200,200,0.05) 50%, transparent 75%);
+}
+.stat-filter-card__header::before { width:180px; height:180px; bottom:-70px; left:-30px;  animation: driftA 10s ease-in-out infinite; }
+.stat-filter-card__header::after  { width:140px; height:140px; top:-50px; right:10%;    animation: driftB 8s ease-in-out infinite 1.5s; }
+.stf-b1 { width:120px; height:120px; top:20%; left:40%;   animation: driftA 9s ease-in-out infinite 0.7s; }
+.stf-b2 { width:100px; height:100px; bottom:10px; right:25%; animation: driftB 7.5s ease-in-out infinite 2.2s; }
+.stf-b3 { width:90px;  height:90px;  top:5px; left:55%;   animation: driftC 6.5s ease-in-out infinite 0.4s; }
+.stf-b4 { width:150px; height:150px; bottom:-50px; right:-20px; animation: driftA 11s ease-in-out infinite 3s; }
+/* MID */
+.stf-m1, .stf-m2, .stf-m3, .stf-m4 {
+    filter: blur(8px);
+    z-index: 1;
+    background: radial-gradient(circle at 40% 40%, rgba(255,255,255,0.22) 0%, rgba(220,220,220,0.08) 50%, transparent 70%);
+}
+.stf-m1 { width:100px; height:100px; top:10%; left:15%;  animation: driftB 7s ease-in-out infinite 0.2s; }
+.stf-m2 { width:80px;  height:80px;  bottom:20%; right:35%; animation: driftC 5.5s ease-in-out infinite 1.1s; }
+.stf-m3 { width:110px; height:110px; top:35%; right:8%;  animation: driftA 8.5s ease-in-out infinite 2.8s; }
+.stf-m4 { width:70px;  height:70px;  top:50%; left:60%;  animation: driftB 6s ease-in-out infinite 0.9s; }
+/* FRONT */
+.stf-f1, .stf-f2, .stf-f3, .stf-f4 {
+    filter: blur(5px);
+    z-index: 3;
+    background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.30) 0%, rgba(240,240,240,0.12) 50%, transparent 70%);
+}
+.stf-f1 { width:60px; height:60px; top:15%; left:30%;  animation: driftC 5s ease-in-out infinite 0.3s; }
+.stf-f2 { width:50px; height:50px; bottom:25%; right:20%; animation: driftA 6s ease-in-out infinite 1.7s; }
+.stf-f3 { width:65px; height:65px; top:40%; left:70%;  animation: driftB 4.5s ease-in-out infinite 2.5s; }
+.stf-f4 { width:45px; height:45px; top:55%; left:10%;  animation: driftC 5.5s ease-in-out infinite 0.6s; }
+
+@keyframes driftA {
+    0%, 100% { transform: translate(0, 0) scale(1);     opacity: 0.5; }
+    25%      { transform: translate(28px, -22px) scale(1.15); opacity: 0.75; }
+    50%      { transform: translate(-12px, -35px) scale(0.85); opacity: 0.3; }
+    75%      { transform: translate(20px, -10px) scale(1.1);   opacity: 0.65; }
+}
+@keyframes driftB {
+    0%, 100% { transform: translate(0, 0) scale(1);     opacity: 0.45; }
+    33%      { transform: translate(-25px, 15px) scale(1.2);  opacity: 0.7; }
+    66%      { transform: translate(18px, -14px) scale(0.8);  opacity: 0.25; }
+}
+@keyframes driftC {
+    0%, 100% { transform: translate(0, 0) scale(1);     opacity: 0.4; }
+    50%      { transform: translate(-15px, -28px) scale(1.3); opacity: 0.65; }
+}
+.stat-filter-card__icon {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3a3a3a 0%, #4a4a4a 100%);
+    color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+    border: 2px solid rgba(255,255,255,0.08);
+}
+.stat-filter-card__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f0f0f0;
+    letter-spacing: 0.03em;
+    position: relative;
+    z-index: 4;
+}
+
+/* --- Export PDF button (right side of header) --- */
+.stat-export-btn {
+    margin-left: auto;
+    position: relative;
+    z-index: 4;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #ccc;
+    border-radius: 6px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.stat-export-btn:hover {
+    background: rgba(255,255,255,0.14);
+    border-color: rgba(255,255,255,0.35);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(255,255,255,0.06);
+}
+.stat-export-btn:active {
+    background: rgba(255,255,255,0.04);
+}
+
+.stat-filter-card__body {
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+.stat-filter-card__body .form-select {
+    width: auto;
+    min-width: 220px;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+    color: #1a1a1a;
+}
+.stat-filter-card__body .form-select:focus {
+    border-color: #555;
+    box-shadow: 0 0 0 0.15rem rgba(0,0,0,0.08);
+}
+
+/* --- Period links --- */
+.stat-period-links {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+.stat-period-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #666;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+.stat-period-link:hover {
+    background: #f2f2f2;
+    color: #1a1a1a;
+    border-color: #ddd;
+}
+.stat-period-link.active {
+    background: #1a1a1a;
+    color: #e0e0e0;
+    border-color: #1a1a1a;
+}
+
+/* --- Date form inline --- */
+.stat-date-form {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fafafa;
+}
+.stat-date-form .form-control {
+    width: auto;
+    max-width: 145px;
+    border: none;
+    background: transparent;
+    font-size: 0.85rem;
+    padding: 0.3rem 0.4rem;
+    color: #1a1a1a;
+}
+.stat-date-form .form-control:focus {
+    outline: none;
+    box-shadow: none;
+}
+.stat-date-form .btn-smoke {
+    padding: 0.35rem 0.85rem;
+    font-size: 0.8rem;
+}
+
+/* ============================================================
+   Stats Row: Summary + Chart
+   ============================================================ */
+.stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+/* --- Summary card --- */
+.stat-summary-card {
+    background: #fff;
+    border: 1px solid #d4d4d4;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+.stat-summary-card__header {
+    background: #f5f5f5;
+    padding: 0.85rem 1.25rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #555;
+    border-bottom: 1px solid #e5e5e5;
+}
+.stat-summary-card__body {
+    padding: 1rem 1.25rem;
+}
+
+.stat-total {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1;
+}
+.stat-total__label {
+    font-size: 0.75rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.stat-breakdown {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.stat-breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background: #fafafa;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+.stat-breakdown-item:hover {
+    background: #f0f0f0;
+}
+.stat-breakdown-item__label {
+    font-size: 0.85rem;
+    color: #444;
+}
+.stat-breakdown-item__count {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    background: #e8e8e8;
+    padding: 0.15rem 0.6rem;
+    border-radius: 12px;
+}
+
+/* --- Chart card --- */
+.stat-chart-card {
+    background: #fff;
+    border: 1px solid #d4d4d4;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+.stat-chart-card__header {
+    background: #f5f5f5;
+    padding: 0.85rem 1.25rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #555;
+    border-bottom: 1px solid #e5e5e5;
+}
+.stat-chart-card__body {
+    padding: 0.75rem;
+}
+
+/* ============================================================
+   Accordion Section
+   ============================================================ */
+.stat-accordion-card {
+    background: #fff;
+    border: 1px solid #d4d4d4;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+.stat-accordion-card__header {
+    background: #f5f5f5;
+    padding: 0.85rem 1.25rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #555;
+    border-bottom: 1px solid #e5e5e5;
+}
+.stat-accordion-card__body {
+    padding: 0;
+}
+
+/* --- Override Bootstrap accordion for smoke theme --- */
+.stat-accordion .accordion-item {
+    border: none;
+    border-bottom: 1px solid #eee;
+    border-radius: 0;
+}
+.stat-accordion .accordion-item:last-child {
+    border-bottom: none;
+}
+.stat-accordion .accordion-button {
+    background: #fafafa;
+    color: #333;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.85rem 1.25rem;
+    box-shadow: none;
+}
+.stat-accordion .accordion-button:not(.collapsed) {
+    background: #1a1a1a;
+    color: #e0e0e0;
+}
+.stat-accordion .accordion-button::after {
+    filter: grayscale(1) brightness(0.5);
+}
+.stat-accordion .accordion-button:not(.collapsed)::after {
+    filter: grayscale(1) brightness(2);
+}
+.stat-accordion .accordion-body {
+    padding: 1rem 1.25rem;
+    background: #fff;
+}
+
+/* Nested accordion items (task cards inside) */
+.stat-accordion .card {
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    box-shadow: none;
+}
+.stat-accordion .card-header {
+    background: #f5f5f5;
+    border-bottom: 1px solid #e5e5e5;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #444;
+    padding: 0.6rem 1rem;
+}
+.stat-accordion .card-body {
+    padding: 0.85rem 1rem;
+}
+.stat-accordion .card-title {
+    font-size: 0.9rem;
+    color: #1a1a1a;
+}
+.stat-accordion .card-text {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* --- Empty state --- */
+.stat-empty {
+    text-align: center;
+    padding: 2rem;
+    color: #999;
+    font-size: 0.9rem;
+}
+
+/* --- Responsive --- */
+@media (max-width: 992px) {
+    .stat-grid {
+        grid-template-columns: 1fr;
+    }
+    .stat-filter-card__body {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .stat-filter-card__body .form-select {
+        width: 100%;
+    }
+    .stat-period-links {
+        flex-wrap: wrap;
+    }
+    .stat-date-form {
+        flex-wrap: wrap;
+    }
+    .stat-date-form .form-control {
+        max-width: 100%;
+    }
+}
+
+/* --- Print styles --- */
+@media print {
+    /* Hide non-content elements */
+    header, nav, footer, .stat-filter-card__body, .stat-export-btn {
+        display: none !important;
+    }
+    /* Ensure white background */
+    body, .stat-wrapper, .stat-filter-card, .stat-summary-card,
+    .stat-chart-card, .stat-accordion-card, .accordion-body {
+        background: #fff !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+    /* Expand all accordions */
+    .accordion-collapse {
+        display: block !important;
+    }
+    .stat-filter-card__header {
+        background: #1a1a1a !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .stat-wrapper {
+        padding: 0;
+    }
+    .stat-accordion .accordion-button:not(.collapsed) {
+        background: #f0f0f0 !important;
+        color: #1a1a1a !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}

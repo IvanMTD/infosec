@@ -1,109 +1,96 @@
-<div class="fluid-container">
-    <div class="row">
-        <div class="col"></div>
-        <div class="col-6">
-            <ul class="list-group py-5">
-                <li class="list-group-item active text-center" aria-current="true">
-                    <h4>Профиль пользователя</h4>
-                </li>
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-3" style="background: whitesmoke">
-                            <span>Почта (Логин)</span>
-                        </div>
-                        <div class="col-9">
-                            <span th:text="${user.getEmail()}"></span>
-                        </div>
-                    </div>
-                </li>
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-3" style="background: whitesmoke">
-                            <span>Фамилия</span>
-                        </div>
-                        <div class="col-9">
-                            <span th:text="${user.getLastname()}"></span>
-                        </div>
-                    </div>
-                </li>
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-3" style="background: whitesmoke">
-                            <span>Имя</span>
-                        </div>
-                        <div class="col-9">
-                            <span th:text="${user.getFirstname()}"></span>
+<div class="profile-wrapper h-100">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- Profile Card -->
+                <div class="profile-card">
+
+                    <!-- Card Header — 12 smoke particles -->
+                    <div class="profile-card__header">
+                        <!-- BACK layer -->
+                        <span class="smoke-b1"></span>
+                        <span class="smoke-b2"></span>
+                        <span class="smoke-b3"></span>
+                        <span class="smoke-b4"></span>
+                        <!-- MID layer -->
+                        <span class="smoke-m1"></span>
+                        <span class="smoke-m2"></span>
+                        <span class="smoke-m3"></span>
+                        <span class="smoke-m4"></span>
+                        <!-- FRONT layer -->
+                        <span class="smoke-f1"></span>
+                        <span class="smoke-f2"></span>
+                        <span class="smoke-f3"></span>
+                        <span class="smoke-f4"></span>
+
+                        <div class="profile-card__avatar" th:text="${#strings.substring(user.getFirstname(),0,1) + #strings.substring(user.getLastname(),0,1)}">ФИ</div>
+                        <div>
+                            <div class="profile-card__title">Профиль пользователя</div>
+                            <div class="profile-card__subtitle" th:text="${user.getEmail()}"></div>
                         </div>
                     </div>
-                </li>
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-3" style="background: whitesmoke">
-                            <span>Отчество</span>
+
+                    <!-- Card Body — single column -->
+                    <div class="profile-card__body">
+                        <div class="info-card">
+                            <div class="info-card__label">Почта (Логин)</div>
+                            <div class="info-card__value" th:text="${user.getEmail()}"></div>
                         </div>
-                        <div class="col-9">
-                            <span th:text="${user.getMiddleName()}"></span>
+                        <div class="info-card">
+                            <div class="info-card__label">Фамилия</div>
+                            <div class="info-card__value" th:text="${user.getLastname()}"></div>
                         </div>
-                    </div>
-                </li>
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-3" style="background: whitesmoke">
-                            <span>Должность</span>
+                        <div class="info-card">
+                            <div class="info-card__label">Имя</div>
+                            <div class="info-card__value" th:text="${user.getFirstname()}"></div>
                         </div>
-                        <div class="col-9">
-                            <span th:text="${user.getOfficePosition()}"></span>
+                        <div class="info-card">
+                            <div class="info-card__label">Отчество</div>
+                            <div class="info-card__value" th:text="${user.getMiddleName()}"></div>
                         </div>
-                    </div>
-                </li>
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-3" style="background: whitesmoke">
-                            <span>Текущая роль</span>
+                        <div class="info-card">
+                            <div class="info-card__label">Должность</div>
+                            <div class="info-card__value" th:text="${user.getOfficePosition()}"></div>
                         </div>
-                        <div class="col-9">
-                            <span th:text="${user.getRole().getTitle()}"></span>
+                        <div class="info-card">
+                            <div class="info-card__label">Текущая роль</div>
+                            <div class="info-card__value" th:text="${user.getRole().getTitle()}"></div>
                         </div>
-                    </div>
-                </li>
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-3" style="background: whitesmoke">
-                            <span>Служба</span>
-                        </div>
-                        <div class="col-9">
-                            <span th:text="${user.getDepartmentRole().getTitle()}"></span>
+                        <div class="info-card">
+                            <div class="info-card__label">Служба</div>
+                            <div class="info-card__value" th:text="${user.getDepartmentRole().getTitle()}"></div>
                         </div>
                     </div>
-                </li>
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-3" style="background: whitesmoke">
-                            <span>Сменить пароль</span>
-                        </div>
-                        <div class="col-9">
-                            <form class="row g-3" th:method="POST" th:action="@{/password/change}" th:object="${pass}">
-                                <div class="col-3">
-                                    <input type="password" class="form-control" placeholder="Старый пароль" th:field="*{oldPassword}">
-                                    <span th:if="${#fields.hasErrors('oldPassword')}" th:errors="*{oldPassword}" style="color: red"></span>
-                                </div>
-                                <div class="col-3">
-                                    <input type="password" class="form-control" placeholder="Новый пароль" th:field="*{newPassword}">
-                                    <span th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}" style="color: red"></span>
-                                </div>
-                                <div class="col-3">
-                                    <input type="password" class="form-control" placeholder="Еще раз новый" th:field="*{newConfirm}">
-                                    <span th:if="${#fields.hasErrors('newConfirm')}" th:errors="*{newConfirm}" style="color: red"></span>
-                                </div>
-                                <div class="col-3">
-                                    <input type="submit" class="btn btn-primary mb-3" value="Сменить">
-                                </div>
-                            </form>
-                        </div>
+
+                    <!-- Card Footer — Password Change -->
+                    <div class="profile-card__footer">
+                        <div class="profile-card__footer-title">Сменить пароль</div>
+                        <form class="profile-form row g-2 align-items-end" th:method="POST" th:action="@{/password/change}" th:object="${pass}">
+                            <div class="col-md-3">
+                                <input type="password" class="form-control" placeholder="Старый пароль" th:field="*{oldPassword}">
+                                <span th:if="${#fields.hasErrors('oldPassword')}" th:errors="*{oldPassword}" class="field-error"></span>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="password" class="form-control" placeholder="Новый пароль" th:field="*{newPassword}">
+                                <span th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}" class="field-error"></span>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="password" class="form-control" placeholder="Ещё раз новый" th:field="*{newConfirm}">
+                                <span th:if="${#fields.hasErrors('newConfirm')}" th:errors="*{newConfirm}" class="field-error"></span>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-smoke w-100">
+                                    <i class="bi bi-lock-fill"></i> Сменить
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                </li>
-            </ul>
+
+                </div>
+                <!-- /Profile Card -->
+
+            </div>
         </div>
-        <div class="col"></div>
     </div>
 </div>

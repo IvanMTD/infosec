@@ -1,167 +1,146 @@
-<div class="container-fluid py-4">
-    <div class="row py-5">
-        <div class="col-4">
-            <select id="my-select" class="form-select" aria-label="Default select example" onchange="setupLinks(this.value)">
-                <option th:each="dr : ${departmentRoles}" th:value="${dr.getType()}" th:text="${dr.getTitle()}"></option>
-                <option th:each="user : ${users}" th:value="${user.getId()}" th:text="${user.getFullName()}" th:if="${user.getRole().getTitle()} != 'Администратор' AND ${user.getRole().getTitle()} != 'Контролирующий'"></option>
-            </select>
-            <script th:inline="javascript">
-                for(let i=0; i<[[${users}]].length; i++){
-                    if([[${users}]][i].id == [[${userId}]]){
-                        document.getElementById('my-select').value = [[${users}]][i].id;
-                    }
-                }
-            </script>
+<div class="stat-wrapper h-100">
+    <div class="container-fluid px-4">
+
+        <!-- ============================================================
+             Filter Bar Card
+             ============================================================ -->
+        <div class="stat-filter-card">
+
+            <div class="stat-filter-card__header">
+                <!-- Smoke particles -->
+                <span class="stf-b1"></span>
+                <span class="stf-b2"></span>
+                <span class="stf-b3"></span>
+                <span class="stf-b4"></span>
+                <span class="stf-m1"></span>
+                <span class="stf-m2"></span>
+                <span class="stf-m3"></span>
+                <span class="stf-m4"></span>
+                <span class="stf-f1"></span>
+                <span class="stf-f2"></span>
+                <span class="stf-f3"></span>
+                <span class="stf-f4"></span>
+
+                <div class="stat-filter-card__icon">
+                    <i class="bi bi-graph-up"></i>
+                </div>
+                <div>
+                    <div class="stat-filter-card__title">Отчёты и статистика</div>
+                </div>
+
+                <button class="stat-export-btn" onclick="exportPDF()" title="Выгрузить отчёт в PDF">
+                    <i class="bi bi-file-earmark-pdf"></i> Выгрузка отчёта
+                </button>
+            </div>
+
+            <div class="stat-filter-card__body">
+                <!-- User / Department selector -->
+                <select id="my-select" class="form-select" onchange="setupLinks(this.value)">
+                    <option th:each="dr : ${departmentRoles}" th:value="${dr.getType()}" th:text="${dr.getTitle()}"></option>
+                    <option th:each="user : ${users}" th:value="${user.getId()}" th:text="${user.getFullName()}" th:if="${user.getRole().getTitle()} != 'Администратор' AND ${user.getRole().getTitle()} != 'Контролирующий'"></option>
+                </select>
+
+                <!-- Period selector -->
+                <div class="stat-period-links">
+                    <a id="week" class="stat-period-link" th:href="@{/task/stat/week/{userId}(userId=${userId})}">
+                        <i class="bi bi-calendar3-week"></i> Неделя
+                    </a>
+                    <a id="month" class="stat-period-link" th:href="@{/task/stat/month/{userId}(userId=${userId})}">
+                        <i class="bi bi-calendar3"></i> Месяц
+                    </a>
+                    <a id="year" class="stat-period-link" th:href="@{/task/stat/year/{userId}(userId=${userId})}">
+                        <i class="bi bi-calendar2-check"></i> Год
+                    </a>
+
+                    <!-- Date range form -->
+                    <form id="date" th:method="POST" th:action="@{/task/stat/date/{userId}(userId=${userId})}" th:object="${dates}" class="stat-date-form">
+                        <input type="date" class="form-control" th:field="*{begin}">
+                        <span class="field-error" th:if="${#fields.hasErrors('begin')}" th:errors="*{begin}"></span>
+                        <span style="color:#aaa;">—</span>
+                        <input type="date" class="form-control" th:field="*{end}">
+                        <span class="field-error" th:if="${#fields.hasErrors('end')}" th:errors="*{end}"></span>
+                        <button type="submit" class="btn btn-smoke">Показать</button>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="col-8"></div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <a id="week" class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);"  th:href="@{/task/stat/week/{userId}(userId=${userId})}">
-                <i class="bi bi-calendar3-week" style="font-size: 20px"></i>
-                Неделя
-            </a>
-            <a id="month" class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);" th:href="@{/task/stat/month/{userId}(userId=${userId})}">
-                <i class="bi bi-calendar3" style="font-size: 20px"></i>
-                Месяц
-            </a>
-            <a id="year" class="icon-link icon-link-hover px-1" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);" th:href="@{/task/stat/year/{userId}(userId=${userId})}">
-                <i class="bi bi-calendar2-check" style="font-size: 20px"></i>
-                Год
-            </a>
-            <a href="#">
-                <form id="date" class="row g-3" th:method="POST" th:action="@{/task/stat/date/{userId}(userId=${userId})}" style="display: inline-flex; margin-left: 1vh; border: solid 1px lightgray; border-radius: 20px" th:object="${dates}">
-                    <div class="col-auto">
-                        <i class="bi bi-calendar" style="font-size: 20px"></i>
-                    </div>
-                    <div class="col-auto">
-                        <input type="date" class="form-control" th:field="*{begin}"> <span th:if="${#fields.hasErrors('begin')}" th:errors="*{begin}" style="color: red"></span>
-                    </div>
-                    <div class="col-auto">
-                        <input type="date" class="form-control" th:field="*{end}"><span th:if="${#fields.hasErrors('end')}" th:errors="*{end}" style="color: red"></span>
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-primary mb-3">Показать</button>
-                    </div>
-                </form>
-            </a>
-        </div>
-    </div>
-    <script>
-        function setupLinks(id){
-            document.getElementById('week').setAttribute('href','/task/stat/week/' + id)
-            document.getElementById('month').setAttribute('href','/task/stat/month/' + id)
-            document.getElementById('year').setAttribute('href','/task/stat/year/' + id)
-            document.getElementById('date').setAttribute('action','/task/stat/date/' + id)
-        }
-    </script>
-    <div class="row">
-        <div class="col-6">
-            <ul class="list-group py-5">
-                <li class="list-group-item active" aria-current="true" th:text="'Общие показатели'"></li>
-                <li class="list-group-item" th:text="'Общее количество заявок: ' + ${taskList.size()}"></li>
-                <li class="list-group-item active" aria-current="true">Детализация</li>
-                <div th:each="st : ${statistics}">
-                    <div th:each="tr : ${st.getTroubles()}">
-                        <div th:if="${tr.getTasks().size() != 0}">
-                            <li class="list-group-item" th:text="${st.getTitle()} + ' - ' + ${tr.getTitle()} + ': ' + ${tr.getTasks().size()}"></li>
+
+        <!-- ============================================================
+             Stats Grid: Summary + Chart
+             ============================================================ -->
+        <div class="stat-grid">
+            <!-- Summary Card -->
+            <div class="stat-summary-card">
+                <div class="stat-summary-card__header">Общие показатели</div>
+                <div class="stat-summary-card__body">
+                    <div class="stat-total__label">Всего заявок</div>
+                    <div class="stat-total" th:text="${taskList.size()}">0</div>
+
+                    <div class="stat-breakdown" th:if="${statistics.size() > 0}">
+                        <div th:each="st : ${statistics}">
+                            <div th:each="tr : ${st.getTroubles()}">
+                                <div th:if="${tr.getTasks().size() != 0}" class="stat-breakdown-item">
+                                    <span class="stat-breakdown-item__label" th:text="${st.getTitle()} + ' — ' + ${tr.getTitle()}"></span>
+                                    <span class="stat-breakdown-item__count" th:text="${tr.getTasks().size()}"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                    <div th:if="${statistics.size() == 0}" class="stat-empty">
+                        Нет данных для отображения
+                    </div>
                 </div>
-            </ul>
-        </div>
-        <div class="col-6">
-            <script th:inline="javascript">
-                document.addEventListener('DOMContentLoaded', function() {
-                    let charts = [[${charts}]];
+            </div>
 
-                    if (!charts || charts.length === 0) return;
-
-                    var options = {
-                        series: charts.map(function(c) { return c.taskCount; }),
-                        labels: charts.map(function(c) { return c.title; }),
-                        chart: {
-                            type: 'donut',
-                            height: 500,
-                            redrawOnWindowResize: true,
-                            animations: { enabled: true, easing: 'easeinout', speed: 500 }
-                        },
-                        colors: generateColors(charts.length),
-                        title: {
-                            text: 'Выполнено за ' + charts[0].status,
-                            align: 'center',
-                            style: { fontSize: '16px', fontWeight: 'bold' }
-                        },
-                        plotOptions: {
-                            pie: {
-                                donut: { size: '40%' }
-                            }
-                        },
-                        legend: { position: 'right' },
-                        tooltip: {
-                            y: {
-                                formatter: function(val, opts) {
-                                    var idx = opts.seriesIndex;
-                                    var desc = (charts[idx] && charts[idx].description)
-                                        ? charts[idx].description
-                                        : '';
-                                    return desc + '\nВсего: ' + val;
-                                }
-                            }
-                        },
-                        responsive: [{
-                            breakpoint: 768,
-                            options: { legend: { position: 'bottom' } }
-                        }]
-                    };
-
-                    var chart = new ApexCharts(document.querySelector('#donutchart'), options);
-                    chart.render();
-                });
-            </script>
-            <div id="donutchart" style="width: 100%; height: 500px"></div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <div class="accordion" id="accordion">
-                <div class="row text-center py-5" th:if="${statistics.size() == 0}">
-                    <hr>
-                    <span>Отсутствуют группы обратитесь к Администратору</span>
+            <!-- Chart Card -->
+            <div class="stat-chart-card">
+                <div class="stat-chart-card__header">Диаграмма</div>
+                <div class="stat-chart-card__body">
+                    <div id="donutchart" style="width:100%; height:400px;"></div>
                 </div>
-                <div th:if="${statistics.size() != 0}">
+            </div>
+        </div>
+
+        <!-- ============================================================
+             Accordion — Detailed Breakdown
+             ============================================================ -->
+        <div class="stat-accordion-card" th:if="${statistics.size() > 0}">
+            <div class="stat-accordion-card__header">Детализация по категориям</div>
+            <div class="stat-accordion-card__body">
+                <div class="accordion stat-accordion" id="mainAccordion">
                     <div class="accordion-item" th:each="stat, s : ${statistics}" th:if="${stat.isShow}">
                         <h2 class="accordion-header">
-                            <button class="accordion-button" th:id="'id-' + ${s.index}" type="button" data-bs-toggle="collapse" th:data-bs-target="'#collapse' + ${s.index}" aria-expanded="true" aria-controls="collapse">
+                            <button class="accordion-button" th:id="'id-' + ${s.index}" type="button" data-bs-toggle="collapse" th:data-bs-target="'#collapse' + ${s.index}" aria-expanded="true" th:attr="aria-controls='collapse' + ${s.index}">
                                 <span th:text="${stat.getTitle()}"></span>
                             </button>
                         </h2>
                         <div th:id="'collapse-' + ${s.index}" class="accordion-collapse collapse show">
                             <div class="accordion-body">
-                                <div class="accordion" th:id="'accordion' + ${s.index}">
-                                    <div class="row text-center py-5" th:if="${stat.getTroubles.size() == 0}">
-                                        <span>Отсутствуют задачи в группе обратитесь к Администратору</span>
+                                <div class="accordion stat-accordion" th:id="'accordion' + ${s.index}">
+                                    <div class="stat-empty" th:if="${stat.getTroubles.size() == 0}">
+                                        Отсутствуют задачи в группе
                                     </div>
                                     <div th:if="${stat.getTroubles.size() != 0}">
                                         <div class="accordion-item" th:each="trouble, s2 : ${stat.getTroubles()}" th:if="${trouble.isShow()}">
                                             <h2 class="accordion-header">
-                                                <button class="accordion-button" th:id="'id' + ${s.index} + ${s2.index}" type="button" data-bs-toggle="collapse" th:data-bs-target="'#collapse-' + ${s.index} + ${s2.index}" aria-expanded="true" aria-controls="collapse">
-                                                    <span th:text="${trouble.getTitle()} + ' - Заявок:  ' + ${trouble.getTasks().size()}"></span>
+                                                <button class="accordion-button" th:id="'id' + ${s.index} + ${s2.index}" type="button" data-bs-toggle="collapse" th:data-bs-target="'#collapse-' + ${s.index} + ${s2.index}" aria-expanded="true" th:attr="aria-controls='collapse-' + ${s.index} + ${s2.index}">
+                                                    <span th:text="${trouble.getTitle()} + ' — заявок: ' + ${trouble.getTasks().size()}"></span>
                                                 </button>
                                             </h2>
                                             <div th:id="'collapse-' + ${s.index} + ${s2.index}" class="accordion-collapse collapse show">
                                                 <div class="accordion-body">
-                                                    <div th:if="${trouble.getTasks().size() == 0}">
-                                                        <p class="text-center">Нет выполненных заявок</p>
+                                                    <div th:if="${trouble.getTasks().size() == 0}" class="stat-empty">
+                                                        Нет выполненных заявок
                                                     </div>
                                                     <div th:if="${trouble.getTasks().size() != 0}">
                                                         <div class="card" th:each="task : ${trouble.getTasks()}">
-                                                            <h5 class="card-header" th:text="'Исполнитель: ' + ${task.getUsername()}"></h5>
+                                                            <div class="card-header" th:text="'Исполнитель: ' + ${task.getUsername()}"></div>
                                                             <div class="card-body">
-                                                                <h5 class="card-title" th:text="'Пользователь или Описание: ' + ${task.getTitle()}"></h5>
+                                                                <h5 class="card-title" th:text="'Пользователь или описание: ' + ${task.getTitle()}"></h5>
                                                                 <p class="card-text" th:text="${task.getContent()}"></p>
                                                                 <p class="card-text" th:text="${task.getDate()}"></p>
-                                                                <a th:href="@{/task/{tid}/edit(tid=${task.getId()})}" class="btn btn-primary" th:if="${manager} or ${admin}">Редактировать</a>
+                                                                <a th:href="@{/task/{tid}/edit(tid=${task.getId()})}" class="btn btn-smoke" th:if="${manager} or ${admin}">Редактировать</a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -170,16 +149,13 @@
                                             <script th:inline="javascript">
                                                 if([[${s2.index}]] == 0){
                                                     document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('class','accordion-button');
-                                                    document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('arial-expend','true');
-                                                    document.getElementById('collapse' + [[${s.index}]] + [[${s2.index}]]).setAttribute('class','accordion-collapse collapse show');
+                                                    document.getElementById('collapse-' + [[${s.index}]] + [[${s2.index}]]).setAttribute('class','accordion-collapse collapse show');
                                                 }else{
                                                     document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('class','accordion-button collapsed');
-                                                    document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('arial-expend','false');
-                                                    document.getElementById('collapse' + [[${s.index}]] + [[${s2.index}]]).setAttribute('class','accordion-collapse collapse');
+                                                    document.getElementById('collapse-' + [[${s.index}]] + [[${s2.index}]]).setAttribute('class','accordion-collapse collapse');
                                                 }
-                                                document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('data-bs-target','#collapse' + [[${s.index}]] + [[${s2.index}]]);
-                                                document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('aria-controls','collapse' + [[${s.index}]] + [[${s2.index}]]);
-                                                document.getElementById('collapse' + [[${s.index}]] + [[${s2.index}]]).setAttribute('data-bs-parent','#accordion' + [[${s.index}]]);
+                                                document.getElementById('id' + [[${s.index}]] + [[${s2.index}]]).setAttribute('data-bs-target','#collapse-' + [[${s.index}]] + [[${s2.index}]]);
+                                                document.getElementById('collapse-' + [[${s.index}]] + [[${s2.index}]]).setAttribute('data-bs-parent','#accordion' + [[${s.index}]]);
                                             </script>
                                         </div>
                                     </div>
@@ -189,19 +165,104 @@
                         <script th:inline="javascript">
                             if([[${s.index}]] == 0){
                                 document.getElementById('id-' + [[${s.index}]]).setAttribute('class','accordion-button');
-                                document.getElementById('id-' + [[${s.index}]]).setAttribute('arial-expend','true');
                                 document.getElementById('collapse-' + [[${s.index}]]).setAttribute('class','accordion-collapse collapse show');
                             }else{
                                 document.getElementById('id-' + [[${s.index}]]).setAttribute('class','accordion-button collapsed');
-                                document.getElementById('id-' + [[${s.index}]]).setAttribute('arial-expend','false');
                                 document.getElementById('collapse-' + [[${s.index}]]).setAttribute('class','accordion-collapse collapse');
                             }
                             document.getElementById('id-' + [[${s.index}]]).setAttribute('data-bs-target','#collapse-' + [[${s.index}]]);
-                            document.getElementById('id-' + [[${s.index}]]).setAttribute('aria-controls','collapse' + [[${s.index}]]);
                         </script>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Empty state -->
+        <div class="stat-empty" th:if="${statistics.size() == 0}">
+            <hr>
+            Отсутствуют группы — обратитесь к Администратору
+        </div>
+
     </div>
 </div>
+
+<script th:inline="javascript">
+    /* Init user selector to current value */
+    for(let i = 0; i < [[${users}]].length; i++){
+        if([[${users}]][i].id == [[${userId}]]){
+            document.getElementById('my-select').value = [[${users}]][i].id;
+        }
+    }
+
+    function setupLinks(id){
+        document.getElementById('week').setAttribute('href','/task/stat/week/' + id);
+        document.getElementById('month').setAttribute('href','/task/stat/month/' + id);
+        document.getElementById('year').setAttribute('href','/task/stat/year/' + id);
+        document.getElementById('date').setAttribute('action','/task/stat/date/' + id);
+    }
+
+    /* ApexCharts init */
+    document.addEventListener('DOMContentLoaded', function() {
+        let charts = [[${charts}]];
+        if (!charts || charts.length === 0) return;
+
+        var options = {
+            series: charts.map(function(c) { return c.taskCount; }),
+            labels: charts.map(function(c) { return c.title; }),
+            chart: {
+                type: 'donut',
+                height: 380,
+                redrawOnWindowResize: true,
+                animations: { enabled: true, easing: 'easeinout', speed: 500 }
+            },
+            colors: generateColors(charts.length),
+            title: {
+                text: 'Выполнено за ' + charts[0].status,
+                align: 'center',
+                style: { fontSize: '14px', fontWeight: '600', color: '#444' }
+            },
+            plotOptions: {
+                pie: {
+                    donut: { size: '45%' }
+                }
+            },
+            legend: { position: 'right', fontSize: '12px' },
+            tooltip: {
+                y: {
+                    formatter: function(val, opts) {
+                        var idx = opts.seriesIndex;
+                        var desc = (charts[idx] && charts[idx].description) ? charts[idx].description : '';
+                        return desc + '\nВсего: ' + val;
+                    }
+                }
+            },
+            responsive: [{
+                breakpoint: 768,
+                options: { legend: { position: 'bottom' } }
+            }]
+        };
+
+        var chart = new ApexCharts(document.querySelector('#donutchart'), options);
+        chart.render();
+    });
+
+    /* PDF Export — browser print (no canvas limit) */
+    function exportPDF() {
+        document.querySelectorAll('.accordion-collapse').forEach(c => c.classList.add('show'));
+        document.querySelectorAll('.accordion-button.collapsed').forEach(b => b.classList.remove('collapsed'));
+
+        var filterBody = document.querySelector('.stat-filter-card__body');
+        var exportBtn = document.querySelector('.stat-export-btn');
+        if(filterBody) filterBody.style.display = 'none';
+        if(exportBtn) exportBtn.style.display = 'none';
+
+        setTimeout(function(){
+            window.print();
+
+            setTimeout(function(){
+                if(filterBody) filterBody.style.display = '';
+                if(exportBtn) exportBtn.style.display = '';
+            }, 500);
+        }, 400);
+    }
+</script>

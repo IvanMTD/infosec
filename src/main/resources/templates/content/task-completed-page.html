@@ -1,59 +1,105 @@
-<div class="container">
-    <div class="row py-5">
-        <div class="col"></div>
-        <div class="col-6">
-            <form th:method="POST" th:action="@{/task/new/add}" th:object="${task}">
-                <ul class="list-group">
-                    <li class="list-group-item active" aria-current="true">
-                        <h5 th:text="'Исполнитель - ' + ${userName}"></h5>
-                    </li>
-                    <li class="list-group-item">
-                        <select class="form-select" aria-label="Default select example" id="select" onchange="setupTrouble()">
-                            <option th:each="ticket, stat : ${troubleTickets}" th:text="${ticket.getCategoryName()}" th:value="${ticket.getCategoryId()}"></option>
-                        </select>
-                    </li>
-                    <li class="list-group-item">
-                        <select class="form-select" aria-label="Default select example" id="trouble_select" th:field="*{troubleId}">
-                            <option th:each="trouble : ${troubleTickets[0].getTroubles()}" th:text="${trouble.getName()}" th:value="${trouble.getId()}"></option>
-                        </select>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="InputGroup-sizing-default">ФИО или Общее название</span>
-                            <input type="text" class="form-control" id="title" th:field="*{title}">
+<div class="task-wrapper h-100">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+
+                <!-- Task Card -->
+                <div class="task-card">
+
+                    <!-- Card Header — smoke -->
+                    <div class="task-card__header">
+                        <span class="tsk-b1"></span>
+                        <span class="tsk-b2"></span>
+                        <span class="tsk-b3"></span>
+                        <span class="tsk-b4"></span>
+                        <span class="tsk-m1"></span>
+                        <span class="tsk-m2"></span>
+                        <span class="tsk-m3"></span>
+                        <span class="tsk-m4"></span>
+                        <span class="tsk-f1"></span>
+                        <span class="tsk-f2"></span>
+                        <span class="tsk-f3"></span>
+                        <span class="tsk-f4"></span>
+
+                        <div class="task-card__icon">
+                            <i class="bi bi-check2-circle"></i>
                         </div>
-                        <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}" style="color: red"></span>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="mb-3">
-                            <label for="exampleFormControlTextarea1" class="form-label">Описание проблемы</label>
-                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="5" th:field="*{description}"></textarea>
+                        <div>
+                            <div class="task-card__title">Закрытие заявки</div>
+                            <div class="task-card__subtitle" th:text="'Исполнитель — ' + ${userName}"></div>
                         </div>
-                        <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red"></span>
-                    </li>
-                    <li class="list-group-item">
-                        <input type="date" class="form-control right" style="float: right; width: 25%" th:field="*{executeDate}">
-                        <input class="btn btn-primary" type="submit" value="Записать">
-                    </li>
-                    <script th:inline="javascript">
-                        function setupTrouble(){
-                            let categoryId = document.getElementById("select").value;
-                            let tickets = [[${troubleTickets}]];
-                            for(let i=0; i<tickets.length; i++){
-                                if(tickets[i].categoryId == categoryId){
-                                    $('#trouble_select').html('');
-                                    tickets[i].troubles.forEach((trouble) => {
-                                        $('#trouble_select').append('' +
-                                            '<option value="' + trouble.id + '">' + trouble.name + '</option>' +
-                                            '')
-                                    })
-                                }
-                            }
-                        }
-                    </script>
-                </ul>
-            </form>
+                    </div>
+
+                    <form class="task-form" th:method="POST" th:action="@{/task/new/add}" th:object="${task}">
+
+                        <!-- Card Body -->
+                        <div class="task-card__body">
+
+                            <!-- Выбор категории (select — свой label) -->
+                            <div class="task-select-group">
+                                <span class="task-select-label">Категория</span>
+                                <select class="form-select" id="select" onchange="setupTrouble()">
+                                    <option th:each="ticket : ${troubleTickets}" th:text="${ticket.getCategoryName()}" th:value="${ticket.getCategoryId()}"></option>
+                                </select>
+                            </div>
+
+                            <!-- Выбор проблемы (select — каскадный) -->
+                            <div class="task-select-group">
+                                <span class="task-select-label">Проблема</span>
+                                <select class="form-select" id="trouble_select" th:field="*{troubleId}">
+                                    <option th:each="trouble : ${troubleTickets[0].getTroubles()}" th:text="${trouble.getName()}" th:value="${trouble.getId()}"></option>
+                                </select>
+                            </div>
+
+                            <!-- Название (floating) -->
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="title" th:field="*{title}" placeholder="ФИО или общее название">
+                                <label for="title">ФИО или общее название</label>
+                                <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="field-error"></span>
+                            </div>
+
+                            <!-- Описание (floating textarea) -->
+                            <div class="form-floating">
+                                <textarea class="form-control" id="description" th:field="*{description}" placeholder="Опишите проблему" style="min-height: 130px;"></textarea>
+                                <label for="description">Описание проблемы</label>
+                                <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="field-error"></span>
+                            </div>
+
+                        </div>
+
+                        <!-- Card Footer — дата + кнопка -->
+                        <div class="task-card__footer">
+                            <div class="task-footer-date">
+                                <i class="bi bi-calendar3 task-footer-date__icon"></i>
+                                <input type="date" class="form-control" th:field="*{executeDate}">
+                            </div>
+                            <button type="submit" class="btn btn-smoke">
+                                <i class="bi bi-check-lg"></i> Записать
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+                <!-- /Task Card -->
+
+            </div>
         </div>
-        <div class="col"></div>
     </div>
 </div>
+
+<script th:inline="javascript">
+    function setupTrouble(){
+        let categoryId = document.getElementById("select").value;
+        let tickets = [[${troubleTickets}]];
+        for(let i = 0; i < tickets.length; i++){
+            if(tickets[i].categoryId == categoryId){
+                $('#trouble_select').html('');
+                tickets[i].troubles.forEach((trouble) => {
+                    $('#trouble_select').append(
+                        '<option value="' + trouble.id + '">' + trouble.name + '</option>'
+                    )
+                })
+            }
+        }
+    }
+</script>
