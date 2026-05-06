@@ -1303,15 +1303,18 @@
         });
     }
 
+    var empSortable = null;
+
     function initEmployeeSortable(){
         if(!admin) return;
+        if(empSortable) empSortable.destroy();
         var grid = document.getElementById('guide-card-col');
         if(!grid) return;
-        Sortable.create(grid, {
+        empSortable = Sortable.create(grid, {
             handle: '.grip-handle',
             animation: 150,
             onEnd: function(){
-                var items = document.querySelectorAll('#guide-card-col .card[data-id]');
+                var items = document.querySelectorAll('#guide-card-col .stat-employee-card[data-id]');
                 var order = [];
                 items.forEach(function(item, index){
                     order.push({ id: parseInt(item.getAttribute('data-id')), number: index });
