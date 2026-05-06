@@ -30,7 +30,20 @@
                         </div>
                     </div>
 
-                    <form class="task-form" th:method="POST" th:action="@{/task/new/add}" th:object="${task}">
+                    <!-- Нет категорий — пользователь без службы -->
+                    <div th:if="${#lists.isEmpty(troubleTickets)}">
+                        <div class="task-card__body">
+                            <div class="stat-empty text-center py-5">
+                                <i class="bi bi-exclamation-circle fs-1" style="color:#bbb;"></i>
+                                <p class="mt-3" style="color:#888;">
+                                    Вы не можете закрывать заявки в связи с отсутствием принадлежности к службе.<br>
+                                    <small>Обратитесь к администратору для назначения службы.</small>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form th:unless="${#lists.isEmpty(troubleTickets)}" class="task-form" th:method="POST" th:action="@{/task/new/add}" th:object="${task}">
 
                         <!-- Card Body -->
                         <div class="task-card__body">

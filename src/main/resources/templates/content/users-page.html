@@ -1,127 +1,135 @@
-<div class="container">
-    <div class="row">
-        <div class="col">
-            <ul class="list-group py-5">
-                <li class="list-group-item active text-center" aria-current="true"><h3>Пользователи системы</h3></li>
-                <li class="list-group-item" th:each="user : ${users}">
-                    <div class="row row-cols-4">
-                        <div class="col">
-                            <p th:text="${user.getFullName()}"></p>
+<div class="profile-wrapper h-100">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- Users List Card -->
+                <div class="profile-card">
+                    <div class="profile-card__header">
+                        <span class="smoke-b1"></span><span class="smoke-b2"></span><span class="smoke-b3"></span><span class="smoke-b4"></span>
+                        <span class="smoke-m1"></span><span class="smoke-m2"></span><span class="smoke-m3"></span><span class="smoke-m4"></span>
+                        <span class="smoke-f1"></span><span class="smoke-f2"></span><span class="smoke-f3"></span><span class="smoke-f4"></span>
+                        <div class="profile-card__avatar"><i class="bi bi-people-fill"></i></div>
+                        <div class="flex-grow-1">
+                            <div class="profile-card__title">Пользователи системы</div>
+                            <div class="profile-card__subtitle" th:text="${#lists.size(users)} + ' пользователей'"></div>
                         </div>
-                        <div class="col">
-                            <p th:text="${user.getRole().getTitle()}"></p>
-                        </div>
-                        <div class="col">
-                            <p th:text="${user.getDepartmentRole().getTitle()}"></p>
-                        </div>
-                        <div class="col">
-                            <div class="btn-group" role="group">
-                                <a class="btn btn-outline-primary disabled">Просмотр</a>
-                                <a class="btn btn-outline-primary" th:href="@{/admin/user/edit(id=${user.id})}">Редактор</a>
-                                <a class="btn btn-outline-primary disabled">Удалить</a>
-                            </div>
-                        </div>
+                        <button type="button" class="btn btn-smoke btn-sm" data-bs-toggle="modal" data-bs-target="#add-user-modal">
+                            <i class="bi bi-person-plus-fill"></i> Добавить
+                        </button>
                     </div>
-                </li>
-            </ul>
+                    <div class="profile-card__body p-0">
+                        <table class="table table-borderless mb-0" style="font-size:0.85rem;">
+                            <thead class="border-bottom">
+                                <tr style="color:#888;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;">
+                                    <th class="ps-3">ФИО</th>
+                                    <th>Роль</th>
+                                    <th>Служба</th>
+                                    <th class="text-end pe-3"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="user : ${users}" style="border-bottom:1px solid #f0f0f0;">
+                                    <td class="ps-3">
+                                        <div th:text="${user.getFullName()}"></div>
+                                        <small class="text-secondary" th:text="${user.getEmail()}" style="font-size:0.72rem;"></small>
+                                    </td>
+                                    <td th:text="${user.getRole().getTitle()}" style="vertical-align:middle;"></td>
+                                    <td th:text="${user.getDepartmentRole().getTitle()}" style="vertical-align:middle;"></td>
+                                    <td class="text-end pe-3" style="vertical-align:middle;">
+                                        <a class="btn btn-sm btn-outline-secondary" th:href="@{/admin/user/edit(id=${user.id})}">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col"></div>
-        <div class="col-6">
-            <form th:method="POST" th:action="@{/admin/user/add}" th:object="${implementer}">
-                <ul class="list-group">
-                    <li class="list-group-item active text-center" aria-current="true">
-                        <h3>Регистрация нового пользователя</h3>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="e-mail">Электронная почта</span>
-                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="e-mail" th:field="*{email}">
-                        </div>
-                        <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color: red"></span>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="pass">Пароль</span>
-                            <input type="password" class="form-control" aria-label="Sizing example input" aria-describedby="pass" th:field="*{password}">
-                        </div>
-                        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color: red"></span>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="pass2">Подтвердить пароль</span>
-                            <input type="password" class="form-control" aria-label="Sizing example input" aria-describedby="pass2" th:field="*{confirmPassword}">
-                        </div>
-                        <span th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" style="color: red"></span>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="name">Имя</span>
-                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="name" th:field="*{firstname}">
-                        </div>
-                        <span th:if="${#fields.hasErrors('firstname')}" th:errors="*{firstname}" style="color: red"></span>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="middl">Отчество</span>
-                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="middl" th:field="*{middleName}">
-                        </div>
-                        <span th:if="${#fields.hasErrors('middleName')}" th:errors="*{middleName}" style="color: red"></span>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="last">Фамилия</span>
-                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="last" th:field="*{lastname}">
-                        </div>
-                        <span th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}" style="color: red"></span>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="office">Должность</span>
-                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="office" th:field="*{officePosition}">
-                        </div>
-                        <span th:if="${#fields.hasErrors('officePosition')}" th:errors="*{officePosition}" style="color: red"></span>
-                    </li>
-                    <li class="list-group-item">
-                        <select class="form-select" th:field="*{role}">
-                            <option th:each="r : ${roles}" th:text="${r.getTitle()}" th:value="${r}"></option>
-                        </select>
-                    </li>
-                    <li class="list-group-item">
-                        <select class="form-select" th:field="*{departmentRole}">
-                            <option th:each="dr : ${departmentRoles}" th:text="${dr.getTitle()}" th:value="${dr}"></option>
-                        </select>
-                    </li>
-                    <li class="list-group-item">
-                        <input class="btn btn-primary" type="submit" value="Зарегистрировать">
-                    </li>
-                </ul>
-            </form>
-        </div>
-        <div class="col"></div>
     </div>
 </div>
 
-
-<!--
-<div>
-    <ul>
-        <li><a th:href="@{/admin/user/reg}">зарегистрировать пользователя</a></li>
-    </ul>
-    <form th:method="GET" id="form">
-        <select id="select" name="select">
-            <option th:each="user : ${users}" th:text="${user.getFullName()}" th:value="${user.getId()}"></option>
-        </select>
-        <input type="submit" value="edit" onclick="editUser()">
-        <input type="submit" value="delete" onclick="deleteUser()" disabled>
-    </form>
-    <script>
-        function editUser(){
-            document.getElementById('form').setAttribute('action','/admin/user/edit')
-        }
-        function deleteUser(){
-            document.getElementById('form').setAttribute('action','/admin/user/delete')
-        }
-    </script>
-</div>-->
+<!-- Modal: Регистрация нового пользователя -->
+<div class="modal fade" id="add-user-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header profile-card__header rounded-top">
+                <span class="smoke-f1"></span><span class="smoke-f2"></span><span class="smoke-f3"></span><span class="smoke-f4"></span>
+                <div class="d-flex align-items-center gap-2" style="position:relative;z-index:1;">
+                    <i class="bi bi-person-plus-fill text-white fs-5"></i>
+                    <h5 class="modal-title text-white border-0">Регистрация нового пользователя</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="position:relative;z-index:1;"></button>
+            </div>
+            <form th:method="POST" th:action="@{/admin/user/add}" th:object="${implementer}">
+                <script th:inline="javascript">
+                    /* открыть модалку если были ошибки валидации */
+                    if([[${#fields.hasAnyErrors()}]]){
+                        var m = new bootstrap.Modal(document.getElementById('add-user-modal'));
+                        m.show();
+                    }
+                </script>
+                <div class="modal-body">
+                    <div class="row g-2">
+                        <div class="col-12 form-floating">
+                            <input type="email" class="form-control" th:field="*{email}" placeholder="user@example.com">
+                            <label for="email" class="ms-2">Электронная почта</label>
+                            <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="field-error"></span>
+                        </div>
+                        <div class="col-12 form-floating">
+                            <input type="password" class="form-control" th:field="*{password}" placeholder="••••••">
+                            <label for="password" class="ms-2">Пароль</label>
+                            <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="field-error"></span>
+                        </div>
+                        <div class="col-12 form-floating">
+                            <input type="password" class="form-control" th:field="*{confirmPassword}" placeholder="••••••">
+                            <label for="confirmPassword" class="ms-2">Подтверждение пароля</label>
+                            <span th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="field-error"></span>
+                        </div>
+                        <div class="col-12 form-floating">
+                            <input type="text" class="form-control" th:field="*{lastname}" placeholder="Иванов">
+                            <label for="lastname" class="ms-2">Фамилия</label>
+                            <span th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}" class="field-error"></span>
+                        </div>
+                        <div class="col-12 form-floating">
+                            <input type="text" class="form-control" th:field="*{firstname}" placeholder="Иван">
+                            <label for="firstname" class="ms-2">Имя</label>
+                            <span th:if="${#fields.hasErrors('firstname')}" th:errors="*{firstname}" class="field-error"></span>
+                        </div>
+                        <div class="col-12 form-floating">
+                            <input type="text" class="form-control" th:field="*{middleName}" placeholder="Иванович">
+                            <label for="middleName" class="ms-2">Отчество</label>
+                            <span th:if="${#fields.hasErrors('middleName')}" th:errors="*{middleName}" class="field-error"></span>
+                        </div>
+                        <div class="col-12 form-floating">
+                            <input type="text" class="form-control" th:field="*{officePosition}" placeholder="Инженер">
+                            <label for="officePosition" class="ms-2">Должность</label>
+                            <span th:if="${#fields.hasErrors('officePosition')}" th:errors="*{officePosition}" class="field-error"></span>
+                        </div>
+                        <div class="col-12 form-floating">
+                            <select class="form-select" th:field="*{role}">
+                                <option th:each="r : ${roles}" th:text="${r.getTitle()}" th:value="${r}"></option>
+                            </select>
+                            <label for="role" class="ms-2">Роль</label>
+                        </div>
+                        <div class="col-12 form-floating">
+                            <select class="form-select" th:field="*{departmentRole}">
+                                <option th:each="dr : ${departmentRoles}" th:text="${dr.getTitle()}" th:value="${dr}"></option>
+                            </select>
+                            <label for="departmentRole" class="ms-2">Служба</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-smoke">
+                        <i class="bi bi-person-check-fill"></i> Зарегистрировать
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

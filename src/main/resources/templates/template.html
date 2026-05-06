@@ -41,8 +41,8 @@
         <nav th:insert="~{block/navbar}"></nav>
         <div th:insert="~{content/home-page}" th:if="${index} == 'home-page'"></div>
         <div class="flex-grow-1" th:insert="~{content/login-page}" th:if="${index} == 'login-page'"></div>
-        <div th:insert="~{content/users-page}" th:if="${index} == 'users-page'"></div>
-        <div th:insert="~{content/user-edit-page}" th:if="${index} == 'user-edit-page'"></div>
+        <div class="flex-grow-1" th:insert="~{content/users-page}" th:if="${index} == 'users-page'"></div>
+        <div class="flex-grow-1" th:insert="~{content/user-edit-page}" th:if="${index} == 'user-edit-page'"></div>
         <div class="flex-grow-1" th:insert="~{content/profile-page}" th:if="${index} == 'profile-page'"></div>
         <div th:insert="~{content/works-page}" th:if="${index} == 'works-page'"></div>
         <div th:insert="~{content/categories-page}" th:if="${index} == 'categories-page'"></div>

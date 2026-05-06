@@ -1,64 +1,74 @@
-<div class="container">
-    <div class="row py-5">
-        <div class="col"></div>
-        <div class="col-6">
-            <form th:method="POST" th:action="@{/admin/user/update}" th:object="${implementer}">
-                <input type="number" th:field="*{id}" hidden>
-                <ul class="list-group">
-                    <li class="list-group-item active text-center" aria-current="true">
-                        <h3>Обновить данные пользователя <br> <span th:text="${implementer.fullName}"></span></h3>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="e-mail">Электронная почта</span>
-                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="e-mail" th:field="*{email}">
+<div class="profile-wrapper h-100">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- Edit Card -->
+                <div class="profile-card">
+                    <div class="profile-card__header">
+                        <span class="smoke-b1"></span><span class="smoke-b2"></span><span class="smoke-b3"></span><span class="smoke-b4"></span>
+                        <span class="smoke-m1"></span><span class="smoke-m2"></span><span class="smoke-m3"></span><span class="smoke-m4"></span>
+                        <span class="smoke-f1"></span><span class="smoke-f2"></span><span class="smoke-f3"></span><span class="smoke-f4"></span>
+                        <div class="profile-card__avatar" th:text="${#strings.isEmpty(implementer.getFirstname()) ? '?' : #strings.substring(implementer.getFirstname(),0,1)} + ${#strings.isEmpty(implementer.getLastname()) ? '?' : #strings.substring(implementer.getLastname(),0,1)}"></div>
+                        <div>
+                            <div class="profile-card__title">Редактирование пользователя</div>
+                            <div class="profile-card__subtitle" th:text="${implementer.getFullName()}"></div>
                         </div>
-                        <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color: red"></span>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="name">Имя</span>
-                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="name" th:field="*{firstname}">
-                        </div>
-                        <span th:if="${#fields.hasErrors('firstname')}" th:errors="*{firstname}" style="color: red"></span>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="middl">Отчество</span>
-                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="middl" th:field="*{middleName}">
-                        </div>
-                        <span th:if="${#fields.hasErrors('middleName')}" th:errors="*{middleName}" style="color: red"></span>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="last">Фамилия</span>
-                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="last" th:field="*{lastname}">
-                        </div>
-                        <span th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}" style="color: red"></span>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="office">Должность</span>
-                            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="office" th:field="*{officePosition}">
-                        </div>
-                        <span th:if="${#fields.hasErrors('officePosition')}" th:errors="*{officePosition}" style="color: red"></span>
-                    </li>
-                    <li class="list-group-item">
-                        <select class="form-select" th:field="*{role}">
-                            <option th:each="r : ${roles}" th:text="${r.getTitle()}" th:value="${r}"></option>
-                        </select>
-                    </li>
-                    <li class="list-group-item">
-                        <select class="form-select" th:field="*{departmentRole}">
-                            <option th:each="r : ${departments}" th:text="${r.getTitle()}" th:value="${r}"></option>
-                        </select>
-                    </li>
-                    <li class="list-group-item">
-                        <input class="btn btn-primary" type="submit" value="Обновить">
-                    </li>
-                </ul>
-            </form>
+                    </div>
+
+                    <div class="profile-card__body">
+                        <form th:method="POST" th:action="@{/admin/user/update}" th:object="${implementer}">
+                            <input type="hidden" th:field="*{id}">
+                            <div class="row g-2">
+                                <div class="col-12 form-floating">
+                                    <input type="email" class="form-control" th:field="*{email}" placeholder="email">
+                                    <label for="email" class="ms-2">Электронная почта</label>
+                                    <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="field-error"></span>
+                                </div>
+                                <div class="col-12 form-floating">
+                                    <input type="text" class="form-control" th:field="*{lastname}" placeholder="lastname">
+                                    <label for="lastname" class="ms-2">Фамилия</label>
+                                    <span th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}" class="field-error"></span>
+                                </div>
+                                <div class="col-12 form-floating">
+                                    <input type="text" class="form-control" th:field="*{firstname}" placeholder="firstname">
+                                    <label for="firstname" class="ms-2">Имя</label>
+                                    <span th:if="${#fields.hasErrors('firstname')}" th:errors="*{firstname}" class="field-error"></span>
+                                </div>
+                                <div class="col-12 form-floating">
+                                    <input type="text" class="form-control" th:field="*{middleName}" placeholder="middleName">
+                                    <label for="middleName" class="ms-2">Отчество</label>
+                                    <span th:if="${#fields.hasErrors('middleName')}" th:errors="*{middleName}" class="field-error"></span>
+                                </div>
+                                <div class="col-12 form-floating">
+                                    <input type="text" class="form-control" th:field="*{officePosition}" placeholder="officePosition">
+                                    <label for="officePosition" class="ms-2">Должность</label>
+                                    <span th:if="${#fields.hasErrors('officePosition')}" th:errors="*{officePosition}" class="field-error"></span>
+                                </div>
+                                <div class="col-12 form-floating">
+                                    <select class="form-select" th:field="*{role}">
+                                        <option th:each="r : ${roles}" th:text="${r.getTitle()}" th:value="${r}"></option>
+                                    </select>
+                                    <label for="role" class="ms-2">Роль</label>
+                                </div>
+                                <div class="col-12 form-floating">
+                                    <select class="form-select" th:field="*{departmentRole}">
+                                        <option th:each="dr : ${departments}" th:text="${dr.getTitle()}" th:value="${dr}"></option>
+                                    </select>
+                                    <label for="departmentRole" class="ms-2">Служба</label>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 mt-4">
+                                <a th:href="@{/admin/users}" class="btn btn-outline-secondary flex-grow-1">Отмена</a>
+                                <button type="submit" class="btn btn-smoke flex-grow-1">
+                                    <i class="bi bi-check-lg"></i> Обновить
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
         </div>
-        <div class="col"></div>
     </div>
 </div>

@@ -7,7 +7,9 @@ import net.security.infosec.models.entity.*;
 import net.security.infosec.services.DepartmentService;
 import net.security.infosec.services.DivisionService;
 import net.security.infosec.services.EmployeeService;
+import net.security.infosec.services.ExcelReportService;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,6 +28,7 @@ public class ApiController {
     private final EmployeeService employeeService;
     private final DepartmentService departmentService;
     private final DivisionService divisionService;
+    private final ExcelReportService excelReportService;
 
     @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     @PostMapping("/add/employee")
@@ -211,5 +214,30 @@ public class ApiController {
                 return employeeService.save(original);
             })
         ).collectList().flatMap(l -> Mono.just("OK"));
+    }
+
+    // ==================== EXCEL REPORT ====================
+
+    @GetMapping("/report/excel")
+    public Mono<Void> exportExcel(
+            org.springframework.web.server.ServerWebExchange exchange,
+            @AuthenticationPrincipal net.security.infosec.models.entity.Implementer currentUser,
+            @RequestParam(defaultValue = "week") String mode,
+            @RequestParam(defaultValue = "-1") int userId,
+            @RequestParam(required = false) String dateFrom,
+            @RequestParam(required = false) String dateTo) {
+
+        // -1 = текущий пользователь, 0 = все, иначе конкретный ID
+        int effectiveUserId = (userId == -1 && currentUser != null) ? currentUser.getId() : userId;
+
+        var response = exchange.getResponse();
+        response.getHeaders().setContentType(org.springframework.http.MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        response.getHeaders().set("Content-Disposition", "attachment; filename=report.xlsx");
+
+        return excelReportService.generateReport(mode, effectiveUserId, dateFrom, dateTo)
+            .flatMap(bytes -> {
+                var buffer = response.bufferFactory().wrap(bytes);
+                return response.writeWith(reactor.core.publisher.Mono.just(buffer));
+            });
     }
 }

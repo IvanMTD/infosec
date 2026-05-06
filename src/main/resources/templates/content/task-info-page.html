@@ -25,8 +25,8 @@
                     <div class="stat-filter-card__title" th:text="'Показатели: ' + ${userName}">Показатели</div>
                 </div>
 
-                <button class="stat-export-btn" onclick="exportPDF()" title="Выгрузить отчёт в PDF">
-                    <i class="bi bi-file-earmark-pdf"></i> Выгрузка отчёта
+                <button class="stat-export-btn" onclick="exportExcel()" title="Выгрузить отчёт в Excel">
+                    <i class="bi bi-file-earmark-excel"></i> Выгрузка отчёта
                 </button>
             </div>
 
@@ -92,7 +92,12 @@
 
         <!-- Accordion Card -->
         <div class="stat-accordion-card" th:if="${statistics.size() > 0}">
-            <div class="stat-accordion-card__header">Детализация по категориям</div>
+            <div class="stat-accordion-card__header d-flex justify-content-between align-items-center">
+                <span>Детализация по категориям</span>
+                <button class="btn btn-sm btn-outline-secondary" id="toggle-all-accordions" onclick="toggleAllAccordions()" style="font-size:0.75rem;">
+                    <i class="bi bi-chevron-expand"></i> Открыть все
+                </button>
+            </div>
             <div class="stat-accordion-card__body">
                 <div class="accordion stat-accordion" id="mainAccordion">
                     <div class="accordion-item" th:each="stat, s : ${statistics}" th:if="${stat.isShow}">
@@ -217,6 +222,38 @@
     });
 
     /* PDF Export — browser print (no canvas limit) */
+    function toggleAllAccordions(){
+        var collapses = document.querySelectorAll('#mainAccordion .accordion-collapse');
+        var buttons = document.querySelectorAll('#mainAccordion .accordion-button');
+        var total = collapses.length;
+        var openCount = document.querySelectorAll('#mainAccordion .accordion-collapse.show').length;
+
+        if(openCount === total){
+            collapses.forEach(function(c) { c.classList.remove('show'); });
+            buttons.forEach(function(b) { b.classList.add('collapsed'); b.setAttribute('aria-expanded','false'); });
+            document.getElementById('toggle-all-accordions').innerHTML = '<i class="bi bi-chevron-expand"></i> Открыть все';
+        } else {
+            collapses.forEach(function(c) { c.classList.add('show'); });
+            buttons.forEach(function(b) { b.classList.remove('collapsed'); b.setAttribute('aria-expanded','true'); });
+            document.getElementById('toggle-all-accordions').innerHTML = '<i class="bi bi-chevron-contract"></i> Закрыть все';
+        }
+    }
+
+    function exportExcel() {
+        var path = window.location.pathname; // /task/info/week
+        var parts = path.split('/');
+        var mode = (parts.length > 3) ? parts[3] : 'week';
+        var baseUrl = '/api/report/excel?mode=' + mode + '&userId=-1';
+
+        var dateFrom = document.getElementById('dateFrom');
+        var dateTo = document.getElementById('dateTo');
+        if(dateFrom && dateTo && dateFrom.value && dateTo.value){
+            baseUrl += '&dateFrom=' + dateFrom.value + '&dateTo=' + dateTo.value;
+        }
+
+        window.open(baseUrl, '_blank');
+    }
+
     function exportPDF() {
         document.querySelectorAll('.accordion-collapse').forEach(c => c.classList.add('show'));
         document.querySelectorAll('.accordion-button.collapsed').forEach(b => b.classList.remove('collapsed'));
