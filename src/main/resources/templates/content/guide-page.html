@@ -1,31 +1,35 @@
-<div class="container-fluid my-2">
-    <div id="edit-modal-field"></div>
-    <!-- Заголовок -->
-    <div class="row pt-2">
-        <div class="col">
-            <h3 class="text-center">Справочник ФЦПСР</h3>
-        </div>
-    </div>
-    <!-- Главная поисковая система -->
-    <div class="row mx-0">
-        <div class="d-grid col-12 col-md-6 col-lg-6 mx-auto my-2">
-            <div class="row mx-0">
-                <div class="col-10 px-0 form-floating">
-                    <input type="text" class="form-control" id="global-search" list="global-list" placeholder="global-search" oninput="globalSearch()">
-                    <datalist id="global-list"></datalist>
-                    <label for="global-search" class="ms-2">Поиск</label>
-                </div>
-                <div class="col-2 px-0 d-flex">
-                    <i class="fs-2 m-auto bi bi-search"></i>
+<div class="stat-wrapper h-100">
+    <div class="container-fluid px-4">
+        <div id="edit-modal-field"></div>
+
+        <!-- Filter Bar Card -->
+        <div class="stat-filter-card">
+            <div class="stat-filter-card__header">
+                <span class="stf-b1"></span><span class="stf-b2"></span><span class="stf-b3"></span><span class="stf-b4"></span>
+                <span class="stf-m1"></span><span class="stf-m2"></span><span class="stf-m3"></span><span class="stf-m4"></span>
+                <span class="stf-f1"></span><span class="stf-f2"></span><span class="stf-f3"></span><span class="stf-f4"></span>
+                <div class="stat-filter-card__icon"><i class="bi bi-diagram-3-fill"></i></div>
+                <div class="flex-grow-1"><div class="stat-filter-card__title">Справочник ФЦПСР</div></div>
+                <div><span id="header-ip" class="text-white-50" style="font-size:0.75rem;"></span></div>
+            </div>
+            <div class="stat-filter-card__body">
+                <div class="row w-100">
+                    <div class="col-12 form-floating">
+                        <input type="text" class="form-control w-100" id="global-search" list="global-list" placeholder="global-search" oninput="globalSearch()">
+                        <datalist id="global-list"></datalist>
+                        <label for="global-search" class="ms-2">Поиск</label>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- Ручной поиск и поле результатов -->
-    <div class="row">
+
+        <!-- Основной контент -->
+        <div class="row mt-3">
         <!-- Левое поле -->
-        <div class="col-sm-6 col-md-5 col-lg-5 mt-4 d-none d-md-block">
-            <div class="row mx-2">
+        <div class="col-sm-6 col-md-5 col-lg-5 mt-3 d-none d-md-block">
+            <div class="stat-card h-100">
+                <div class="stat-card__body">
+            <div class="row mx-0">
                 <div class="col">
                     <div class="d-grid gap-2" id="department-grid">
                         <th:block th:each="department, dps : ${guide.departments}">
@@ -97,11 +101,14 @@
                     </div>
                 </div>
             </div>
+                </div> <!-- /stat-card__body -->
+            </div> <!-- /stat-card -->
         </div>
 
         <!-- Правое поле -->
-        <div class="col-sm-6 col-md-7 col-lg-7 position-relative mt-4">
-            <div class="row border border-dark img-bg rounded-3 h-100 mx-2">
+        <div class="col-sm-6 col-md-7 col-lg-7 position-relative mt-3">
+            <div class="stat-card h-100">
+                <div class="stat-card__body position-relative">
 
                 <div class="col">
                     <div id="guide-card-col" class="mb-5 pb-3">
@@ -253,27 +260,49 @@
                 </div>
             </div>
         </div>
+                </div> <!-- /stat-card__body -->
+            </div> <!-- /stat-card -->
+        </div>
         <div class="row">
-            <div id="user-ip" class="col d-flex">
-
-            </div>
         </div>
         <script>
             $.ajax({
                 url:'/api/service/get/ip',
                 type:'get',
                 success: function (ip){
-                    $('#user-ip').empty();
-                    $('#user-ip').append(
-                        '<div class="ms-auto">' +
-                        '   <small id="user-ip" class="text-secondary">' + ip + '</small>' +
-                        '</div>'
-                    );
+                    /* IP в шапке */
+                    document.getElementById('header-ip').textContent = ip;
+                    /* водяной знак */
+                    var container = document.querySelector('#guide-card-col').parentElement;
+                    container.style.position = 'relative';
+                    /* водяной знак — слой под карточками */
+                    var watermarkLayer = document.createElement('div');
+                    watermarkLayer.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;';
+                    container.insertBefore(watermarkLayer, container.firstChild);
+                    /* генерируем водяной знак IP по диагонали */
+                    var cols = 8, rows = 12;
+                    for(var r=0; r<rows; r++){
+                        for(var c=0; c<cols; c++){
+                            var span = document.createElement('span');
+                            span.textContent = ip;
+                            span.style.cssText =
+                                'position:absolute;' +
+                                'pointer-events:none;user-select:none;' +
+                                'color:rgba(0,0,0,0.04);' +
+                                'font-size:14px;font-weight:600;' +
+                                'top:' + (r * 100 / rows) + '%;' +
+                                'left:' + (c * 100 / cols + 3) + '%;' +
+                                'transform:rotate(-30deg);' +
+                                'z-index:0;';
+                            watermarkLayer.appendChild(span);
+                        }
+                    }
                 }
             });
         </script>
     </div>
-</div>
+    </div> <!-- /container-fluid -->
+</div> <!-- /stat-wrapper -->
 
 <script>
     const modal = document.getElementById('person-modal');
@@ -761,36 +790,26 @@
 
     function employeeAppend(employee){
         var cardBody = `
-            <div class="card mx-1 my-3 zoom w-100" data-id="${employee.id}" onclick="showDepartmentAndDivision('${employee.id}')">
-                <div class="row rounded-4 shadow m-2">
-                    ${admin ? '<div class="col-auto d-flex align-items-center px-2 grip-handle" style="cursor: grab;"><i class="bi bi-grip-vertical text-secondary"></i></div>' : ''}
-                    <div class="col" id="col-${employee.id}">
-                        <div class="row border-bottom">
-                            <div class="col-10 col-sm-12 col-md-12 col-lg-12 m-0 p-1 my-auto">
-                                <div class="m-0 p-1 d-flex justify-content-between align-items-center">
-                                    <p class="m-0 p-0 ps-2"><b>${employee.position}</b></p>
-                                    <button class="btn btn-sm btn-outline-secondary border-0 me-1" onclick="event.stopPropagation(); showDepartmentAndDivision('${employee.id}')" title="Показать в структуре"><i class="bi bi-eye"></i></button>
-                                </div>
-                            </div>
+            <div class="stat-employee-card zoom" data-id="${employee.id}" onclick="showDepartmentAndDivision('${employee.id}')">
+                <div class="stat-employee-card__inner">
+                    ${admin ? '<div class="d-flex align-items-center grip-handle" style="cursor: grab; padding:0 6px 0 2px;"><i class="bi bi-grip-vertical text-secondary"></i></div>' : ''}
+                    <div class="flex-grow-1" id="col-${employee.id}">
+                        <div class="stat-employee-card__header d-flex justify-content-between align-items-center">
+                            <span><b>${employee.position}</b></span>
+                            <button class="btn btn-sm btn-outline-secondary border-0" onclick="event.stopPropagation(); showDepartmentAndDivision('${employee.id}')" title="Показать в структуре"><i class="bi bi-eye"></i></button>
                         </div>
-                        <div class="row">
-                            <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
-                                <div class="m-0 p-1">
+                        <div class="stat-employee-card__body">
+                            <div class="row">
+                                <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1">
                                     <p class="m-0 p-0 px-2">${employee.fullName}</p>
                                 </div>
-                            </div>
-                            <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
-                                <div class="m-0 p-1">
+                                <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1">
                                     <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center">${employee.email}</p>
                                 </div>
-                            </div>
-                            <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
-                                <div class="m-0 p-1">
+                                <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1">
                                     <p class="m-0 p-0 px-2 text-sm-start text-md-center text-lg-center text-secondary"><i style="font-size: 14px">8 (499) 550-94-74 — </i><span class="text-dark">${employee.phone}</span></p>
                                 </div>
-                            </div>
-                            <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1 my-auto">
-                                <div class="m-0 p-1">
+                                <div class="col-sm-12 col-md-3 col-lg-3 m-0 p-1">
                                     <p class="m-0 p-0 px-2 user-select-none cursor-pointer blur text-sm-start text-md-end text-lg-end">${employee.personalPhone}</p>
                                 </div>
                             </div>
@@ -802,12 +821,10 @@
         $('#guide-card-col').append(cardBody);
         if(admin){
             var info = `
-                <div class="row">
-                    <div class="col-sm-12 col-md-12 col-lg-12 d-flex bg-primary-subtle rounded-bottom-4">
-                        <div class="btn-group m-auto" role="group" aria-label="Basic outlined example">
-                            <button type="button" id="pin-out-${employee.id}" class="btn btn-outline-secondary my-2" onclick="pinOut(this.id)"><i class="bi bi-pin-angle">Открепить</i></button>
-                            <button type="button" id="edit-${employee.id}" class="btn btn-outline-secondary my-2" onclick="editEmployee(this.id)"><i class="bi bi-pencil">Редактор</i></button>
-                        </div>
+                <div class="stat-employee-card__actions">
+                    <div class="btn-group" role="group">
+                        <button type="button" id="pin-out-${employee.id}" class="btn btn-sm btn-outline-secondary" onclick="pinOut(this.id)"><i class="bi bi-pin-angle"></i> Открепить</button>
+                        <button type="button" id="edit-${employee.id}" class="btn btn-sm btn-outline-secondary" onclick="editEmployee(this.id)"><i class="bi bi-pencil"></i> Редактор</button>
                     </div>
                 </div>
             `;
