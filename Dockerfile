@@ -37,9 +37,8 @@ WORKDIR /app
 COPY pom.xml mvnw ./
 COPY .mvn ./.mvn
 RUN chmod +x mvnw
-RUN ./mvnw dependency:go-offline -B
 COPY src ./src
-RUN ./mvnw clean package -DskipTests
+RUN ./mvnw clean package -DskipTests -q
 
 FROM eclipse-temurin:17-jre-jammy AS runner
 WORKDIR /app
