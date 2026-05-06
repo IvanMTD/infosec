@@ -47,3 +47,57 @@ body {
 footer {
     margin-top: auto;
 }
+
+/* ============================================================
+   Security Ticker ? ??????? ??????
+   ============================================================ */
+.security-ticker-bar {
+    background: linear-gradient(160deg, #0d0d0d 0%, #1a1a1a 50%, #111 100%);
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #333;
+    overflow: hidden;
+    height: 36px;
+    display: flex;
+    align-items: center;
+}
+.security-ticker-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    color: #8f8;
+    white-space: nowrap;
+    padding-left: 100%;
+    display: inline-block;
+}
+.security-ticker-text.scroll {
+    animation: ticker-scroll 36s linear forwards;
+}
+@keyframes ticker-scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(calc(-100% - 100vw)); }
+}
+
+/* ============================================================
+   Footer ? Smoke Theme minimal
+   ============================================================ */
+.smoke-footer {
+    background: #fafafa;
+    border-top: 1px solid #e5e5e5;
+    padding: 1.25rem 0;
+    text-align: center;
+}
+.smoke-footer__org {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #555;
+    margin-bottom: 0.25rem;
+}
+.smoke-footer__author {
+    font-size: 0.7rem;
+    color: #999;
+    letter-spacing: 0.04em;
+}
+.smoke-footer__copy {
+    color: #aaa;
+}

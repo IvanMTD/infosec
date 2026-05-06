@@ -1,18 +1,65 @@
-<hr>
-<div class="container">
-    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4">
-        <p class="col-md-4 mb-0 text-body-secondary">©2023 ФГБУ "ФЦПСР"</p>
-
-        <a th:href="@{/}" class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
-            <i class="bi bi-file-lock2" style="font-size: 32px"></i>
-        </a>
-
-        <ul class="nav col-md-4 justify-content-end">
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary"></a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary"></a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary"></a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary"></a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary"></a></li>
-        </ul>
-    </footer>
+<div class="security-ticker-bar">
+    <span class="security-ticker-text" id="ticker-text"></span>
 </div>
+<footer class="smoke-footer">
+    <div class="container">
+        <p class="smoke-footer__org">
+            <span class="smoke-footer__copy">&copy;</span> <span id="copy-year">2023-2026</span> ФГБУ &laquo;ФЕДЕРАЛЬНЫЙ ЦЕНТР ПОДГОТОВКИ СПОРТИВНОГО РЕЗЕРВА&raquo;
+        </p>
+        <p class="smoke-footer__author">Автор: Карачков Иван Сергеевич</p>
+    </div>
+</footer>
+
+<script>
+    /* Текущий год */
+    (function(){
+        var startYear = 2023;
+        var currentYear = new Date().getFullYear();
+        var yearText = startYear + (currentYear > startYear ? '-' + currentYear : '');
+        document.getElementById('copy-year').textContent = yearText;
+    })();
+
+    /* Бегущая строка — советы по безопасности */
+    var tips = [
+        'Не переходите по подозрительным ссылкам в письмах — фишинг остаётся угрозой №1.',
+        'Используйте уникальные пароли для каждой учётной записи.',
+        'Включайте двухфакторную аутентификацию везде, где это возможно.',
+        'Регулярно обновляйте программное обеспечение — уязвимости исправляются в обновлениях.',
+        'Не подключайте неизвестные USB-устройства к рабочему компьютеру.',
+        'Блокируйте экран при отходе от рабочего места.',
+        'Вредоносное ПО часто маскируется под легитимные программы — проверяйте источник.',
+        'Не сообщайте пароли и коды подтверждения никому, включая коллег.',
+        'Используйте менеджер паролей вместо записей на стикерах.',
+        'При работе с конфиденциальными данными убедитесь, что вас никто не видит.'
+    ];
+
+    var tickerEl = document.getElementById('ticker-text');
+    var currentIndex = -1;
+
+    function pickRandomTip(){
+        var idx;
+        do {
+            idx = Math.floor(Math.random() * tips.length);
+        } while(idx === currentIndex && tips.length > 1);
+        currentIndex = idx;
+        return tips[idx];
+    }
+
+    function runTicker(){
+        tickerEl.textContent = pickRandomTip();
+        tickerEl.classList.remove('scroll');
+        /* force reflow */
+        void tickerEl.offsetWidth;
+        tickerEl.classList.add('scroll');
+
+        /* после анимации — пауза 1 сек, затем следующий */
+        tickerEl.addEventListener('animationend', function handler(){
+            tickerEl.removeEventListener('animationend', handler);
+            tickerEl.classList.remove('scroll');
+            setTimeout(runTicker, 1000);
+        });
+    }
+
+    /* старт после небольшой задержки */
+    setTimeout(runTicker, 800);
+</script>

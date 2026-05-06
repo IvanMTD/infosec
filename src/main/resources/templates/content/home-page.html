@@ -1,24 +1,57 @@
-<div class="container-fluid py-4">
-    <div class="row">
-        <div class="col"></div>
-        <div class="col-6 text-center">
-            <div class="btn-group" role="group">
-                <button type="button" class="btn btn-primary active" id="btn-day" onclick="setupChart('day')">День</button>
-                <button type="button" class="btn btn-primary" id="btn-week" onclick="setupChart('week')">Неделя</button>
-                <button type="button" class="btn btn-primary" id="btn-month" onclick="setupChart('month')">Месяц</button>
+<div class="stat-wrapper h-100">
+    <div class="container-fluid px-4">
+
+        <!-- Filter Bar Card -->
+        <div class="stat-filter-card">
+
+            <div class="stat-filter-card__header">
+                <span class="stf-b1"></span>
+                <span class="stf-b2"></span>
+                <span class="stf-b3"></span>
+                <span class="stf-b4"></span>
+                <span class="stf-m1"></span>
+                <span class="stf-m2"></span>
+                <span class="stf-m3"></span>
+                <span class="stf-m4"></span>
+                <span class="stf-f1"></span>
+                <span class="stf-f2"></span>
+                <span class="stf-f3"></span>
+                <span class="stf-f4"></span>
+
+                <div class="stat-filter-card__icon">
+                    <i class="bi bi-bar-chart-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-filter-card__title" id="chart-title">Общая статистика</div>
+                </div>
+            </div>
+
+            <div class="stat-filter-card__body d-flex justify-content-end">
+                <div class="stat-period-links">
+                    <button class="stat-period-link active" id="btn-day" onclick="setupChart('day')">
+                        <i class="bi bi-calendar3"></i> День
+                    </button>
+                    <button class="stat-period-link" id="btn-week" onclick="setupChart('week')">
+                        <i class="bi bi-calendar3-week"></i> Неделя
+                    </button>
+                    <button class="stat-period-link" id="btn-month" onclick="setupChart('month')">
+                        <i class="bi bi-calendar2-check"></i> Месяц
+                    </button>
+                </div>
             </div>
         </div>
-        <div class="col"></div>
-    </div>
-    <div class="row mt-3">
-        <div class="col-12">
-            <div id="category-chart" style="width: 100%; height: 700px;"></div>
+
+        <!-- Stats Grid -->
+        <div class="stat-grid" style="grid-template-columns: 1fr;">
+            <!-- Chart Card -->
+            <div class="stat-chart-card">
+                <div class="stat-chart-card__header">Диаграмма</div>
+                <div class="stat-chart-card__body">
+                    <div id="category-chart" style="width:100%; min-height:500px;"></div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="row" hidden>
-        <div class="col">
-            <div id="trouble-chart" style="width: 100%; height: 700px;"></div>
-        </div>
+
     </div>
 </div>
 
@@ -34,7 +67,6 @@
 
     /* ===== ТЕКУЩИЙ ЭКЗЕМПЛЯР ГРАФИКА ===== */
     var currentChart = null;
-    var currentTroubleChart = null;
 
     /* ===== ПОСТРОЕНИЕ СЕРИЙ ДЛЯ РАЗНЫХ РЕЖИМОВ ===== */
     function buildDaySeries() {
@@ -44,10 +76,7 @@
             for (var j = 0; j < chartDay.length; j++) {
                 data.push(chartDay[j].taskOnTrouble[i]);
             }
-            series.push({
-                name: categoryTitle[i].name,
-                data: data
-            });
+            series.push({ name: categoryTitle[i].name, data: data });
         }
         return series;
     }
@@ -63,10 +92,7 @@
             for (var j = 0; j < chartWeek.length; j++) {
                 data.push(chartWeek[j].charts[i].taskCount);
             }
-            series.push({
-                name: categoryTitle[i].name,
-                data: data
-            });
+            series.push({ name: categoryTitle[i].name, data: data });
         }
         return series;
     }
@@ -82,10 +108,7 @@
             for (var j = 0; j < chartMonth.length; j++) {
                 data.push(chartMonth[j].charts[i].taskCount);
             }
-            series.push({
-                name: categoryTitle[i].name,
-                data: data
-            });
+            series.push({ name: categoryTitle[i].name, data: data });
         }
         return series;
     }
@@ -94,7 +117,6 @@
         return chartMonth.map(function(item) { return item.title; });
     }
 
-    /* ===== ЗАГОЛОВОК ГРАФИКА ===== */
     function getChartTitle(mode) {
         if (mode === 'day') return 'Общая статистика по дням за ' + year + ' год';
         if (mode === 'week') return 'Общая статистика по неделям за ' + year + ' год';
@@ -124,7 +146,7 @@
             series: series,
             chart: {
                 type: 'bar',
-                height: 700,
+                height: 500,
                 stacked: true,
                 toolbar: { show: false },
                 redrawOnWindowResize: true,
@@ -134,7 +156,7 @@
             title: {
                 text: getChartTitle(mode),
                 align: 'center',
-                style: { fontSize: '16px', fontWeight: 'bold' }
+                style: { fontSize: '14px', fontWeight: '600', color: '#444' }
             },
             plotOptions: {
                 bar: {
@@ -149,16 +171,13 @@
             stroke: { width: 0 },
             xaxis: {
                 categories: categories,
-                labels: {
-                    rotate: -45,
-                    style: { fontSize: '11px' }
-                }
+                labels: { rotate: -45, style: { fontSize: '11px' } }
             },
             yaxis: {
                 title: { text: 'Всего выполнено' },
                 allowDecimals: false
             },
-            legend: { position: 'bottom', horizontalAlign: 'center' },
+            legend: { position: 'bottom', horizontalAlign: 'center', fontSize: '12px' },
             tooltip: {
                 shared: true,
                 intersect: false,
@@ -184,19 +203,21 @@
         currentChart = new ApexCharts(document.querySelector('#category-chart'), options);
         currentChart.render();
 
-        document.querySelectorAll('.btn-group .btn').forEach(function(btn) {
+        /* Обновляем заголовок фильтр-бара */
+        document.getElementById('chart-title').innerText = getChartTitle(mode);
+
+        /* Переключаем активную кнопку */
+        document.querySelectorAll('.stat-period-link').forEach(function(btn) {
             btn.classList.remove('active');
         });
         var activeBtn = document.getElementById('btn-' + mode);
         if (activeBtn) activeBtn.classList.add('active');
     }
 
-    /* ===== ФУНКЦИЯ ПЕРЕКЛЮЧЕНИЯ ===== */
     function setupChart(mode) {
         drawChart(mode);
     }
 
-    /* ===== ПЕРВИЧНАЯ ОТРИСОВКА ===== */
     document.addEventListener('DOMContentLoaded', function() {
         drawChart('day');
     });

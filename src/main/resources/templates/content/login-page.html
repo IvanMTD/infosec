@@ -1,33 +1,72 @@
-<div class="container">
-    <div class="row">
-        <div class="d-greed col-sm-12 col-md-5 col-lg-5 py-5 mx-auto">
-            <form th:method="POST" th:action="@{/login}">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Электронная почта</label>
-                    <input type="email" class="form-control" name="username" id="username" aria-describedby="emailHelp">
-                    <div id="emailHelp" class="form-text"><small>Не сообщайте вашу электронную почту и пароль никому.</small></div>
+<div class="profile-wrapper h-100">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7">
+
+                <!-- Login Card -->
+                <div class="profile-card">
+
+                    <!-- Card Header — smoke -->
+                    <div class="profile-card__header">
+                        <span class="smoke-b1"></span>
+                        <span class="smoke-b2"></span>
+                        <span class="smoke-b3"></span>
+                        <span class="smoke-b4"></span>
+                        <span class="smoke-m1"></span>
+                        <span class="smoke-m2"></span>
+                        <span class="smoke-m3"></span>
+                        <span class="smoke-m4"></span>
+                        <span class="smoke-f1"></span>
+                        <span class="smoke-f2"></span>
+                        <span class="smoke-f3"></span>
+                        <span class="smoke-f4"></span>
+
+                        <div class="profile-card__avatar">
+                            <i class="bi bi-shield-lock-fill"></i>
+                        </div>
+                        <div>
+                            <div class="profile-card__title">Вход в систему</div>
+                            <div class="profile-card__subtitle">InfoSec — управление безопасностью</div>
+                        </div>
+                    </div>
+
+                    <!-- Card Body — login form -->
+                    <div class="profile-card__body">
+                        <form th:method="POST" th:action="@{/login}">
+                            <div class="mb-3">
+                                <label for="username" class="info-card__label">Электронная почта</label>
+                                <input type="email" class="form-control" name="username" id="username" placeholder="user@example.com">
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="info-card__label">Пароль</label>
+                                <input type="password" class="form-control" name="password" id="password" placeholder="••••••••">
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="show-password">
+                                <label class="form-check-label" for="show-password" style="font-size:0.82rem;color:#777;">Показать пароль</label>
+                            </div>
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-smoke">
+                                    <i class="bi bi-box-arrow-in-right"></i> Войти
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
                 </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Пароль</label>
-                    <input type="password" class="form-control" name="password" id="password">
-                </div>
-                <div class="mb-3 form-check">
-                    <input type="checkbox" class="form-check-input" id="show-password">
-                    <label class="form-check-label" for="show-password">Показать пароль</label>
-                    <script>
-                        $('body').on('click', '#show-password', function () {
-                            if ($(this).is(':checked')) {
-                                $('#password').attr('type', 'text');
-                            } else {
-                                $('#password').attr('type', 'password');
-                            }
-                        });
-                    </script>
-                </div>
-                <div class="d-grid col-6 col-md-5 col-lg-4 mx-auto">
-                    <button type="submit" class="btn btn-primary">Войти</button>
-                </div>
-            </form>
+                <!-- /Login Card -->
+
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    $('body').on('click', '#show-password', function () {
+        if ($(this).is(':checked')) {
+            $('#password').attr('type', 'text');
+        } else {
+            $('#password').attr('type', 'password');
+        }
+    });
+</script>

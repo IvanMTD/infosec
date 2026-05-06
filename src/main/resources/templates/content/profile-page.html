@@ -24,7 +24,7 @@
                         <span class="smoke-f3"></span>
                         <span class="smoke-f4"></span>
 
-                        <div class="profile-card__avatar" th:text="${#strings.substring(user.getFirstname(),0,1) + #strings.substring(user.getLastname(),0,1)}">ФИ</div>
+                        <div class="profile-card__avatar" th:text="${#strings.isEmpty(user.getFirstname()) ? '?' : #strings.substring(user.getFirstname(),0,1)} + ${#strings.isEmpty(user.getLastname()) ? '?' : #strings.substring(user.getLastname(),0,1)}">ФИ</div>
                         <div>
                             <div class="profile-card__title">Профиль пользователя</div>
                             <div class="profile-card__subtitle" th:text="${user.getEmail()}"></div>
