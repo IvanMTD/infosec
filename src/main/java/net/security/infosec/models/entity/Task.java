@@ -59,5 +59,7 @@ public class Task {
         setExecuteDate(taskDTO.getPlacedAt());
         setTroubleId(taskDTO.getTroubleId());
         setImplementerId(taskDTO.getImplementerId());
+        setStartTime(taskDTO.getStartTime());
+        setEndTime(taskDTO.getEndTime());
     }
 }

@@ -30,7 +30,9 @@ public class TaskDTO {
     @NotNull(message = "Укажите дату!")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate placedAt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime startTime;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime endTime;
 
     public TaskDTO(Task task) {
