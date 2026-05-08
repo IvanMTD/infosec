@@ -134,4 +134,20 @@ public class TroubleTicketService {
             return map;
         });
     }
+
+    public Mono<Category> deleteCategoryById(int id) {
+        return categoryRepository.findById(id).flatMap(category ->
+            troubleRepository.findAllByCategoryId(id).flatMap(trouble ->
+                troubleRepository.delete(trouble)
+            ).collectList().flatMap(l ->
+                categoryRepository.delete(category).thenReturn(category)
+            )
+        );
+    }
+
+    public Mono<Trouble> deleteTroubleById(int id) {
+        return troubleRepository.findById(id).flatMap(trouble ->
+            troubleRepository.delete(trouble).thenReturn(trouble)
+        );
+    }
 }

@@ -7,6 +7,7 @@ import net.security.infosec.models.dto.TaskDataTransferObject;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Locale;
@@ -16,23 +17,21 @@ import java.util.Locale;
 public class Task {
     @Id
     private int id;
-    /**
-     * Описание модели
-     */
     private String title;
     private String description;
     private LocalDate executeDate;
-    /**
-     * Связные модели
-     */
     private int troubleId;
     private int implementerId;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
     public Task(TaskDataTransferObject dto) {
         setTitle(dto.getTitle());
         setDescription(dto.getDescription());
         setTroubleId(dto.getTroubleId());
         setImplementerId(dto.getImplementerId());
+        setStartTime(dto.getStartTime());
+        setEndTime(dto.getEndTime());
         if(dto.getExecuteDate() != null){
             setExecuteDate(dto.getExecuteDate());
         }else{

@@ -8,6 +8,8 @@ import net.security.infosec.services.DepartmentService;
 import net.security.infosec.services.DivisionService;
 import net.security.infosec.services.EmployeeService;
 import net.security.infosec.services.ExcelReportService;
+import net.security.infosec.services.TaskService;
+import net.security.infosec.services.TroubleTicketService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,6 +32,8 @@ public class ApiController {
     private final DepartmentService departmentService;
     private final DivisionService divisionService;
     private final ExcelReportService excelReportService;
+    private final TroubleTicketService troubleTicketService;
+    private final TaskService taskService;
 
     @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     @PostMapping("/add/employee")
@@ -214,6 +219,57 @@ public class ApiController {
                 return employeeService.save(original);
             })
         ).collectList().flatMap(l -> Mono.just("OK"));
+    }
+
+    // ==================== CATEGORY / TROUBLE CRUD ====================
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/category/add")
+    public Mono<Category> addCategory(@RequestBody TicketDataTransferObject dto){
+        return troubleTicketService.saveCategory(dto);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/category/edit/{id}")
+    public Mono<Category> editCategory(@PathVariable int id, @RequestBody TicketDataTransferObject dto){
+        return troubleTicketService.updateCategory(dto, id);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/category/{id}")
+    public Mono<String> deleteCategory(@PathVariable int id){
+        return troubleTicketService.deleteCategoryById(id).flatMap(c -> Mono.just("OK"));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/trouble/add")
+    public Mono<Category> addTrouble(@RequestBody TicketDataTransferObject dto){
+        return troubleTicketService.saveTroubleInCategory(dto);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/trouble/edit/{id}")
+    public Mono<Trouble> editTrouble(@PathVariable int id, @RequestBody TicketDataTransferObject dto){
+        return troubleTicketService.updateTrouble(dto, id);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/trouble/{id}")
+    public Mono<String> deleteTrouble(@PathVariable int id){
+        return troubleTicketService.deleteTroubleById(id).flatMap(t -> Mono.just("OK"));
+    }
+
+    // ==================== KPI ====================
+
+    @GetMapping("/kpi/data")
+    public Flux<KpiEntry> kpiData(
+            @RequestParam(defaultValue = "ALL") String dept,
+            @RequestParam(defaultValue = "0") int empId,
+            @RequestParam String from,
+            @RequestParam String to){
+        LocalDate dateFrom = LocalDate.parse(from);
+        LocalDate dateTo = LocalDate.parse(to);
+        return taskService.getKpiData(dept, empId, dateFrom, dateTo);
     }
 
     // ==================== EXCEL REPORT ====================

@@ -86,6 +86,8 @@ public class TaskController {
                                 taskDTO.setContent(task.getDescription());
                                 taskDTO.setUsername(implementer.getFullName());
                                 taskDTO.setPlacedAt(task.getExecuteDate());
+                                taskDTO.setStartTime(task.getStartTime());
+                                taskDTO.setEndTime(task.getEndTime());
                                 troubleDTO.addTask(taskDTO);
                             }
                         }
@@ -158,6 +160,8 @@ public class TaskController {
                                 taskDTO.setContent(task.getDescription());
                                 taskDTO.setUsername(implementer.getFullName());
                                 taskDTO.setPlacedAt(task.getExecuteDate());
+                                taskDTO.setStartTime(task.getStartTime());
+                                taskDTO.setEndTime(task.getEndTime());
                                 troubleDTO.addTask(taskDTO);
                             }
                         }
@@ -230,6 +234,8 @@ public class TaskController {
                                 taskDTO.setContent(task.getDescription());
                                 taskDTO.setUsername(implementer.getFullName());
                                 taskDTO.setPlacedAt(task.getExecuteDate());
+                                taskDTO.setStartTime(task.getStartTime());
+                                taskDTO.setEndTime(task.getEndTime());
                                 troubleDTO.addTask(taskDTO);
                             }
                         }
@@ -314,6 +320,8 @@ public class TaskController {
                                 taskDTO.setContent(task.getDescription());
                                 taskDTO.setUsername(implementer.getFullName());
                                 taskDTO.setPlacedAt(task.getExecuteDate());
+                                taskDTO.setStartTime(task.getStartTime());
+                                taskDTO.setEndTime(task.getEndTime());
                                 troubleDTO.addTask(taskDTO);
                             }
                         }
@@ -391,6 +399,8 @@ public class TaskController {
                                         taskDTO.setTitle(task.getTitle());
                                         taskDTO.setContent(task.getDescription());
                                         taskDTO.setPlacedAt(task.getExecuteDate());
+                                taskDTO.setStartTime(task.getStartTime());
+                                taskDTO.setEndTime(task.getEndTime());
                                         troubleDTO.addTask(taskDTO);
                                         for (Implementer implementer : implementers) {
                                             if (task.getImplementerId() == implementer.getId()) {
@@ -468,6 +478,8 @@ public class TaskController {
                                     taskDTO.setContent(task.getDescription());
                                     taskDTO.setUsername(implementer.getFullName());
                                     taskDTO.setPlacedAt(task.getExecuteDate());
+                                taskDTO.setStartTime(task.getStartTime());
+                                taskDTO.setEndTime(task.getEndTime());
                                     troubleDTO.addTask(taskDTO);
                                 }
                             }
@@ -549,6 +561,8 @@ public class TaskController {
                                         taskDTO.setTitle(task.getTitle());
                                         taskDTO.setContent(task.getDescription());
                                         taskDTO.setPlacedAt(task.getExecuteDate());
+                                taskDTO.setStartTime(task.getStartTime());
+                                taskDTO.setEndTime(task.getEndTime());
                                         troubleDTO.addTask(taskDTO);
                                         for (Implementer implementer : implementers) {
                                             if (task.getImplementerId() == implementer.getId()) {
@@ -626,6 +640,8 @@ public class TaskController {
                                     taskDTO.setContent(task.getDescription());
                                     taskDTO.setUsername(implementer.getFullName());
                                     taskDTO.setPlacedAt(task.getExecuteDate());
+                                taskDTO.setStartTime(task.getStartTime());
+                                taskDTO.setEndTime(task.getEndTime());
                                     troubleDTO.addTask(taskDTO);
                                 }
                             }
@@ -707,6 +723,8 @@ public class TaskController {
                                         taskDTO.setTitle(task.getTitle());
                                         taskDTO.setContent(task.getDescription());
                                         taskDTO.setPlacedAt(task.getExecuteDate());
+                                taskDTO.setStartTime(task.getStartTime());
+                                taskDTO.setEndTime(task.getEndTime());
                                         troubleDTO.addTask(taskDTO);
                                         for (Implementer implementer : implementers) {
                                             if (task.getImplementerId() == implementer.getId()) {
@@ -784,6 +802,8 @@ public class TaskController {
                                     taskDTO.setContent(task.getDescription());
                                     taskDTO.setUsername(implementer.getFullName());
                                     taskDTO.setPlacedAt(task.getExecuteDate());
+                                taskDTO.setStartTime(task.getStartTime());
+                                taskDTO.setEndTime(task.getEndTime());
                                     troubleDTO.addTask(taskDTO);
                                 }
                             }
@@ -882,6 +902,8 @@ public class TaskController {
                                         taskDTO.setTitle(task.getTitle());
                                         taskDTO.setContent(task.getDescription());
                                         taskDTO.setPlacedAt(task.getExecuteDate());
+                                taskDTO.setStartTime(task.getStartTime());
+                                taskDTO.setEndTime(task.getEndTime());
                                         troubleDTO.addTask(taskDTO);
                                         for (Implementer implementer : implementers) {
                                             if (task.getImplementerId() == implementer.getId()) {
@@ -976,6 +998,8 @@ public class TaskController {
                                     taskDTO.setContent(task.getDescription());
                                     taskDTO.setUsername(implementer.getFullName());
                                     taskDTO.setPlacedAt(task.getExecuteDate());
+                                taskDTO.setStartTime(task.getStartTime());
+                                taskDTO.setEndTime(task.getEndTime());
                                     troubleDTO.addTask(taskDTO);
                                 }
                             }
@@ -1090,5 +1114,18 @@ public class TaskController {
             log.info("SAVED!");
             return Mono.just(Rendering.redirectTo("/").build());
         }))));
+    }
+
+    @GetMapping("/kpi")
+    @PreAuthorize("hasAnyRole('MANAGER','ADMIN')")
+    public Mono<Rendering> kpiPage(@AuthenticationPrincipal Implementer user){
+        return Mono.just(
+                Rendering.view("template")
+                        .modelAttribute("title","KPI — Загруженность")
+                        .modelAttribute("index","kpi-page")
+                        .modelAttribute("departmentRoles", DepartmentRole.values())
+                        .modelAttribute("currentUser", user)
+                        .build()
+        );
     }
 }

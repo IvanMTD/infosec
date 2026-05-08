@@ -1,164 +1,365 @@
-<div class="container-fluid">
-    <div class="row">
-        <div class="col"></div>
-        <div class="col-6">
-            <div class="row" th:if="${categories.size()} != 0">
-                <div class="col py-5">
-                    <div class="card" style="height: 100%">
-                        <div class="card-body" id="my-card">
-                            <h5 class="card-title" th:text="${categories[0].getTitle()}"></h5>
-                            <p class="card-text" th:text="${categories[0].getDescription()}"></p>
-                            <p class="card-text" th:text="${categories[0].getDepartmentRole().getTitle()}"></p>
-                            <a th:href="@{/admin/category/edit/{id}(id=${categories[0].getId()})}" class="card-link">Редактировать</a>
-                            <a href="#" class="card-link disabled">Удалить</a>
+<div class="profile-wrapper h-100">
+    <div class="container">
+        <div class="row g-3 justify-content-center">
+            <!-- Левая карточка: Категории -->
+            <div class="col-lg-6">
+                <div class="profile-card">
+                    <div class="profile-card__header">
+                        <span class="smoke-b1"></span><span class="smoke-b2"></span><span class="smoke-b3"></span><span class="smoke-b4"></span>
+                        <span class="smoke-m1"></span><span class="smoke-m2"></span><span class="smoke-m3"></span><span class="smoke-m4"></span>
+                        <span class="smoke-f1"></span><span class="smoke-f2"></span><span class="smoke-f3"></span><span class="smoke-f4"></span>
+                        <div class="profile-card__avatar"><i class="bi bi-tags-fill"></i></div>
+                        <div class="flex-grow-1"><div class="profile-card__title">Категории</div></div>
+                        <button class="btn btn-smoke btn-sm" onclick="showAddCategoryModal()"><i class="bi bi-plus-lg"></i></button>
+                    </div>
+                    <div class="profile-card__body p-2">
+                        <div class="d-grid gap-1" id="category-list">
+                            <th:block th:each="category, stat : ${categories}">
+                                <button th:attr="data-cid=${category.getId()},data-title=${category.getTitle()},data-desc=${category.getDescription()},data-role=${category.getDepartmentRole()}"
+                                    th:classappend="${stat.first} ? 'btn-smoke' : 'btn-outline-secondary'"
+                                    class="btn btn-sm text-start w-100"
+                                    onclick="selectCategoryFrom(this)">
+                                    <span th:text="${category.getTitle()}"></span>
+                                    <small class="ms-2 opacity-75" th:text="'— ' + ${category.getDepartmentRole().getTitle()}"></small>
+                                </button>
+                            </th:block>
                         </div>
                     </div>
-                </div>
-                <div class="col py-5">
-                    <div class="card" style="height: 100%" th:if="${categories[0].getTroubles().size()} != 0">
-                        <div class="card-body" id="my-card-2">
-                            <h5 class="card-title" th:text="${categories[0].getTroubles[0].getTitle()}"></h5>
-                            <p class="card-text" th:text="${categories[0].getTroubles[0].getDescription()}"></p>
-                            <p class="card-text" th:text="${categories[0].getTroubles[0].getDepartmentRole().getTitle()}"></p>
-                            <a th:href="@{/admin/trouble/edit/{id}(id=${categories[0].getTroubles[0].getId()})}" class="card-link">Редактировать</a>
-                            <a href="#" class="card-link disabled">Удалить</a>
+                    <div class="profile-card__body border-top" id="category-info">
+                        <div id="cat-preview" th:if="${!categories.isEmpty()}"
+                            th:attr="data-cid=${categories[0].getId()},data-title=${categories[0].getTitle()},data-desc=${categories[0].getDescription()},data-role=${categories[0].getDepartmentRole()}">
+                            <div class="info-card"><div class="info-card__label">Название</div><div class="info-card__value" th:text="${categories[0].getTitle()}"></div></div>
+                            <div class="info-card mt-2"><div class="info-card__label">Описание</div><div class="info-card__value" th:text="${categories[0].getDescription()}"></div></div>
+                            <div class="d-flex gap-2 mt-2">
+                                <button class="btn btn-sm btn-outline-secondary flex-grow-1" onclick="showEditCategoryModalFromEl()"><i class="bi bi-pencil-square"></i> Редактировать</button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteCategoryFromEl()"><i class="bi bi-trash"></i></button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row" th:if="${categories.size()} != 0">
-                <div class="col">
-                    <ul class="list-group py-3">
-                        <li class="list-group-item" th:each="category, stat : ${categories}" th:id="${stat.index}" onclick="setActive(this.id)" style="cursor: pointer;">
-                            <span th:text="${category.getTitle()}"></span> - <span th:text="${category.getDepartmentRole().getTitle()}"></span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col">
-                    <ul class="list-group py-3" id="trouble-list" style="cursor: pointer;">
-                        <li class="list-group-item" th:each="trouble, stat : ${categories[0].getTroubles()}" th:name="${stat.index}" th:id="'id0' + ${stat.index}" onclick="setTroubleActive(this.id)">
-                            <span th:text="${trouble.getTitle()}"></span> - <span th:text="${trouble.getDepartmentRole().getTitle()}"></span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <form th:method="POST" th:action="@{/admin/category/add}" th:object="${ticket}">
-                        <ul class="list-group py-5">
-                            <li class="list-group-item active text-center">Добавить категорию</li>
-                            <li class="list-group-item">
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text" id="inputGroup-sizing-default">Заголовок</span>
-                                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" th:field="*{name}">
-                                    <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color: red"></span>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <div class="input-group">
-                                    <span class="input-group-text">Описание</span>
-                                    <textarea class="form-control" aria-label="With textarea" th:field="*{description}" rows="10"></textarea>
-                                    <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red"></span>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <div class="input-group">
-                                    <span class="input-group-text">Служба</span>
-                                    <select class="form-select" th:field="*{departmentRole}">
-                                        <option th:each="departmentRole : ${departmentRoles}" th:value="${departmentRole}" th:text="${departmentRole.getTitle()}"></option>
-                                    </select>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <input class="btn btn-primary" type="submit"value="Добавить">
-                            </li>
-                        </ul>
-                    </form>
-                </div>
-                <div class="col">
-                    <form th:method="POST" th:action="@{/admin/trouble/add}" th:object="${ticket}">
-                        <ul class="list-group py-5">
-                            <li class="list-group-item active text-center">Добавить раздел</li>
-                            <li class="list-group-item">
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text" id="inputGroup-sizing-default">Заголовок</span>
-                                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" th:field="*{name}">
-                                    <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color: red"></span>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <div class="input-group">
-                                    <span class="input-group-text">Описание</span>
-                                    <textarea class="form-control" aria-label="With textarea" th:field="*{description}" rows="10"></textarea>
-                                    <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red"></span>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <select class="form-select"  th:field="*{categoryId}">
-                                    <option th:each="category : ${categories2}" th:text="${category.getName()}" th:value="${category.getId()}"></option>
-                                </select>
-                            </li>
-                            <li class="list-group-item">
-                                <input class="btn btn-primary" type="submit"value="Добавить">
-                            </li>
-                        </ul>
-                    </form>
+
+            <!-- Правая карточка: Разделы -->
+            <div class="col-lg-6">
+                <div class="profile-card">
+                    <div class="profile-card__header">
+                        <span class="smoke-b1"></span><span class="smoke-b2"></span><span class="smoke-b3"></span><span class="smoke-b4"></span>
+                        <span class="smoke-m1"></span><span class="smoke-m2"></span><span class="smoke-m3"></span><span class="smoke-m4"></span>
+                        <span class="smoke-f1"></span><span class="smoke-f2"></span><span class="smoke-f3"></span><span class="smoke-f4"></span>
+                        <div class="profile-card__avatar"><i class="bi bi-list-ul"></i></div>
+                        <div class="flex-grow-1"><div class="profile-card__title">Разделы</div></div>
+                        <button class="btn btn-smoke btn-sm" onclick="showAddTroubleModal()"><i class="bi bi-plus-lg"></i></button>
+                    </div>
+                    <div class="profile-card__body p-2">
+                        <div class="d-grid gap-1" id="trouble-list">
+                            <th:block th:if="${!categories.isEmpty()}">
+                                <th:block th:each="trouble, stat : ${categories[0].getTroubles()}">
+                                    <button th:attr="data-tid=${trouble.getId()},data-title=${trouble.getTitle()},data-desc=${trouble.getDescription()},data-role=${trouble.getDepartmentRole()}"
+                                        th:classappend="${stat.first} ? 'btn-smoke' : 'btn-outline-secondary'"
+                                        class="btn btn-sm text-start w-100"
+                                        onclick="selectTroubleFrom(this)">
+                                        <span th:text="${trouble.getTitle()}"></span>
+                                    </button>
+                                </th:block>
+                            </th:block>
+                        </div>
+                    </div>
+                    <div class="profile-card__body border-top" id="trouble-info">
+                        <div id="tr-preview" th:if="${!categories.isEmpty() and !categories[0].getTroubles().isEmpty()}"
+                            th:attr="data-tid=${categories[0].getTroubles()[0].getId()},data-title=${categories[0].getTroubles()[0].getTitle()},data-desc=${categories[0].getTroubles()[0].getDescription()},data-role=${categories[0].getTroubles()[0].getDepartmentRole()}">
+                            <div class="info-card"><div class="info-card__label">Название</div><div class="info-card__value" th:text="${categories[0].getTroubles()[0].getTitle()}"></div></div>
+                            <div class="info-card mt-2"><div class="info-card__label">Описание</div><div class="info-card__value" th:text="${categories[0].getTroubles()[0].getDescription()}"></div></div>
+                            <div class="d-flex gap-2 mt-2">
+                                <button class="btn btn-sm btn-outline-secondary flex-grow-1" onclick="showEditTroubleModalFromEl()"><i class="bi bi-pencil-square"></i> Редактировать</button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTroubleFromEl()"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col"></div>
     </div>
 </div>
 
+<div id="edit-modal-field"></div>
+
 <script th:inline="javascript">
-    let current = 0;
-    function setActive(id){
-        current = id;
-        for(let i=0; i<[[${categories}]].length; i++){
-            if(i == id){
-                document.getElementById(i).setAttribute('class','list-group-item active');
-                $('#trouble-list').html('');
-                let tl = [[${categories}]][i].troubles;
-                for(let j=0; j<tl.length; j++){
-                    $('#trouble-list').append(
-                        '<li class="list-group-item" name="' + j + '" id="id' + i + j + '" onclick="setTroubleActive(this.id)">\n' +
-                        '   <span>' + tl[j].title + '</span>\n' +
-                        '</li>'
-                    );
-                }
-                $('#my-card').html('');
-                $('#my-card').append(
-                    '<h5 class="card-title">' + [[${categories}]][id].title + '</h5>\n' +
-                    '<p class="card-text">' + [[${categories}]][id].description + '</p>\n' +
-                    '<a href="/admin/category/edit/' + [[${categories}]][id].id + '" class="card-link">Редактировать</a>\n' +
-                    '<a href="#" class="card-link disabled">Удалить</a>'
-                );
-                document.getElementById('id' + current + 0).setAttribute('class','list-group-item active');
-                $('#my-card-2').html('');
-                $('#my-card-2').append(
-                    '<h5 class="card-title">' + [[${categories}]][current].troubles[0].title + '</h5>\n' +
-                    '<p class="card-text">' + [[${categories}]][current].troubles[0].description + '</p>\n' +
-                    '<a href="/admin/trouble/edit/' + [[${categories}]][current].troubles[0].id + '" class="card-link">Редактировать</a>\n' +
-                    '<a href="#" class="card-link disabled">Удалить</a>'
-                );
-            }else{
-                document.getElementById(i).setAttribute('class','list-group-item');
-            }
+    /* данные с сервера */
+    var deptRoles = [[${departmentRoles}]];
+    var allCategoriesForSelect = [[${categories2}]];
+
+    var csData = {
+        categories: [],
+        selectedCategoryId: 0,
+        selectedTroubleId: 0
+    };
+
+    var rawCategories = [[${categories}]];
+    rawCategories.forEach(function(c){
+        csData.categories.push({
+            id: c.id,
+            title: c.title,
+            description: c.description,
+            departmentRole: c.departmentRole,
+            troubles: c.troubles || []
+        });
+    });
+    if(csData.categories.length > 0){
+        csData.selectedCategoryId = csData.categories[0].id;
+        if(csData.categories[0].troubles.length > 0){
+            csData.selectedTroubleId = csData.categories[0].troubles[0].id;
         }
     }
 
-    function setTroubleActive(id){
-        for(let i=0; i<[[${categories}]][current].troubles.length; i++){
-            document.getElementById('id' + current + i).setAttribute('class','list-group-item');
+    function selectCategoryFrom(btn){
+        var id = parseInt(btn.getAttribute('data-cid'));
+        selectCategory(id);
+    }
+
+    function selectCategory(id){
+        csData.selectedCategoryId = id;
+        var cat = getCategoryById(id);
+        if(!cat) return;
+
+        document.querySelectorAll('#category-list .btn').forEach(function(b){ b.className = 'btn btn-sm btn-outline-secondary text-start w-100'; });
+        var btn = document.querySelector('#category-list button[data-cid="' + id + '"]');
+        if(btn) btn.className = 'btn btn-sm btn-smoke text-start w-100';
+
+        updateCategoryInfo(cat);
+        rebuildTroubleList(cat);
+    }
+
+    function selectTroubleFrom(btn){
+        var id = parseInt(btn.getAttribute('data-tid'));
+        selectTrouble(id);
+    }
+
+    function selectTrouble(id){
+        csData.selectedTroubleId = id;
+        var tr = getTroubleById(id);
+        if(!tr) return;
+
+        document.querySelectorAll('#trouble-list .btn').forEach(function(b){ b.className = 'btn btn-sm btn-outline-secondary text-start w-100'; });
+        var btn = document.querySelector('#trouble-list button[data-tid="' + id + '"]');
+        if(btn) btn.className = 'btn btn-sm btn-smoke text-start w-100';
+
+        updateTroubleInfo(tr);
+    }
+
+    function getCategoryById(id){
+        return csData.categories.find(function(c){ return c.id == id; });
+    }
+
+    function getTroubleById(id){
+        for(var i=0; i<csData.categories.length; i++){
+            var tr = csData.categories[i].troubles.find(function(t){ return t.id == id; });
+            if(tr) return tr;
         }
-        document.getElementById(id).setAttribute('class','list-group-item active');
-        let num = document.getElementById(id).getAttribute('name');
-        $('#my-card-2').html('');
-        $('#my-card-2').append(
-            '<h5 class="card-title">' + [[${categories}]][current].troubles[num].title + '</h5>\n' +
-            '<p class="card-text">' + [[${categories}]][current].troubles[num].description + '</p>\n' +
-            '<a href="/admin/trouble/edit/' + [[${categories}]][current].troubles[num].id + '" class="card-link">Редактировать</a>\n' +
-            '<a href="#" class="card-link disabled">Удалить</a>'
-        );
+        return null;
+    }
+
+    function updateCategoryInfo(cat){
+        var el = document.getElementById('cat-preview');
+        el.setAttribute('data-cid', cat.id);
+        el.setAttribute('data-title', cat.title);
+        el.setAttribute('data-desc', cat.description || '');
+        el.setAttribute('data-role', cat.departmentRole || '');
+        el.innerHTML =
+            '<div class="info-card"><div class="info-card__label">Название</div><div class="info-card__value">' + cat.title + '</div></div>' +
+            '<div class="info-card mt-2"><div class="info-card__label">Описание</div><div class="info-card__value">' + (cat.description || '') + '</div></div>' +
+            '<div class="d-flex gap-2 mt-2">' +
+            '<button class="btn btn-sm btn-outline-secondary flex-grow-1" onclick="showEditCategoryModalFromEl()"><i class="bi bi-pencil-square"></i> Редактировать</button>' +
+            '<button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteCategoryFromEl()"><i class="bi bi-trash"></i></button>' +
+            '</div>';
+    }
+
+    function updateTroubleInfo(tr){
+        var el = document.getElementById('tr-preview');
+        el.setAttribute('data-tid', tr.id);
+        el.setAttribute('data-title', tr.title);
+        el.setAttribute('data-desc', tr.description || '');
+        el.setAttribute('data-role', tr.departmentRole || '');
+        el.innerHTML =
+            '<div class="info-card"><div class="info-card__label">Название</div><div class="info-card__value">' + tr.title + '</div></div>' +
+            '<div class="info-card mt-2"><div class="info-card__label">Описание</div><div class="info-card__value">' + (tr.description || '') + '</div></div>' +
+            '<div class="d-flex gap-2 mt-2">' +
+            '<button class="btn btn-sm btn-outline-secondary flex-grow-1" onclick="showEditTroubleModalFromEl()"><i class="bi bi-pencil-square"></i> Редактировать</button>' +
+            '<button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTroubleFromEl()"><i class="bi bi-trash"></i></button>' +
+            '</div>';
+    }
+
+    function rebuildTroubleList(cat){
+        var html = '';
+        cat.troubles.forEach(function(t, idx){
+            html += '<button data-tid="' + t.id + '" data-title="' + t.title + '" data-desc="' + (t.description||'') + '" data-role="' + (t.departmentRole||'') + '" class="btn btn-sm ' + (idx===0?'btn-smoke':'btn-outline-secondary') + ' text-start w-100" onclick="selectTroubleFrom(this)">' + t.title + '</button>';
+        });
+        document.getElementById('trouble-list').innerHTML = html;
+
+        if(cat.troubles.length > 0){
+            selectTrouble(cat.troubles[0].id);
+        } else {
+            document.getElementById('tr-preview').innerHTML = '<p class="text-muted m-0 p-3">Нет разделов</p>';
+        }
+    }
+
+    /* ==================== MODAL HELPERS ==================== */
+    function roleOptions(){
+        var html = '';
+        deptRoles.forEach(function(r){ html += '<option value="' + r + '">' + (r==='ALL'?'Все':r==='IB'?'Информационная безопасность':r==='IT'?'Техническая поддержка':'') + '</option>'; });
+        return html;
+    }
+    function categoryOptions(selectedId){
+        var html = '';
+        allCategoriesForSelect.forEach(function(c){
+            var sel = c.id == selectedId ? ' selected' : '';
+            html += '<option value="' + c.id + '"' + sel + '>' + c.name + '</option>';
+        });
+        return html;
+    }
+
+    function showEditCategoryModalFromEl(){
+        var el = document.getElementById('cat-preview');
+        showEditCategoryModal(parseInt(el.getAttribute('data-cid')), el.getAttribute('data-title'), el.getAttribute('data-desc'), el.getAttribute('data-role'));
+    }
+    function confirmDeleteCategoryFromEl(){
+        var el = document.getElementById('cat-preview');
+        confirmDeleteCategory(parseInt(el.getAttribute('data-cid')), el.getAttribute('data-title'));
+    }
+    function showEditTroubleModalFromEl(){
+        var el = document.getElementById('tr-preview');
+        showEditTroubleModal(parseInt(el.getAttribute('data-tid')), el.getAttribute('data-title'), el.getAttribute('data-desc'), el.getAttribute('data-role'));
+    }
+    function confirmDeleteTroubleFromEl(){
+        var el = document.getElementById('tr-preview');
+        confirmDeleteTrouble(parseInt(el.getAttribute('data-tid')), el.getAttribute('data-title'));
+    }
+
+    /* ==================== CATEGORY MODALS ==================== */
+    function showAddCategoryModal(){
+        var html = '<div class="modal fade" id="cat-modal" tabindex="-1" aria-hidden="true">'
+            + '<div class="modal-dialog modal-dialog-centered"><div class="modal-content">'
+            + '<div class="modal-header profile-card__header rounded-top">'
+            + '<span class="smoke-f1"></span><span class="smoke-f2"></span><span class="smoke-f3"></span><span class="smoke-f4"></span>'
+            + '<h5 class="modal-title text-white border-0" style="position:relative;z-index:1;"><i class="bi bi-tags-fill"></i> Добавить категорию</h5>'
+            + '<button class="btn-close btn-close-white" data-bs-dismiss="modal" style="position:relative;z-index:1;"></button>'
+            + '</div><div class="modal-body"><div class="row g-2">'
+            + '<div class="col-12 form-floating"><input type="text" class="form-control" id="cat-title" placeholder="title"><label for="cat-title" class="ms-2">Название</label></div>'
+            + '<div class="col-12 form-floating"><textarea class="form-control" id="cat-desc" placeholder="desc" style="height:80px;"></textarea><label for="cat-desc" class="ms-2">Описание</label></div>'
+            + '<div class="col-12 form-floating"><select class="form-select" id="cat-role">' + roleOptions() + '</select><label for="cat-role" class="ms-2">Служба</label></div>'
+            + '</div></div><div class="modal-footer">'
+            + '<button class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>'
+            + '<button class="btn btn-smoke" onclick="submitCategory(null)">Добавить</button>'
+            + '</div></div></div></div>';
+        document.getElementById('edit-modal-field').innerHTML = html;
+        new bootstrap.Modal(document.getElementById('cat-modal')).show();
+    }
+
+    function showEditCategoryModal(id, title, desc, role){
+        var html = '<div class="modal fade" id="cat-modal" tabindex="-1" aria-hidden="true">'
+            + '<div class="modal-dialog modal-dialog-centered"><div class="modal-content">'
+            + '<div class="modal-header profile-card__header rounded-top">'
+            + '<span class="smoke-f1"></span><span class="smoke-f2"></span><span class="smoke-f3"></span><span class="smoke-f4"></span>'
+            + '<h5 class="modal-title text-white border-0" style="position:relative;z-index:1;"><i class="bi bi-pencil-square"></i> Редактировать</h5>'
+            + '<button class="btn-close btn-close-white" data-bs-dismiss="modal" style="position:relative;z-index:1;"></button>'
+            + '</div><div class="modal-body"><div class="row g-2">'
+            + '<div class="col-12 form-floating"><input type="text" class="form-control" id="cat-title" placeholder="title" value="' + title + '"><label for="cat-title" class="ms-2">Название</label></div>'
+            + '<div class="col-12 form-floating"><textarea class="form-control" id="cat-desc" placeholder="desc" style="height:80px;">' + (desc||'') + '</textarea><label for="cat-desc" class="ms-2">Описание</label></div>'
+            + '<div class="col-12 form-floating"><select class="form-select" id="cat-role">' + roleOptions() + '</select><label for="cat-role" class="ms-2">Служба</label></div>'
+            + '</div></div><div class="modal-footer">'
+            + '<button class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>'
+            + '<button class="btn btn-smoke" onclick="submitCategory(' + id + ')">Сохранить</button>'
+            + '</div></div></div></div>';
+        document.getElementById('edit-modal-field').innerHTML = html;
+        var m = new bootstrap.Modal(document.getElementById('cat-modal'));
+        m.show();
+        setTimeout(function(){ $('#cat-role').val(role); }, 200);
+    }
+
+    function submitCategory(id){
+        var data = { name: $('#cat-title').val(), description: $('#cat-desc').val(), departmentRole: $('#cat-role').val() };
+        var url = id ? '/api/category/edit/' + id : '/api/category/add';
+        $.ajax({ url: url, type: 'POST', contentType: 'application/json', data: JSON.stringify(data), success: function(){ location.reload(); } });
+    }
+
+    function confirmDeleteCategory(id, title){
+        var html = '<div class="modal fade" id="del-modal" tabindex="-1" aria-hidden="true">'
+            + '<div class="modal-dialog modal-dialog-centered"><div class="modal-content">'
+            + '<div class="modal-header bg-danger-subtle"><h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Удаление категории</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>'
+            + '<div class="modal-body"><p>Удалить категорию <b>"' + title + '"</b>?</p><p class="text-danger">Все связанные разделы также будут удалены.</p></div>'
+            + '<div class="modal-footer"><button class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button><button class="btn btn-danger" onclick="deleteCategory(' + id + ')">Удалить</button></div>'
+            + '</div></div></div>';
+        document.getElementById('edit-modal-field').innerHTML = html;
+        new bootstrap.Modal(document.getElementById('del-modal')).show();
+    }
+
+    function deleteCategory(id){
+        $.ajax({ url: '/api/category/' + id, type: 'DELETE', success: function(){ location.reload(); } });
+    }
+
+    /* ==================== TROUBLE MODALS ==================== */
+    function showAddTroubleModal(){
+        var html = '<div class="modal fade" id="tr-modal" tabindex="-1" aria-hidden="true">'
+            + '<div class="modal-dialog modal-dialog-centered"><div class="modal-content">'
+            + '<div class="modal-header profile-card__header rounded-top">'
+            + '<span class="smoke-f1"></span><span class="smoke-f2"></span><span class="smoke-f3"></span><span class="smoke-f4"></span>'
+            + '<h5 class="modal-title text-white border-0" style="position:relative;z-index:1;"><i class="bi bi-list-ul"></i> Добавить раздел</h5>'
+            + '<button class="btn-close btn-close-white" data-bs-dismiss="modal" style="position:relative;z-index:1;"></button>'
+            + '</div><div class="modal-body"><div class="row g-2">'
+            + '<div class="col-12 form-floating"><input type="text" class="form-control" id="tr-title" placeholder="title"><label for="tr-title" class="ms-2">Название</label></div>'
+            + '<div class="col-12 form-floating"><textarea class="form-control" id="tr-desc" placeholder="desc" style="height:80px;"></textarea><label for="tr-desc" class="ms-2">Описание</label></div>'
+            + '<div class="col-12 form-floating"><select class="form-select" id="tr-category">' + categoryOptions() + '</select><label for="tr-category" class="ms-2">Категория</label></div>'
+            + '</div></div><div class="modal-footer">'
+            + '<button class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>'
+            + '<button class="btn btn-smoke" onclick="submitTrouble(null)">Добавить</button>'
+            + '</div></div></div></div>';
+        document.getElementById('edit-modal-field').innerHTML = html;
+        new bootstrap.Modal(document.getElementById('tr-modal')).show();
+    }
+
+    function showEditTroubleModal(id, title, desc, role){
+        var html = '<div class="modal fade" id="tr-modal" tabindex="-1" aria-hidden="true">'
+            + '<div class="modal-dialog modal-dialog-centered"><div class="modal-content">'
+            + '<div class="modal-header profile-card__header rounded-top">'
+            + '<span class="smoke-f1"></span><span class="smoke-f2"></span><span class="smoke-f3"></span><span class="smoke-f4"></span>'
+            + '<h5 class="modal-title text-white border-0" style="position:relative;z-index:1;"><i class="bi bi-pencil-square"></i> Редактировать</h5>'
+            + '<button class="btn-close btn-close-white" data-bs-dismiss="modal" style="position:relative;z-index:1;"></button>'
+            + '</div><div class="modal-body"><div class="row g-2">'
+            + '<div class="col-12 form-floating"><input type="text" class="form-control" id="tr-title" placeholder="title" value="' + title + '"><label for="tr-title" class="ms-2">Название</label></div>'
+            + '<div class="col-12 form-floating"><textarea class="form-control" id="tr-desc" placeholder="desc" style="height:80px;">' + (desc||'') + '</textarea><label for="tr-desc" class="ms-2">Описание</label></div>'
+            + '<div class="col-12 form-floating"><select class="form-select" id="tr-category">' + categoryOptions() + '</select><label for="tr-category" class="ms-2">Категория</label></div>'
+            + '</div></div><div class="modal-footer">'
+            + '<button class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>'
+            + '<button class="btn btn-smoke" onclick="submitTrouble(' + id + ')">Сохранить</button>'
+            + '</div></div></div></div>';
+        document.getElementById('edit-modal-field').innerHTML = html;
+        var m = new bootstrap.Modal(document.getElementById('tr-modal'));
+        m.show();
+        setTimeout(function(){
+            for(var i=0; i<csData.categories.length; i++){
+                var cat = csData.categories[i];
+                if(cat.troubles.find(function(t){ return t.id == id; })){ $('#tr-category').val(cat.id); break; }
+            }
+        }, 200);
+    }
+
+    function submitTrouble(id){
+        var data = { name: $('#tr-title').val(), description: $('#tr-desc').val(), categoryId: $('#tr-category').val() };
+        var url = id ? '/api/trouble/edit/' + id : '/api/trouble/add';
+        $.ajax({ url: url, type: 'POST', contentType: 'application/json', data: JSON.stringify(data), success: function(){ location.reload(); } });
+    }
+
+    function confirmDeleteTrouble(id, title){
+        var html = '<div class="modal fade" id="del-modal" tabindex="-1" aria-hidden="true">'
+            + '<div class="modal-dialog modal-dialog-centered"><div class="modal-content">'
+            + '<div class="modal-header bg-danger-subtle"><h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Удаление раздела</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>'
+            + '<div class="modal-body"><p>Удалить раздел <b>"' + title + '"</b>?</p></div>'
+            + '<div class="modal-footer"><button class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button><button class="btn btn-danger" onclick="deleteTrouble(' + id + ')">Удалить</button></div>'
+            + '</div></div></div>';
+        document.getElementById('edit-modal-field').innerHTML = html;
+        new bootstrap.Modal(document.getElementById('del-modal')).show();
+    }
+
+    function deleteTrouble(id){
+        $.ajax({ url: '/api/trouble/' + id, type: 'DELETE', success: function(){ location.reload(); } });
     }
 </script>

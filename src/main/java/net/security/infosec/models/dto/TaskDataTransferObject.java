@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @RequiredArgsConstructor
@@ -16,4 +17,6 @@ public class TaskDataTransferObject {
     private int troubleId;
     private int implementerId;
     private LocalDate executeDate = LocalDate.now();
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 }

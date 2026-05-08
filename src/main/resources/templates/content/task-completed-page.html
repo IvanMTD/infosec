@@ -80,6 +80,18 @@
 
                         </div>
 
+                        <!-- Время выполнения -->
+                        <div class="row pt-2 g-2 mx-0">
+                            <div class="col-6 form-floating px-0">
+                                <input type="datetime-local" class="form-control" id="startTime" th:field="*{startTime}" placeholder="start">
+                                <label for="startTime" class="ms-2">Начало выполнения</label>
+                            </div>
+                            <div class="col-6 form-floating px-0">
+                                <input type="datetime-local" class="form-control" id="endTime" th:field="*{endTime}" placeholder="end">
+                                <label for="endTime" class="ms-2">Окончание выполнения</label>
+                            </div>
+                        </div>
+
                         <!-- Card Footer — дата + кнопка -->
                         <div class="task-card__footer">
                             <div class="task-footer-date">

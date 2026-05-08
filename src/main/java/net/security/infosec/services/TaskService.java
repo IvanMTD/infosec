@@ -1,25 +1,33 @@
 package net.security.infosec.services;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.security.infosec.models.dto.DateDTO;
+import net.security.infosec.models.dto.KpiEntry;
 import net.security.infosec.models.dto.TaskDTO;
 import net.security.infosec.models.dto.TaskDataTransferObject;
 import net.security.infosec.models.entity.Implementer;
 import net.security.infosec.models.entity.Task;
+import net.security.infosec.repositories.ImplementerRepository;
 import net.security.infosec.repositories.TaskRepository;
+import net.security.infosec.repositories.TroubleRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Comparator;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final ImplementerRepository implementerRepository;
+    private final TroubleRepository troubleRepository;
 
     public Mono<Task> saveTask(TaskDataTransferObject dto){
         return taskRepository.save(new Task(dto));
@@ -197,5 +205,38 @@ public class TaskService {
             task.update(taskDTO);
             return taskRepository.save(task);
         });
+    }
+
+    /* ==================== KPI ==================== */
+    public Flux<KpiEntry> getKpiData(String departmentRole, int employeeId, LocalDate from, LocalDate to) {
+        return taskRepository.findAllByExecuteDateBetween(from, to)
+            .filter(t -> t.getStartTime() != null && t.getEndTime() != null && t.getStartTime().isBefore(t.getEndTime()))
+            .filter(t -> {
+                if (employeeId > 0) return t.getImplementerId() == employeeId;
+                return true;
+            })
+            .flatMap(task -> {
+                long minutes = Duration.between(task.getStartTime(), task.getEndTime()).toMinutes();
+                return implementerRepository.findById(task.getImplementerId())
+                    .flatMap(implementer -> {
+                        // фильтр по departmentRole
+                        if (departmentRole != null && !"ALL".equals(departmentRole)) {
+                            if (!departmentRole.equals(implementer.getDepartmentRole().name())) {
+                                return Mono.empty();
+                            }
+                        }
+                        return troubleRepository.findById(task.getTroubleId())
+                            .defaultIfEmpty(new net.security.infosec.models.entity.Trouble())
+                            .map(trouble -> new KpiEntry(
+                                task.getImplementerId(),
+                                implementer.getFullName(),
+                                task.getExecuteDate(),
+                                task.getTroubleId(),
+                                trouble.getName() != null ? trouble.getName() : "",
+                                "",
+                                minutes
+                            ));
+                    });
+            });
     }
 }

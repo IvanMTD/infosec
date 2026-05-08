@@ -44,7 +44,7 @@
         <div class="flex-grow-1" th:insert="~{content/users-page}" th:if="${index} == 'users-page'"></div>
         <div class="flex-grow-1" th:insert="~{content/user-edit-page}" th:if="${index} == 'user-edit-page'"></div>
         <div class="flex-grow-1" th:insert="~{content/profile-page}" th:if="${index} == 'profile-page'"></div>
-        <div th:insert="~{content/works-page}" th:if="${index} == 'works-page'"></div>
+        <div class="flex-grow-1" th:insert="~{content/works-page}" th:if="${index} == 'works-page'"></div>
         <div th:insert="~{content/categories-page}" th:if="${index} == 'categories-page'"></div>
         <div th:insert="~{content/category-reg-page}" th:if="${index} == 'category-reg-page'"></div>
         <div th:insert="~{content/category-edit-page}" th:if="${index} == 'category-edit-page'"></div>
@@ -66,6 +66,7 @@
         <div th:insert="~{content/structure-edit-page}" th:if="${index} == 'structure-edit-page'"></div>
         <div th:insert="~{content/division-edit-page}" th:if="${index} == 'division-edit-page'"></div>
         <div th:insert="~{content/employee-edit-page}" th:if="${index} == 'employee-edit-page'"></div>
+        <div class="flex-grow-1" th:insert="~{content/kpi-page}" th:if="${index} == 'kpi-page'"></div>
 
         <main th:insert="~{content/testing}" th:if="${index} == 'page-testing'"></main>
 

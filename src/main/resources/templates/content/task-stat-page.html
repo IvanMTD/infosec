@@ -144,6 +144,8 @@
                                                             <div class="card-body">
                                                                 <h5 class="card-title" th:text="'Пользователь или описание: ' + ${task.getTitle()}"></h5>
                                                                 <p class="card-text" th:text="${task.getContent()}"></p>
+                                                                <p class="card-text small text-secondary" th:if="${task.getTimeInfo() != null}" th:text="${task.getTimeInfo()}"></p>
+                                                                <p class="card-text small text-muted" th:unless="${task.getTimeInfo() != null}">Время выполнения не было указано</p>
                                                                 <p class="card-text" th:text="${task.getDate()}"></p>
                                                                 <a th:href="@{/task/{tid}/edit(tid=${task.getId()})}" class="btn btn-smoke" th:if="${manager} or ${admin}">Редактировать</a>
                                                             </div>
