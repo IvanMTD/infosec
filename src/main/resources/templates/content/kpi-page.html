@@ -89,7 +89,7 @@
 
     function loadEmployeesForRole(dept){
         $.ajax({
-            url:'/api/search/employees?search=&role=' + dept,
+            url:'/api/search/implementers?role=' + dept,
             type:'get',
             success:function(data){
                 var html = '<option value="0">Все</option>';

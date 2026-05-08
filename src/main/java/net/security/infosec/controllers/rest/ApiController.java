@@ -8,6 +8,7 @@ import net.security.infosec.services.DepartmentService;
 import net.security.infosec.services.DivisionService;
 import net.security.infosec.services.EmployeeService;
 import net.security.infosec.services.ExcelReportService;
+import net.security.infosec.services.ImplementerService;
 import net.security.infosec.services.TaskService;
 import net.security.infosec.services.TroubleTicketService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,6 +35,7 @@ public class ApiController {
     private final ExcelReportService excelReportService;
     private final TroubleTicketService troubleTicketService;
     private final TaskService taskService;
+    private final ImplementerService implementerService;
 
     @PreAuthorize("hasAnyRole('ADMIN','GUIDE_ADMIN')")
     @PostMapping("/add/employee")
@@ -260,6 +262,13 @@ public class ApiController {
     }
 
     // ==================== KPI ====================
+
+    @GetMapping("/search/implementers")
+    public Flux<ImplementerDataTransferObject> searchImplementers(@RequestParam(defaultValue = "ALL") String role){
+        return implementerService.getAll().filter(i -> 
+            "ALL".equals(role) || i.getDepartmentRole().name().equals(role)
+        ).map(i -> new ImplementerDataTransferObject(i));
+    }
 
     @GetMapping("/kpi/data")
     public Flux<KpiEntry> kpiData(
