@@ -1,0 +1,185 @@
+<div class="stat-wrapper h-100">
+    <div class="container-fluid px-4">
+        <div class="stat-filter-card">
+            <div class="stat-filter-card__header">
+                <span class="stf-b1"></span><span class="stf-b2"></span><span class="stf-b3"></span><span class="stf-b4"></span>
+                <span class="stf-m1"></span><span class="stf-m2"></span><span class="stf-m3"></span><span class="stf-m4"></span>
+                <span class="stf-f1"></span><span class="stf-f2"></span><span class="stf-f3"></span><span class="stf-f4"></span>
+                <div class="stat-filter-card__icon"><i class="bi bi-graph-up-arrow"></i></div>
+                <div class="flex-grow-1"><div class="stat-filter-card__title">KPI — Загруженность сотрудников</div></div>
+            </div>
+            <div class="stat-filter-card__body">
+                <div class="row w-100 g-2">
+                    <div th:if="${currentUser.getRole().name() == 'ADMIN'}" class="col form-floating">
+                        <select class="form-select w-100" id="kpi-dept">
+                            <option th:each="dr : ${departmentRoles}" th:text="${dr.getTitle()}" th:value="${dr.name()}"></option>
+                        </select>
+                        <label for="kpi-dept" class="ms-2">Служба</label>
+                    </div>
+                    <div class="col form-floating">
+                        <select class="form-select w-100" id="kpi-employee">
+                            <option value="0">Все</option>
+                        </select>
+                        <label for="kpi-employee" class="ms-2">Сотрудник</label>
+                    </div>
+                    <div class="col form-floating">
+                        <input type="date" class="form-control w-100" id="kpi-from">
+                        <label for="kpi-from" class="ms-2">С</label>
+                    </div>
+                    <div class="col form-floating">
+                        <input type="date" class="form-control w-100" id="kpi-to">
+                        <label for="kpi-to" class="ms-2">По</label>
+                    </div>
+                    <div class="col-2">
+                        <button class="btn btn-smoke w-100 h-100" onclick="loadKpi()"><i class="bi bi-search"></i> Показать</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-grid mt-3" style="grid-template-columns:1fr;">
+            <div class="stat-chart-card">
+                <div class="stat-chart-card__header">Загруженность по сотрудникам (часы)</div>
+                <div class="stat-chart-card__body"><div id="chart-load" style="min-height:400px;"></div></div>
+            </div>
+            <div class="stat-chart-card">
+                <div class="stat-chart-card__header">Динамика по дням (часы)</div>
+                <div class="stat-chart-card__body"><div id="chart-daily" style="min-height:400px;"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    var currentUserDept = [[${currentUser.getDepartmentRole().name()}]];
+    var isAdmin = [[${currentUser.getRole().name() == 'ADMIN' ? true : false}]];
+
+    var chartLoad = null;
+    var chartDaily = null;
+
+    /* инициализация: загрузить сотрудников для текущей службы */
+    document.addEventListener('DOMContentLoaded', function(){
+        // даты по умолчанию — текущая неделя
+        setDefaultWeek();
+        if(isAdmin){
+            document.getElementById('kpi-dept').addEventListener('change', loadEmployees);
+            loadEmployees();
+        } else {
+            document.getElementById('kpi-employee').innerHTML = '<option value="0">Все</option>';
+            loadEmployeesForRole(currentUserDept);
+        }
+        loadKpi();
+    });
+
+    function setDefaultWeek(){
+        var now = new Date();
+        var day = now.getDay();
+        var monday = new Date(now);
+        monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+        var sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        document.getElementById('kpi-from').value = monday.toISOString().split('T')[0];
+        document.getElementById('kpi-to').value = sunday.toISOString().split('T')[0];
+    }
+
+    function loadEmployees(){
+        var dept = isAdmin ? document.getElementById('kpi-dept').value : currentUserDept;
+        loadEmployeesForRole(dept);
+    }
+
+    function loadEmployeesForRole(dept){
+        $.ajax({
+            url:'/api/search/employees?search=&role=' + dept,
+            type:'get',
+            success:function(data){
+                var html = '<option value="0">Все</option>';
+                data.forEach(function(emp){
+                    html += '<option value="' + emp.id + '">' + emp.fullName + '</option>';
+                });
+                document.getElementById('kpi-employee').innerHTML = html;
+            }
+        });
+    }
+
+    function getDates(){
+        return {
+            from: document.getElementById('kpi-from').value,
+            to: document.getElementById('kpi-to').value
+        };
+    }
+
+    function loadKpi(){
+        var dept = isAdmin ? document.getElementById('kpi-dept').value : currentUserDept;
+        var empId = document.getElementById('kpi-employee').value;
+        var dates = getDates();
+
+        $.ajax({
+            url:'/api/kpi/data',
+            type:'get',
+            data:{ dept: dept, empId: empId, from: dates.from, to: dates.to },
+            success:function(data){
+                drawChartLoad(data);
+                drawChartDaily(data);
+            }
+        });
+    }
+
+    function drawChartLoad(data){
+        if(chartLoad) chartLoad.destroy();
+        var byEmployee = {};
+        data.forEach(function(e){
+            if(!byEmployee[e.employeeName]) byEmployee[e.employeeName] = 0;
+            byEmployee[e.employeeName] += e.totalMinutes;
+        });
+        var names = Object.keys(byEmployee).sort();
+        var hours = names.map(function(n){ return Math.round(byEmployee[n] / 6) / 10; }); // в часах с 1 знаком
+
+        chartLoad = new ApexCharts(document.querySelector('#chart-load'), {
+            series: [{ name: 'Часы', data: hours }],
+            chart: { type: 'bar', height: 400, toolbar: { show: false } },
+            plotOptions: { bar: { horizontal: true, borderRadius: 2 } },
+            colors: ['#3a3a3a'],
+            xaxis: { categories: names, title: { text: 'Часы' } },
+            dataLabels: { enabled: false },
+            tooltip: { y: { formatter: function(v){ return v.toFixed(1) + ' ч.'; } } }
+        });
+        chartLoad.render();
+    }
+
+    function drawChartDaily(data){
+        if(chartDaily) chartDaily.destroy();
+        var byDateAndName = {};
+        var nameSet = new Set();
+        data.forEach(function(e){
+            var key = e.date + '|' + e.employeeName;
+            if(!byDateAndName[key]) byDateAndName[key] = 0;
+            byDateAndName[key] += e.totalMinutes;
+            nameSet.add(e.employeeName);
+        });
+        var allNames = Array.from(nameSet).sort();
+        var dateSet = new Set();
+        data.forEach(function(e){ dateSet.add(e.date); });
+        var dates = Array.from(dateSet).sort();
+
+        var series = allNames.map(function(name){
+            return {
+                name: name,
+                data: dates.map(function(d){
+                    var v = byDateAndName[d + '|' + name] || 0;
+                    return Math.round(v / 6) / 10;
+                })
+            };
+        });
+
+        chartDaily = new ApexCharts(document.querySelector('#chart-daily'), {
+            series: series,
+            chart: { type: 'bar', height: 400, stacked: true, toolbar: { show: false } },
+            colors: generateColors(allNames.length),
+            xaxis: { categories: dates, labels: { rotate: -45 } },
+            dataLabels: { enabled: false },
+            legend: { position: 'bottom' },
+            tooltip: { y: { formatter: function(v){ return v.toFixed(1) + ' ч.'; } } }
+        });
+        chartDaily.render();
+    }
+</script>
