@@ -118,4 +118,13 @@ public class SecurityControllerAdvice {
             return Mono.just(implementer.getDepartmentRole().toString());
         }
     }
+
+    @ModelAttribute(name = "workDayEnd")
+    public Mono<String> workDayEnd(@AuthenticationPrincipal Implementer implementer){
+        if(implementer != null && implementer.getWorkDayEnd() != null){
+            return Mono.just(implementer.getWorkDayEnd().toString());
+        }else{
+            return Mono.just("18:00");
+        }
+    }
 }

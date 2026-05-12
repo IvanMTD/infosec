@@ -34,6 +34,8 @@ public class Task {
         setEndTime(dto.getEndTime());
         if(dto.getExecuteDate() != null){
             setExecuteDate(dto.getExecuteDate());
+        }else if(dto.getStartTime() != null){
+            setExecuteDate(dto.getStartTime().toLocalDate());
         }else{
             setExecuteDate(LocalDate.now());
         }
@@ -56,7 +58,11 @@ public class Task {
     public void update(TaskDTO taskDTO) {
         setTitle(taskDTO.getTitle());
         setDescription(taskDTO.getContent());
-        setExecuteDate(taskDTO.getPlacedAt());
+        if(taskDTO.getPlacedAt() != null){
+            setExecuteDate(taskDTO.getPlacedAt());
+        }else if(taskDTO.getStartTime() != null){
+            setExecuteDate(taskDTO.getStartTime().toLocalDate());
+        }
         setTroubleId(taskDTO.getTroubleId());
         setImplementerId(taskDTO.getImplementerId());
         setStartTime(taskDTO.getStartTime());

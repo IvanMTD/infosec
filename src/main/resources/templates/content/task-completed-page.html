@@ -83,20 +83,24 @@
                         <!-- Время выполнения -->
                         <div class="row pt-2 g-2 mx-0">
                             <div class="col-6 form-floating px-0">
-                                <input type="datetime-local" class="form-control" id="startTime" th:field="*{startTime}" placeholder="start">
+                                <input type="datetime-local" class="form-control" id="startTime" th:field="*{startTime}" placeholder="start" onchange="syncDateFromStart()">
                                 <label for="startTime" class="ms-2">Начало выполнения</label>
                             </div>
-                            <div class="col-6 form-floating px-0">
+                            <div class="col-6 form-floating px-0" id="endTimeGroup">
                                 <input type="datetime-local" class="form-control" id="endTime" th:field="*{endTime}" placeholder="end">
                                 <label for="endTime" class="ms-2">Окончание выполнения</label>
                             </div>
                         </div>
 
-                        <!-- Card Footer — дата + кнопка -->
+                        <!-- Card Footer — переключатель + кнопка -->
                         <div class="task-card__footer">
                             <div class="task-footer-date">
                                 <i class="bi bi-calendar3 task-footer-date__icon"></i>
-                                <input type="date" class="form-control" th:field="*{executeDate}">
+                                <input type="hidden" th:field="*{executeDate}" id="executeDateHidden">
+                                <div class="form-check form-switch ms-2">
+                                    <input class="form-check-input" type="checkbox" id="allDayToggle" onchange="toggleAllDay()">
+                                    <label class="form-check-label" for="allDayToggle">Весь день</label>
+                                </div>
                             </div>
                             <button type="submit" class="btn btn-smoke">
                                 <i class="bi bi-check-lg"></i> Записать
@@ -113,6 +117,10 @@
 </div>
 
 <script th:inline="javascript">
+    /*<![CDATA[*/
+    var workDayEnd = /*[[${workDayEnd}]]*/ '18:00';
+    /*]]>*/
+
     function setupTrouble(){
         let categoryId = document.getElementById("select").value;
         let tickets = [[${troubleTickets}]];
@@ -127,4 +135,45 @@
             }
         }
     }
+
+    // Синхронизация executeDate (hidden) из startTime
+    function syncDateFromStart(){
+        let st = document.getElementById("startTime").value;
+        if(st){
+            document.getElementById("executeDateHidden").value = st.substring(0,10);
+            // Если «Весь день» включён — пересчитать endTime
+            if(document.getElementById("allDayToggle").checked){
+                setAllDayEnd();
+            }
+        }
+    }
+
+    // Включение/выключение «Весь день»
+    function toggleAllDay(){
+        let toggle = document.getElementById("allDayToggle");
+        let endGroup = document.getElementById("endTimeGroup");
+        if(toggle.checked){
+            endGroup.style.display = 'none';
+            setAllDayEnd();
+        }else{
+            endGroup.style.display = '';
+            document.getElementById("endTime").value = '';
+        }
+    }
+
+    function setAllDayEnd(){
+        let st = document.getElementById("startTime").value;
+        if(st){
+            let endStr = st.substring(0,10) + 'T' + workDayEnd + ':00';
+            document.getElementById("endTime").value = endStr;
+        }
+    }
+
+    // Инициализация: если startTime уже заполнен — синхронизировать executeDate
+    (function(){
+        let st = document.getElementById("startTime").value;
+        if(st){
+            document.getElementById("executeDateHidden").value = st.substring(0,10);
+        }
+    })();
 </script>

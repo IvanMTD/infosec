@@ -57,6 +57,10 @@
                                     </select>
                                     <label for="departmentRole" class="ms-2">Служба</label>
                                 </div>
+                                <div class="col-12 form-floating">
+                                    <input type="time" class="form-control" th:field="*{workDayEnd}" placeholder="workDayEnd">
+                                    <label for="workDayEnd" class="ms-2">Конец рабочего дня (по умолчанию 18:00)</label>
+                                </div>
                             </div>
                             <div class="d-flex gap-2 mt-4">
                                 <a th:href="@{/admin/users}" class="btn btn-outline-secondary flex-grow-1">Отмена</a>

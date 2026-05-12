@@ -1090,6 +1090,12 @@ public class TaskController {
                         .modelAttribute("implementers", implementerService.getAll())
                         .modelAttribute("categories", troubleTicketService.getAllCategories())
                         .modelAttribute("troubles", troubleTicketService.getAllTrouble())
+                        .modelAttribute("workDayEnd",
+                                taskService.getTaskById(tid)
+                                        .flatMap(task -> implementerService.getUserById(task.getImplementerId()))
+                                        .map(impl -> impl.getWorkDayEnd() != null ? impl.getWorkDayEnd().toString() : "18:00")
+                                        .defaultIfEmpty("18:00")
+                        )
                         .build()
         );
     }

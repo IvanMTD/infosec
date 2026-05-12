@@ -10,6 +10,8 @@ import net.security.infosec.models.entity.DepartmentRole;
 import net.security.infosec.models.entity.Implementer;
 import net.security.infosec.models.entity.Role;
 
+import java.time.LocalTime;
+
 @Data
 @RequiredArgsConstructor
 public class ImplementerDataTransferObject {
@@ -36,6 +38,7 @@ public class ImplementerDataTransferObject {
     private String officePosition;
     private Role role;
     private DepartmentRole departmentRole;
+    private LocalTime workDayEnd;
 
     public ImplementerDataTransferObject(Implementer implementer) {
         setId(implementer.getId());
@@ -46,6 +49,7 @@ public class ImplementerDataTransferObject {
         setOfficePosition(implementer.getOfficePosition());
         setRole(implementer.getRole());
         setDepartmentRole(implementer.getDepartmentRole());
+        setWorkDayEnd(implementer.getWorkDayEnd());
     }
 
     public String getFullName(){

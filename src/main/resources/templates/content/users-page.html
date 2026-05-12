@@ -25,6 +25,7 @@
                                     <th class="ps-3">ФИО</th>
                                     <th>Роль</th>
                                     <th>Служба</th>
+                                    <th>Конец РД</th>
                                     <th class="text-end pe-3"></th>
                                 </tr>
                             </thead>
@@ -36,6 +37,7 @@
                                     </td>
                                     <td th:text="${user.getRole().getTitle()}" style="vertical-align:middle;"></td>
                                     <td th:text="${user.getDepartmentRole().getTitle()}" style="vertical-align:middle;"></td>
+                                    <td th:text="${user.getWorkDayEnd() != null ? user.getWorkDayEnd() : '18:00'}" style="vertical-align:middle;"></td>
                                     <td class="text-end pe-3" style="vertical-align:middle;">
                                         <a class="btn btn-sm btn-outline-secondary" th:href="@{/admin/user/edit(id=${user.id})}">
                                             <i class="bi bi-pencil-square"></i>

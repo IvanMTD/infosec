@@ -32,6 +32,9 @@ public class TroubleDTO {
     }
 
     public void sortTasks(){
-        tasks = tasks.stream().sorted(Comparator.comparing(TaskDTO::getTitle)).collect(Collectors.toList());
+        tasks = tasks.stream()
+            .sorted(Comparator.comparing(TaskDTO::getPlacedAt, Comparator.nullsLast(Comparator.reverseOrder()))
+                .thenComparing(TaskDTO::getStartTime, Comparator.nullsLast(Comparator.reverseOrder())))
+            .collect(Collectors.toList());
     }
 }

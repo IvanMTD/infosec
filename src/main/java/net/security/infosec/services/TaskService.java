@@ -54,7 +54,7 @@ public class TaskService {
                 return Mono.empty();
             }
         }).collectList().flatMapMany(l -> {
-            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate)).collect(Collectors.toList());
+            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate).reversed()).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);
     }
@@ -77,7 +77,7 @@ public class TaskService {
                 return Mono.empty();
             }
         }).collectList().flatMapMany(l -> {
-            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate)).collect(Collectors.toList());
+            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate).reversed()).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);
     }
@@ -100,7 +100,7 @@ public class TaskService {
                 return Mono.empty();
             }
         }).collectList().flatMapMany(l -> {
-            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate)).collect(Collectors.toList());
+            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate).reversed()).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);
     }
@@ -113,7 +113,7 @@ public class TaskService {
                 return Mono.empty();
             }
         }).collectList().flatMapMany(l -> {
-            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate)).collect(Collectors.toList());
+            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate).reversed()).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);
     }
@@ -129,7 +129,7 @@ public class TaskService {
             }
         }
         return taskRepository.findTasksByExecuteDateAfter(localDate).collectList().flatMapMany(l -> {
-            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate)).collect(Collectors.toList());
+            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate).reversed()).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);
     }
@@ -146,7 +146,7 @@ public class TaskService {
         }
         localDate = localDate.minusDays(1);
         return taskRepository.findTasksByExecuteDateAfter(localDate).collectList().flatMapMany(l -> {
-            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate)).collect(Collectors.toList());
+            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate).reversed()).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);
     }
@@ -163,21 +163,21 @@ public class TaskService {
         }
         localDate = localDate.minusDays(1);
         return taskRepository.findTasksByExecuteDateAfter(localDate).collectList().flatMapMany(l -> {
-            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate)).collect(Collectors.toList());
+            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate).reversed()).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);
     }
 
     public Flux<Task> getFromDate(DateDTO dateDTO) {
         return taskRepository.findAllByExecuteDateBetween(dateDTO.getBegin(), dateDTO.getEnd()).collectList().flatMapMany(l -> {
-            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate)).collect(Collectors.toList());
+            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate).reversed()).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);
     }
 
     public Flux<Task> getImplementerTasks(Implementer implementer) {
         return taskRepository.findAllByImplementerId(implementer.getId()).collectList().flatMapMany(l -> {
-            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate)).collect(Collectors.toList());
+            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate).reversed()).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);
     }
@@ -188,7 +188,7 @@ public class TaskService {
 
     public Flux<Task> getTasksByLocalDate(LocalDate localDate) {
         return taskRepository.findTasksByExecuteDate(localDate).collectList().flatMapMany(l -> {
-            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate)).collect(Collectors.toList());
+            l = l.stream().sorted(Comparator.comparing(Task::getExecuteDate).reversed()).collect(Collectors.toList());
             return Flux.fromIterable(l);
         }).flatMapSequential(Mono::just);
     }

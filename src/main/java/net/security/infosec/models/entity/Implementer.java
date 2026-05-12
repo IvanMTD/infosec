@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalTime;
 import java.util.*;
 
 @Data
@@ -23,6 +24,7 @@ public class Implementer implements UserDetails {
     private String officePosition;
     private Role role;
     private DepartmentRole departmentRole;
+    private LocalTime workDayEnd;
 
     public Implementer(ImplementerDataTransferObject dto){
         setEmail(dto.getEmail());
@@ -33,6 +35,7 @@ public class Implementer implements UserDetails {
         setOfficePosition(dto.getOfficePosition());
         setRole(dto.getRole());
         setDepartmentRole(dto.getDepartmentRole());
+        setWorkDayEnd(dto.getWorkDayEnd());
     }
 
     public Implementer update(ImplementerDataTransferObject implementerDTO) {
@@ -42,6 +45,7 @@ public class Implementer implements UserDetails {
         setOfficePosition(implementerDTO.getOfficePosition());
         setRole(implementerDTO.getRole());
         setDepartmentRole(implementerDTO.getDepartmentRole());
+        setWorkDayEnd(implementerDTO.getWorkDayEnd());
         return this;
     }
 

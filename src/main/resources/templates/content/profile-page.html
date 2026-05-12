@@ -61,6 +61,10 @@
                             <div class="info-card__label">Служба</div>
                             <div class="info-card__value" th:text="${user.getDepartmentRole().getTitle()}"></div>
                         </div>
+                        <div class="info-card">
+                            <div class="info-card__label">Конец рабочего дня</div>
+                            <div class="info-card__value" th:text="${user.getWorkDayEnd() != null ? user.getWorkDayEnd() : '18:00 (по умолчанию)'}"></div>
+                        </div>
                     </div>
 
                     <!-- Card Footer — Password Change -->
