@@ -47,6 +47,11 @@ public class ApiController {
         });
     }
 
+    @GetMapping("/health")
+    public Mono<String> health() {
+        return Mono.just("OK");
+    }
+
     @GetMapping("/search/free/employees")
     public Flux<EmployeeDTO> searchFreeEmployees(@RequestParam(name = "query") String query){
         return employeeService.searchFreeEmployees(query).collectList().flatMapMany(l -> {
