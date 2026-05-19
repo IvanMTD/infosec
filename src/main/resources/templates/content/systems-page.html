@@ -1,0 +1,543 @@
+<link rel="stylesheet" th:href="@{/css/stat.css}">
+
+<div class="container-fluid px-4 py-3">
+    <div class="row justify-content-center">
+        <div class="col-12">
+
+            <!-- Filter Bar -->
+            <div class="stat-filter-card">
+                <div class="stat-filter-card__header">
+                    <i class="bi bi-diagram-3 stat-filter-card__icon"></i>
+                    <span class="stat-filter-card__title">Системы</span>
+                    <!-- Smoke particles -->
+                    <span class="stf-b1"></span><span class="stf-b2"></span><span class="stf-b3"></span><span class="stf-b4"></span>
+                    <span class="stf-m1"></span><span class="stf-m2"></span><span class="stf-m3"></span><span class="stf-m4"></span>
+                    <span class="stf-f1"></span><span class="stf-f2"></span><span class="stf-f3"></span><span class="stf-f4"></span>
+                </div>
+                <div class="stat-filter-card__body">
+                    <div class="row g-2 w-100">
+                        <div class="col-12 col-md-2">
+                            <select id="typeFilter" class="form-select w-100" onchange="loadPage(0)">
+                                <option value="ALL">Все</option>
+                                <option value="INTERNAL">Внутренние</option>
+                                <option value="EXTERNAL">Внешние</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-8">
+                            <div class="input-group w-100">
+                                <input type="text" id="searchInput" class="form-control" placeholder="Поиск по названию, описанию, URL..." onkeyup="debounceSearch()" onkeydown="if(event.key==='Enter')searchNow()">
+                                <button class="btn btn-smoke" onclick="searchNow()" title="Найти">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-2">
+                            <button class="btn btn-smoke w-100" onclick="openAddModal()">
+                                <i class="bi bi-plus-lg"></i> Добавить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid -->
+            <div id="systems-grid" class="d-flex flex-column gap-3"></div>
+
+            <!-- Pagination -->
+            <div id="pagination-container" class="d-flex justify-content-center mt-3"></div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="systemModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px; border: 1px solid #d4d4d4;">
+            <div class="modal-header" style="background: linear-gradient(160deg, #0d0d0d 0%, #1a1a1a 50%, #111 100%); color: #e0e0e0; border-radius: 11px 11px 0 0;">
+                <h5 class="modal-title" id="modalTitle">Добавить систему</h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editUuid">
+                <div class="mb-3">
+                    <label class="form-label">Название *</label>
+                    <input type="text" id="sysName" class="form-control" placeholder="Название системы">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Тип *</label>
+                    <select id="sysType" class="form-select">
+                        <option value="INTERNAL">Внутренняя</option>
+                        <option value="EXTERNAL">Внешняя</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Краткое описание</label>
+                    <textarea id="sysShortDesc" class="form-control" rows="2" maxlength="1000" placeholder="До 1000 символов" oninput="updateShortDescCounter()"></textarea>
+                    <small class="text-muted float-end" id="shortDescCounter">0 / 1000</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Детальное описание</label>
+                    <textarea id="sysDetailDesc" class="form-control" rows="5" placeholder="Подробное описание (переносы строк сохраняются)"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Ссылка</label>
+                    <input type="url" id="sysUrl" class="form-control" placeholder="https://...">
+                </div>
+            </div>
+            <div class="modal-footer" style="background: #fafafa; border-top: 1px solid #eee;">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button class="btn btn-smoke" onclick="saveSystem()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Employees Modal -->
+<div class="modal fade" id="employeesModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px; border: 1px solid #d4d4d4;">
+            <div class="modal-header" style="background: linear-gradient(160deg, #0d0d0d 0%, #1a1a1a 50%, #111 100%); color: #e0e0e0; border-radius: 11px 11px 0 0;">
+                <h5 class="modal-title" id="employeesModalTitle">Сотрудники системы</h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="empSystemUuid">
+                <div class="input-group mb-3">
+                    <input type="text" id="empSearchInput" class="form-control" placeholder="Поиск по ФИО..." onkeydown="if(event.key==='Enter')searchEmployee()">
+                    <button class="btn btn-smoke" onclick="searchEmployee()" title="Найти">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+                <div id="empSearchResults" class="mb-3" style="max-height:200px;overflow-y:auto;"></div>
+                <hr>
+                <div id="empBoundList"><p class="text-muted text-center">Загрузка...</p></div>
+            </div>
+            <div class="modal-footer" style="background: #fafafa; border-top: 1px solid #eee;">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Binding Settings Modal -->
+<div class="modal fade" id="bindingModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px; border: 1px solid #d4d4d4;">
+            <div class="modal-header" style="background: linear-gradient(160deg, #0d0d0d 0%, #1a1a1a 50%, #111 100%); color: #e0e0e0; border-radius: 11px 11px 0 0;">
+                <h5 class="modal-title" id="bindingModalTitle">Настройки подключения</h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="bindSystemUuid">
+                <input type="hidden" id="bindEmployeeId">
+                <div class="form-floating mb-3">
+                    <input type="date" id="bindConnectDate" class="form-control" placeholder="Дата подключения">
+                    <label>Дата подключения</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <select id="bindStatus" class="form-select" onchange="toggleDisconnectDate()">
+                        <option value="ACTIVE">Активный</option>
+                        <option value="INACTIVE">Неактивный</option>
+                    </select>
+                    <label>Статус</label>
+                </div>
+                <div class="form-floating mb-3" id="bindDisconnectGroup" style="display:none;">
+                    <input type="date" id="bindDisconnectDate" class="form-control" placeholder="Дата отключения">
+                    <label>Дата отключения</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <select id="bindMchdType" class="form-select" onchange="toggleMchdField()">
+                        <option value="">Нет</option>
+                        <option value="SPECIFIED">Указать</option>
+                    </select>
+                    <label>МЧД</label>
+                </div>
+                <div class="form-floating mb-3" id="bindMchdGroup" style="display:none;">
+                    <textarea id="bindMchd" class="form-control" placeholder="Описание МЧД" style="height:100px;"></textarea>
+                    <label>Описание МЧД</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <select id="bindRoleType" class="form-select" onchange="toggleRoleField()">
+                        <option value="">Нет</option>
+                        <option value="SPECIFIED">Указать</option>
+                    </select>
+                    <label>Роль в системе</label>
+                </div>
+                <div class="form-floating mb-3" id="bindRoleGroup" style="display:none;">
+                    <textarea id="bindRoleInSystem" class="form-control" placeholder="Описание роли" style="height:100px;"></textarea>
+                    <label>Описание роли</label>
+                </div>
+            </div>
+            <div class="modal-footer" style="background: #fafafa; border-top: 1px solid #eee;">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button class="btn btn-smoke" onclick="saveBinding()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+/* ============================================================
+   PRESENTATION — рендеринг HTML
+   ============================================================ */
+
+var page = 0, totalPages = 0, searchTimer = null;
+var bsModal;
+var csrfToken, csrfHeader;
+
+function fetchWithCsrf(url, opts) {
+    opts = opts || {};
+    opts.headers = opts.headers || {};
+    opts.headers[csrfHeader] = csrfToken;
+    return fetch(url, opts);
+}
+
+function renderCard(sys) {
+    var typeBadge = sys.systemType === 'INTERNAL'
+        ? '<span class="badge bg-dark">Внутренняя</span>'
+        : '<span class="badge bg-secondary">Внешняя</span>';
+
+    var urlLink = sys.url ? '<div class="mt-2"><i class="bi bi-link-45deg"></i> <a href="' + escapeHtml(sys.url) + '" target="_blank">' + escapeHtml(sys.url) + '</a></div>' : '';
+
+    var detailLines = sys.detailedDescription
+        ? sys.detailedDescription.replace(/\n/g, '<br>')
+        : '';
+
+    return '<div class="stat-card" style="border:1px solid #d4d4d4; border-radius:12px; overflow:hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.06);">'
+        + '<div style="position:relative; background:linear-gradient(160deg,#0d0d0d 0%,#1a1a1a 50%,#111 100%); color:#e0e0e0; padding:0.75rem 1.25rem; display:flex; align-items:center; justify-content:space-between; border-radius:12px 12px 0 0;">'
+        + '<div class="d-flex align-items-center gap-2">' + typeBadge + ' <strong>' + escapeHtml(sys.name) + '</strong></div>'
+        + '<div class="d-flex gap-1">'
+        + '<button class="btn btn-sm btn-outline-light" onclick="openEmployeesModal(\'' + sys.uuid + '\', \'' + escapeJs(sys.name) + '\')" title="Сотрудники"><i class="bi bi-people"></i></button>'
+        + '<button class="btn btn-sm btn-outline-light" onclick="openEditModal(\'' + sys.uuid + '\')" title="Редактировать"><i class="bi bi-pencil"></i></button>'
+        + '<button class="btn btn-sm btn-outline-danger" onclick="deleteSystem(\'' + sys.uuid + '\', \'' + escapeJs(sys.name) + '\')" title="Удалить"><i class="bi bi-trash"></i></button>'
+        + '</div></div>'
+        + '<div style="background:#fff; padding:1rem 1.25rem;">'
+        + (sys.shortDescription ? '<p class="mb-2">' + escapeHtml(sys.shortDescription) + '</p>' : '')
+        + urlLink
+        + '</div></div>';
+}
+
+function renderPagination() {
+    if (totalPages <= 1) return '';
+    var html = '<nav><ul class="pagination pagination-sm">';
+    html += '<li class="page-item' + (page === 0 ? ' disabled' : '') + '"><a class="page-link" href="#" onclick="loadPage(' + (page - 1) + ');return false;">&laquo;</a></li>';
+    for (var i = 0; i < totalPages; i++) {
+        html += '<li class="page-item' + (i === page ? ' active' : '') + '"><a class="page-link" href="#" onclick="loadPage(' + i + ');return false;">' + (i + 1) + '</a></li>';
+    }
+    html += '<li class="page-item' + (page >= totalPages - 1 ? ' disabled' : '') + '"><a class="page-link" href="#" onclick="loadPage(' + (page + 1) + ');return false;">&raquo;</a></li>';
+    html += '</ul></nav>';
+    return html;
+}
+
+function renderEmpty() {
+    return '<div class="text-center text-secondary py-5">'
+        + '<i class="bi bi-inbox" style="font-size:3rem;"></i>'
+        + '<p class="mt-2 fs-5">Системы не зарегистрированы</p>'
+        + '</div>';
+}
+
+/* ============================================================
+   LOGIC — AJAX, события, инициализация
+   ============================================================ */
+
+function loadPage(p) {
+    page = p;
+    var search = document.getElementById('searchInput').value.trim();
+    var type = document.getElementById('typeFilter').value;
+
+    fetchWithCsrf('/api/systems?page=' + page + '&size=20&search=' + encodeURIComponent(search) + '&type=' + encodeURIComponent(type), {
+        headers: { 'Accept': 'application/json' }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        totalPages = data.totalPages;
+        var grid = document.getElementById('systems-grid');
+        var pagination = document.getElementById('pagination-container');
+
+        if (!data.content || data.content.length === 0) {
+            grid.innerHTML = renderEmpty();
+            pagination.innerHTML = '';
+        } else {
+            grid.innerHTML = data.content.map(renderCard).join('');
+            pagination.innerHTML = renderPagination();
+        }
+    });
+}
+
+function searchNow() {
+    clearTimeout(searchTimer);
+    loadPage(0);
+}
+
+function debounceSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function() { loadPage(0); }, 400);
+}
+
+function openAddModal() {
+    document.getElementById('modalTitle').textContent = 'Добавить систему';
+    document.getElementById('editUuid').value = '';
+    document.getElementById('sysName').value = '';
+    document.getElementById('sysType').value = 'INTERNAL';
+    document.getElementById('sysShortDesc').value = '';
+    document.getElementById('sysDetailDesc').value = '';
+    document.getElementById('sysUrl').value = '';
+    updateShortDescCounter();
+    if (!bsModal) bsModal = new bootstrap.Modal(document.getElementById('systemModal'));
+    bsModal.show();
+}
+
+function openEditModal(uuid) {
+    fetchWithCsrf('/api/system/' + uuid)
+    .then(function(r) { return r.json(); })
+    .then(function(sys) {
+        document.getElementById('modalTitle').textContent = 'Редактировать систему';
+        document.getElementById('editUuid').value = sys.uuid;
+        document.getElementById('sysName').value = sys.name || '';
+        document.getElementById('sysType').value = sys.systemType || 'INTERNAL';
+        document.getElementById('sysShortDesc').value = sys.shortDescription || '';
+        document.getElementById('sysDetailDesc').value = sys.detailedDescription || '';
+        document.getElementById('sysUrl').value = sys.url || '';
+        updateShortDescCounter();
+        if (!bsModal) bsModal = new bootstrap.Modal(document.getElementById('systemModal'));
+        bsModal.show();
+    });
+}
+
+function saveSystem() {
+    var uuid = document.getElementById('editUuid').value;
+    var dto = {
+        name: document.getElementById('sysName').value.trim(),
+        systemType: document.getElementById('sysType').value,
+        shortDescription: document.getElementById('sysShortDesc').value.trim(),
+        detailedDescription: document.getElementById('sysDetailDesc').value.trim(),
+        url: document.getElementById('sysUrl').value.trim()
+    };
+
+    if (!dto.name) { alert('Введите название системы'); return; }
+
+    var url = uuid ? '/api/system/' + uuid : '/api/system';
+    var method = uuid ? 'PUT' : 'POST';
+
+    fetchWithCsrf(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dto)
+    })
+    .then(function(r) {
+        if (r.ok) {
+            bsModal.hide();
+            loadPage(page);
+        } else {
+            r.text().then(function(t) { alert('Ошибка: ' + t); });
+        }
+    });
+}
+
+// ======== Employees Modal ========
+
+var empBsModal;
+var empSystemUuid;
+
+function openEmployeesModal(uuid, name) {
+    empSystemUuid = uuid;
+    document.getElementById('employeesModalTitle').textContent = 'Сотрудники: ' + name;
+    document.getElementById('empSystemUuid').value = uuid;
+    document.getElementById('empSearchInput').value = '';
+    document.getElementById('empSearchResults').innerHTML = '';
+    loadBoundEmployees();
+    if (!empBsModal) empBsModal = new bootstrap.Modal(document.getElementById('employeesModal'));
+    empBsModal.show();
+}
+
+function loadBoundEmployees() {
+    document.getElementById('empBoundList').innerHTML = '<p class="text-muted text-center">Загрузка...</p>';
+    fetchWithCsrf('/api/system/' + empSystemUuid + '/employees')
+    .then(function(r) { return r.json(); })
+    .then(function(list) {
+        if (!list || list.length === 0) {
+            document.getElementById('empBoundList').innerHTML = '<p class="text-muted text-center">Нет привязанных сотрудников</p>';
+            return;
+        }
+        var html = '';
+        for (var i = 0; i < list.length; i++) {
+            var emp = list[i];
+            html += '<div class="d-flex align-items-center justify-content-between border rounded-3 p-2 mb-1">'
+                + '<span>' + escapeHtml(emp.lastname) + ' ' + escapeHtml(emp.name) + ' ' + escapeHtml(emp.middleName) + ' <small class="text-muted">(' + escapeHtml(emp.position) + ')</small></span>'
+                + '<div class="d-flex gap-1">'
+                + '<button class="btn btn-sm btn-outline-secondary" onclick="openBindingModal(\'' + empSystemUuid + '\', ' + emp.id + ', \'' + escapeJs(emp.lastname + ' ' + emp.name) + '\')" title="Настройки"><i class="bi bi-gear"></i></button>'
+                + '<button class="btn btn-sm btn-outline-danger" onclick="unbindEmployee(' + emp.id + ', \'' + escapeJs(emp.lastname + ' ' + emp.name) + '\')" title="Отвязать"><i class="bi bi-x-lg"></i></button>'
+                + '</div>'
+                + '</div>';
+        }
+        document.getElementById('empBoundList').innerHTML = html;
+    });
+}
+
+function searchEmployee() {
+    var q = document.getElementById('empSearchInput').value.trim();
+    if (!q) return;
+    document.getElementById('empSearchResults').innerHTML = '<p class="text-muted text-center">Поиск...</p>';
+    fetch('/api/search/employees?search=' + encodeURIComponent(q))
+    .then(function(r) { return r.json(); })
+    .then(function(list) {
+        if (!list || list.length === 0) {
+            document.getElementById('empSearchResults').innerHTML = '<p class="text-muted text-center">Ничего не найдено</p>';
+            return;
+        }
+        var html = '';
+        for (var i = 0; i < list.length; i++) {
+            var emp = list[i];
+            html += '<div class="d-flex align-items-center justify-content-between border rounded-3 p-2 mb-1">'
+                + '<span>' + escapeHtml(emp.lastname) + ' ' + escapeHtml(emp.name) + ' ' + escapeHtml(emp.middleName) + ' <small class="text-muted">(' + escapeHtml(emp.position) + ')</small></span>'
+                + '<button class="btn btn-sm btn-outline-success" onclick="bindEmployee(' + emp.id + ', \'' + escapeJs(emp.lastname + ' ' + emp.name) + '\')" title="Привязать"><i class="bi bi-plus-lg"></i></button>'
+                + '</div>';
+        }
+        document.getElementById('empSearchResults').innerHTML = html;
+    });
+}
+
+function bindEmployee(employeeId, name) {
+    fetchWithCsrf('/api/system/' + empSystemUuid + '/employees?employeeId=' + employeeId, { method: 'POST' })
+    .then(function(r) {
+        if (r.ok) {
+            document.getElementById('empSearchResults').innerHTML = '';
+            document.getElementById('empSearchInput').value = '';
+            loadBoundEmployees();
+        } else {
+            alert('Не удалось привязать сотрудника «' + name + '»');
+        }
+    });
+}
+
+function unbindEmployee(employeeId, name) {
+    if (!confirm('Отвязать сотрудника «' + name + '»?')) return;
+    fetchWithCsrf('/api/system/' + empSystemUuid + '/employees/' + employeeId, { method: 'DELETE' })
+    .then(function(r) {
+        if (r.ok) loadBoundEmployees();
+        else alert('Не удалось отвязать сотрудника');
+    });
+}
+
+function deleteSystem(uuid, name) {
+    if (!confirm('Удалить систему «' + name + '»?')) return;
+    fetchWithCsrf('/api/system/' + uuid, { method: 'DELETE' })
+    .then(function(r) {
+        if (r.ok) loadPage(page);
+        else r.text().then(function(t) { alert('Ошибка: ' + t); });
+    });
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function escapeJs(str) {
+    if (!str) return '';
+    return str.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
+}
+
+// ======== Binding Settings Modal ========
+
+var bindBsModal;
+var bindSystemUuid, bindEmployeeId;
+
+function openBindingModal(sysUuid, empId, empName) {
+    bindSystemUuid = sysUuid;
+    bindEmployeeId = empId;
+    document.getElementById('bindingModalTitle').textContent = 'Настройки: ' + empName;
+    document.getElementById('bindSystemUuid').value = sysUuid;
+    document.getElementById('bindEmployeeId').value = empId;
+
+    // Сброс
+    document.getElementById('bindStatus').value = 'ACTIVE';
+    document.getElementById('bindDisconnectGroup').style.display = 'none';
+    document.getElementById('bindDisconnectDate').value = '';
+    document.getElementById('bindMchdType').value = '';
+    document.getElementById('bindMchdGroup').style.display = 'none';
+    document.getElementById('bindMchd').value = '';
+    document.getElementById('bindRoleType').value = '';
+    document.getElementById('bindRoleGroup').style.display = 'none';
+    document.getElementById('bindRoleInSystem').value = '';
+
+    // Загрузка данных
+    fetchWithCsrf('/api/system/' + sysUuid + '/employees/' + empId)
+    .then(function(r) { return r.json(); })
+    .then(function(b) {
+        document.getElementById('bindConnectDate').value = b.connectDate || '';
+        document.getElementById('bindStatus').value = b.status || 'ACTIVE';
+        if (b.status === 'INACTIVE') {
+            document.getElementById('bindDisconnectGroup').style.display = '';
+            document.getElementById('bindDisconnectDate').value = b.disconnectDate || '';
+        }
+        if (b.mchd) {
+            document.getElementById('bindMchdType').value = 'SPECIFIED';
+            document.getElementById('bindMchdGroup').style.display = '';
+            document.getElementById('bindMchd').value = b.mchd;
+        }
+        if (b.roleInSystem) {
+            document.getElementById('bindRoleType').value = 'SPECIFIED';
+            document.getElementById('bindRoleGroup').style.display = '';
+            document.getElementById('bindRoleInSystem').value = b.roleInSystem;
+        }
+    });
+
+    if (!bindBsModal) bindBsModal = new bootstrap.Modal(document.getElementById('bindingModal'));
+    bindBsModal.show();
+}
+
+function toggleDisconnectDate() {
+    var status = document.getElementById('bindStatus').value;
+    document.getElementById('bindDisconnectGroup').style.display = status === 'INACTIVE' ? '' : 'none';
+}
+
+function toggleMchdField() {
+    var val = document.getElementById('bindMchdType').value;
+    document.getElementById('bindMchdGroup').style.display = val === 'SPECIFIED' ? '' : 'none';
+}
+
+function toggleRoleField() {
+    var val = document.getElementById('bindRoleType').value;
+    document.getElementById('bindRoleGroup').style.display = val === 'SPECIFIED' ? '' : 'none';
+}
+
+function saveBinding() {
+    var dto = {
+        connectDate: document.getElementById('bindConnectDate').value || null,
+        status: document.getElementById('bindStatus').value,
+        disconnectDate: document.getElementById('bindStatus').value === 'INACTIVE' ? (document.getElementById('bindDisconnectDate').value || null) : null,
+        mchd: document.getElementById('bindMchdType').value === 'SPECIFIED' ? document.getElementById('bindMchd').value : null,
+        roleInSystem: document.getElementById('bindRoleType').value === 'SPECIFIED' ? document.getElementById('bindRoleInSystem').value : null
+    };
+
+    fetchWithCsrf('/api/system/' + bindSystemUuid + '/employees/' + bindEmployeeId, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dto)
+    })
+    .then(function(r) {
+        if (r.ok) {
+            bindBsModal.hide();
+            loadBoundEmployees();
+        } else {
+            r.text().then(function(t) { alert('Ошибка: ' + t); });
+        }
+    });
+}
+
+function updateShortDescCounter() {
+    var len = document.getElementById('sysShortDesc').value.length;
+    document.getElementById('shortDescCounter').textContent = len + ' / 1000';
+}
+
+// Init
+(function(){
+    csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    loadPage(0);
+})();
+/*]]>*/
+</script>

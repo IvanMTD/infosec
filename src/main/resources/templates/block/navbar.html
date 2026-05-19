@@ -52,6 +52,7 @@
                         <ul class="dropdown-menu">
                             <li th:if="${admin}"><a class="dropdown-item" th:href="@{/admin/users}">Пользователи</a></li>
                             <li th:if="${admin}"><a class="dropdown-item" th:href="@{/admin/works}">Настройка разделов</a></li>
+                            <li th:if="${admin}"><a class="dropdown-item" th:href="@{/admin/systems}">Системы</a></li>
                             <li th:if="${admin}"><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" th:href="@{/admin/departments}">Структуры</a></li>
                             <li><a class="dropdown-item" th:href="@{/admin/divisions}">Подструктуры</a></li>

@@ -1,0 +1,5 @@
+ALTER TABLE employee_job_system ADD COLUMN IF NOT EXISTS connect_date DATE NOT NULL DEFAULT CURRENT_DATE;
+ALTER TABLE employee_job_system ADD COLUMN IF NOT EXISTS disconnect_date DATE;
+ALTER TABLE employee_job_system ADD COLUMN IF NOT EXISTS status VARCHAR(10) NOT NULL DEFAULT 'ACTIVE';
+ALTER TABLE employee_job_system ADD COLUMN IF NOT EXISTS mchd TEXT;
+ALTER TABLE employee_job_system ADD COLUMN IF NOT EXISTS role_in_system TEXT;

@@ -9,6 +9,7 @@ import net.security.infosec.services.DivisionService;
 import net.security.infosec.services.EmployeeService;
 import net.security.infosec.services.ExcelReportService;
 import net.security.infosec.services.ImplementerService;
+import net.security.infosec.services.JobSystemService;
 import net.security.infosec.services.TaskService;
 import net.security.infosec.services.TroubleTicketService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,6 +21,8 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 
@@ -33,6 +36,7 @@ public class ApiController {
     private final DepartmentService departmentService;
     private final DivisionService divisionService;
     private final ExcelReportService excelReportService;
+    private final JobSystemService jobSystemService;
     private final TroubleTicketService troubleTicketService;
     private final TaskService taskService;
     private final ImplementerService implementerService;
@@ -309,5 +313,71 @@ public class ApiController {
                 var buffer = response.bufferFactory().wrap(bytes);
                 return response.writeWith(reactor.core.publisher.Mono.just(buffer));
             });
+    }
+
+    // ======== Job System API ========
+
+    @GetMapping("/systems")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Map<String, Object>> getSystems(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String type) {
+        return jobSystemService.getSystems(search, type, page, size);
+    }
+
+    @GetMapping("/system/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<JobSystemDTO> getSystem(@PathVariable UUID uuid) {
+        return jobSystemService.getById(uuid);
+    }
+
+    @PostMapping("/system")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<JobSystemDTO> createSystem(@RequestBody JobSystemDTO dto) {
+        return jobSystemService.create(dto);
+    }
+
+    @PutMapping("/system/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<JobSystemDTO> updateSystem(@PathVariable UUID uuid, @RequestBody JobSystemDTO dto) {
+        return jobSystemService.update(uuid, dto);
+    }
+
+    @DeleteMapping("/system/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<String> deleteSystem(@PathVariable UUID uuid) {
+        return jobSystemService.delete(uuid);
+    }
+
+    @GetMapping("/system/{uuid}/employees")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Flux<EmployeeDTO> getSystemEmployees(@PathVariable UUID uuid) {
+        return jobSystemService.getEmployees(uuid);
+    }
+
+    @PostMapping("/system/{uuid}/employees")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<EmployeeDTO> addSystemEmployee(@PathVariable UUID uuid, @RequestParam long employeeId) {
+        return jobSystemService.addEmployee(uuid, employeeId);
+    }
+
+    @DeleteMapping("/system/{uuid}/employees/{employeeId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Void> removeSystemEmployee(@PathVariable UUID uuid, @PathVariable long employeeId) {
+        return jobSystemService.removeEmployee(uuid, employeeId);
+    }
+
+    @GetMapping("/system/{uuid}/employees/{employeeId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<EmployeeJobSystemDTO> getSystemEmployeeBinding(@PathVariable UUID uuid, @PathVariable long employeeId) {
+        return jobSystemService.getBinding(uuid, employeeId);
+    }
+
+    @PutMapping("/system/{uuid}/employees/{employeeId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<EmployeeJobSystemDTO> updateSystemEmployeeBinding(@PathVariable UUID uuid, @PathVariable long employeeId, @RequestBody EmployeeJobSystemDTO dto) {
+        return jobSystemService.updateBinding(uuid, employeeId, dto);
     }
 }

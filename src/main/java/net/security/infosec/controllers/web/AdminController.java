@@ -365,4 +365,15 @@ public class AdminController {
             });
         });
     }
+
+    @GetMapping("/systems")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Rendering> systemsPage() {
+        return Mono.just(
+            Rendering.view("template")
+                .modelAttribute("title", "Системы")
+                .modelAttribute("index", "systems-page")
+                .build()
+        );
+    }
 }
