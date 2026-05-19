@@ -2,9 +2,11 @@ package net.security.infosec.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.security.infosec.models.dto.EmployeeBindingDTO;
 import net.security.infosec.models.dto.EmployeeDTO;
 import net.security.infosec.models.dto.EmployeeJobSystemDTO;
 import net.security.infosec.models.dto.JobSystemDTO;
+import net.security.infosec.models.dto.SystemReportDTO;
 import net.security.infosec.models.entity.EmployeeJobSystem;
 import net.security.infosec.models.entity.JobSystem;
 import net.security.infosec.repositories.EmployeeJobSystemRepository;
@@ -15,9 +17,11 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -33,7 +37,8 @@ public class JobSystemService {
         String lowerSearch = (search == null || search.isBlank()) ? null : search.toLowerCase();
         boolean filterByType = type != null && !type.isEmpty() && !"ALL".equalsIgnoreCase(type);
 
-        return repository.findAllByOrderByName()
+        return repository.findAll()
+            .sort(Comparator.comparing(sys -> sys.getName() != null ? sys.getName().toLowerCase() : ""))
             .filter(sys -> {
                 if (lowerSearch == null) return true;
                 return matches(sys, lowerSearch);
@@ -148,5 +153,67 @@ public class JobSystemService {
                 .filter(es -> es.getEmployeeId() == employeeId)
                 .next()
                 .map(EmployeeJobSystemDTO::new));
+    }
+
+    // ======== Report ========
+
+    public Flux<SystemReportDTO> getReport(String search, String type, String employeeSearch) {
+        String lowerSearch = (search == null || search.isBlank()) ? null : search.toLowerCase();
+        String lowerEmp = (employeeSearch == null || employeeSearch.isBlank()) ? null : employeeSearch.toLowerCase();
+        boolean filterByType = type != null && !type.isEmpty() && !"ALL".equalsIgnoreCase(type);
+
+        return repository.findAll()
+            .sort(Comparator.comparing(sys -> sys.getName() != null ? sys.getName().toLowerCase() : ""))
+            .filter(sys -> lowerSearch == null || matchesSystem(sys, lowerSearch) || lowerEmp != null)
+            .filter(sys -> !filterByType || (sys.getSystemType() != null && sys.getSystemType().name().equalsIgnoreCase(type)))
+            .flatMapSequential(sys -> empSysRepo.findAllByJobSystemUuid(sys.getUuid())
+                .flatMap(es -> employeeRepository.findById(es.getEmployeeId())
+                    .map(emp -> buildBindingDTO(emp, es)))
+                .sort(Comparator.comparing(EmployeeBindingDTO::getStatus)
+                    .thenComparing(b -> (b.getLastname() + " " + b.getName()).toLowerCase()))
+                .collectList()
+                .map(bindings -> {
+                    if (lowerEmp != null) {
+                        bindings = bindings.stream()
+                            .filter(b -> matchesEmployeeName(b, lowerEmp))
+                            .collect(Collectors.toList());
+                    }
+                    SystemReportDTO report = new SystemReportDTO();
+                    report.setSystem(new JobSystemDTO(sys));
+                    report.setEmployees(bindings);
+                    return report;
+                })
+            )
+            .filter(report -> lowerEmp == null || !report.getEmployees().isEmpty());
+    }
+
+    private boolean matchesSystem(JobSystem sys, String lower) {
+        if (sys.getName() != null && sys.getName().toLowerCase().contains(lower)) return true;
+        if (sys.getShortDescription() != null && sys.getShortDescription().toLowerCase().contains(lower)) return true;
+        if (sys.getUrl() != null && sys.getUrl().toLowerCase().contains(lower)) return true;
+        return false;
+    }
+
+    private boolean matchesEmployeeName(EmployeeBindingDTO b, String lower) {
+        String full = (b.getLastname() + " " + b.getName() + " " + b.getMiddleName()).toLowerCase();
+        return full.contains(lower);
+    }
+
+    private EmployeeBindingDTO buildBindingDTO(net.security.infosec.models.entity.Employee emp, EmployeeJobSystem es) {
+        EmployeeBindingDTO dto = new EmployeeBindingDTO();
+        dto.setEmployeeId(emp.getId());
+        dto.setLastname(emp.getLastname());
+        dto.setName(emp.getName());
+        dto.setMiddleName(emp.getMiddleName());
+        dto.setPosition(emp.getPosition());
+        dto.setEmail(emp.getEmail());
+        dto.setPhone(emp.getPhone());
+        dto.setPersonalPhone(emp.getPersonalPhone());
+        dto.setStatus(es.getStatus());
+        dto.setConnectDate(es.getConnectDate());
+        dto.setDisconnectDate(es.getDisconnectDate());
+        dto.setMchd(es.getMchd());
+        dto.setRoleInSystem(es.getRoleInSystem());
+        return dto;
     }
 }

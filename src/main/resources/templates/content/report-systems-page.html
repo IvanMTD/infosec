@@ -1,0 +1,231 @@
+<link rel="stylesheet" th:href="@{/css/stat.css}">
+
+<div class="container-fluid px-4 py-3">
+    <div class="row justify-content-center">
+        <div class="col-12">
+
+            <!-- Hero / Filter Bar -->
+            <div class="stat-filter-card">
+                <div class="stat-filter-card__header">
+                    <i class="bi bi-diagram-3 stat-filter-card__icon"></i>
+                    <span class="stat-filter-card__title">Информационные системы</span>
+                    <span class="stf-b1"></span><span class="stf-b2"></span><span class="stf-b3"></span><span class="stf-b4"></span>
+                    <span class="stf-m1"></span><span class="stf-m2"></span><span class="stf-m3"></span><span class="stf-m4"></span>
+                    <span class="stf-f1"></span><span class="stf-f2"></span><span class="stf-f3"></span><span class="stf-f4"></span>
+                </div>
+                <div class="stat-filter-card__body">
+                    <div class="row g-2 align-items-center w-100">
+                        <div class="col-3">
+                            <select id="typeFilter" class="form-select w-100" onchange="loadData()">
+                                <option value="ALL">Все</option>
+                                <option value="INTERNAL">Внутренние</option>
+                                <option value="EXTERNAL">Внешние</option>
+                            </select>
+                        </div>
+                        <div class="col-7">
+                            <div class="input-group w-100">
+                                <input type="text" id="searchInput" class="form-control" placeholder="Поиск по названию системы или ФИО сотрудника..." onkeyup="debounceSearch()" onkeydown="if(event.key==='Enter')loadData()">
+                                <button class="btn btn-smoke" onclick="loadData()" title="Найти"><i class="bi bi-search"></i></button>
+                            </div>
+                        </div>
+                        <div class="col-2 text-end">
+                            <span class="text-muted" id="resultCount" style="font-size:0.85rem;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid -->
+            <div id="report-grid" class="d-flex flex-column gap-3"></div>
+
+        </div>
+    </div>
+</div>
+
+<!-- System Detail Modal -->
+<div class="modal fade" id="sysDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px; border: 1px solid #d4d4d4;">
+            <div class="modal-header" style="background: linear-gradient(160deg, #0d0d0d 0%, #1a1a1a 50%, #111 100%); color: #e0e0e0; border-radius: 11px 11px 0 0;">
+                <h5 class="modal-title" id="sysDetailTitle">Подробности</h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="sysDetailBody"></div>
+            <div class="modal-footer" style="background: #fafafa; border-top: 1px solid #eee;">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Employee Detail Modal -->
+<div class="modal fade" id="empDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px; border: 1px solid #d4d4d4;">
+            <div class="modal-header" style="background: linear-gradient(160deg, #0d0d0d 0%, #1a1a1a 50%, #111 100%); color: #e0e0e0; border-radius: 11px 11px 0 0;">
+                <h5 class="modal-title" id="empDetailTitle">Детали сотрудника</h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="empDetailBody"></div>
+            <div class="modal-footer" style="background: #fafafa; border-top: 1px solid #eee;">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+/* ============================================================
+   PRESENTATION
+   ============================================================ */
+
+var searchTimer = null, sysDetailBsModal, empDetailBsModal;
+
+function renderSystemCard(report) {
+    var sys = report.system;
+    var typeBadge = sys.systemType === 'INTERNAL'
+        ? '<span class="badge bg-dark">Внутренняя</span>'
+        : '<span class="badge bg-secondary">Внешняя</span>';
+
+    var urlLink = sys.url ? '<div class="mt-1"><i class="bi bi-link-45deg"></i> <a href="' + escapeHtml(sys.url) + '" target="_blank">' + escapeHtml(sys.url) + '</a></div>' : '';
+
+    var empCards = '';
+    if (report.employees && report.employees.length > 0) {
+        for (var i = 0; i < report.employees.length; i++) {
+            empCards += renderEmployeeCard(report.employees[i], sys.uuid);
+        }
+    } else {
+        empCards = '<p class="text-muted mb-0" style="font-size:0.85rem;">Нет привязанных сотрудников</p>';
+    }
+
+    return '<div class="stat-card" style="border:1px solid #d4d4d4; border-radius:12px; overflow:hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.06); margin-bottom:0;">'
+        + '<div style="position:relative; background:linear-gradient(160deg,#0d0d0d 0%,#1a1a1a 50%,#111 100%); color:#e0e0e0; padding:0.75rem 1.25rem; display:flex; align-items:center; justify-content:space-between; border-radius:12px 12px 0 0;">'
+        + '<div class="d-flex align-items-center gap-2">' + typeBadge + ' <strong>' + escapeHtml(sys.name) + '</strong></div>'
+        + '<button class="btn btn-sm btn-outline-light" onclick="openSysDetail(\'' + sys.uuid + '\')" title="Подробности"><i class="bi bi-info-circle"></i> Подробности</button>'
+        + '</div>'
+        + '<div style="background:#fff; padding:0.75rem 1.25rem;">'
+        + (sys.shortDescription ? '<p class="mb-1">' + escapeHtml(sys.shortDescription) + '</p>' : '')
+        + urlLink
+        + '</div>'
+        + '<div style="background:#fafafa; padding:0.5rem 1rem; border-top:1px solid #eee;">'
+        + empCards
+        + '</div></div>';
+}
+
+function renderEmployeeCard(emp, sysUuid) {
+    var isActive = emp.status === 'ACTIVE';
+    var statusDot = '<span class="d-inline-block rounded-circle me-1" style="width:10px;height:10px;background:' + (isActive ? '#28a745' : '#dc3545') + ';" title="' + (isActive ? 'Активный' : 'Неактивный') + '"></span>';
+    var dates = '<small class="text-muted">' + (emp.connectDate || '—');
+    if (!isActive && emp.disconnectDate) dates += ' → ' + emp.disconnectDate;
+    dates += '</small>';
+
+    return '<div class="d-flex align-items-center justify-content-between py-1 border-bottom" style="cursor:pointer;" onclick="openEmpDetail(\'' + sysUuid + '\', ' + emp.employeeId + ', \'' + escapeJs(emp.lastname + ' ' + emp.name) + '\')">'
+        + '<div>' + statusDot + '<strong>' + escapeHtml(emp.lastname) + ' ' + escapeHtml(emp.name) + ' ' + escapeHtml(emp.middleName) + '</strong>'
+        + (emp.position ? ' <small class="text-muted">(' + escapeHtml(emp.position) + ')</small>' : '') + '</div>'
+        + '<div>' + dates + '</div>'
+        + '</div>';
+}
+
+function renderEmpty() {
+    return '<div class="text-center text-secondary py-5">'
+        + '<i class="bi bi-inbox" style="font-size:3rem;"></i>'
+        + '<p class="mt-2 fs-5">Системы не найдены</p>'
+        + '</div>';
+}
+
+/* ============================================================
+   LOGIC
+   ============================================================ */
+
+function loadData() {
+    var search = document.getElementById('searchInput').value.trim();
+    var type = document.getElementById('typeFilter').value;
+
+    var url = '/api/report/systems?search=' + encodeURIComponent(search) + '&type=' + encodeURIComponent(type) + '&employee=' + encodeURIComponent(search);
+
+    fetch(url, { headers: { 'Accept': 'application/json' } })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        var grid = document.getElementById('report-grid');
+        if (!data || data.length === 0) {
+            grid.innerHTML = renderEmpty();
+            document.getElementById('resultCount').textContent = '';
+        } else {
+            var totalEmps = 0;
+            for (var i = 0; i < data.length; i++) totalEmps += data[i].employees ? data[i].employees.length : 0;
+            document.getElementById('resultCount').textContent = 'Систем: ' + data.length + ', сотрудников: ' + totalEmps;
+            grid.innerHTML = data.map(renderSystemCard).join('');
+        }
+    });
+}
+
+function debounceSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(loadData, 400);
+}
+
+function openSysDetail(uuid) {
+    fetch('/api/system/' + uuid)
+    .then(function(r) { return r.json(); })
+    .then(function(sys) {
+        var typeBadge = sys.systemType === 'INTERNAL'
+            ? '<span class="badge bg-dark">Внутренняя</span>'
+            : '<span class="badge bg-secondary">Внешняя</span>';
+        var detailLines = sys.detailedDescription ? sys.detailedDescription.replace(/\n/g, '<br>') : '—';
+        var urlLink = sys.url ? '<a href="' + escapeHtml(sys.url) + '" target="_blank">' + escapeHtml(sys.url) + '</a>' : '—';
+
+        document.getElementById('sysDetailTitle').textContent = sys.name;
+        document.getElementById('sysDetailBody').innerHTML =
+            '<p>' + typeBadge + ' <strong>' + escapeHtml(sys.name) + '</strong></p>'
+            + '<p><small class="text-muted">Краткое описание</small><br>' + (sys.shortDescription || '—') + '</p>'
+            + '<p><small class="text-muted">Детальное описание</small><br><span style="white-space:pre-wrap;">' + detailLines + '</span></p>'
+            + '<p><small class="text-muted">Ссылка</small><br>' + urlLink + '</p>';
+
+        if (!sysDetailBsModal) sysDetailBsModal = new bootstrap.Modal(document.getElementById('sysDetailModal'));
+        sysDetailBsModal.show();
+    });
+}
+
+function openEmpDetail(sysUuid, empId, empName) {
+    document.getElementById('empDetailTitle').textContent = 'Детали: ' + empName;
+
+    fetchWithCsrf('/api/system/' + sysUuid + '/employees/' + empId)
+    .then(function(r) { return r.json(); })
+    .then(function(b) {
+        var statusBadge = b.status === 'ACTIVE'
+            ? '<span class="badge bg-success">Активный</span>'
+            : '<span class="badge bg-danger">Неактивный</span>';
+        document.getElementById('empDetailBody').innerHTML =
+            '<p><strong>Статус:</strong> ' + statusBadge + '</p>'
+            + '<p><strong>Дата подключения:</strong> ' + (b.connectDate || '—') + '</p>'
+            + (b.status === 'INACTIVE' ? '<p><strong>Дата отключения:</strong> ' + (b.disconnectDate || '—') + '</p>' : '')
+            + '<p><strong>МЧД:</strong> ' + (b.mchd ? '<br><span style="white-space:pre-wrap;">' + escapeHtml(b.mchd) + '</span>' : '—') + '</p>'
+            + '<p><strong>Роль в системе:</strong> ' + (b.roleInSystem ? '<br><span style="white-space:pre-wrap;">' + escapeHtml(b.roleInSystem) + '</span>' : '—') + '</p>';
+
+        if (!empDetailBsModal) empDetailBsModal = new bootstrap.Modal(document.getElementById('empDetailModal'));
+        empDetailBsModal.show();
+    });
+}
+
+function fetchWithCsrf(url, opts) {
+    opts = opts || {};
+    opts.headers = opts.headers || {};
+    opts.headers[document.querySelector("meta[name='_csrf_header']").getAttribute("content")] = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    return fetch(url, opts);
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function escapeJs(str) {
+    if (!str) return '';
+    return str.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
+}
+
+// Init
+(function(){ loadData(); })();
+/*]]>*/
+</script>

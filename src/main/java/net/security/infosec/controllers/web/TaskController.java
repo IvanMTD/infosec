@@ -1134,4 +1134,15 @@ public class TaskController {
                         .build()
         );
     }
+
+    @GetMapping("/systems")
+    @PreAuthorize("@securityCheck.canManageSystems(principal)")
+    public Mono<Rendering> reportSystemsPage() {
+        return Mono.just(
+            Rendering.view("template")
+                .modelAttribute("title", "Информационные системы")
+                .modelAttribute("index", "report-systems-page")
+                .build()
+        );
+    }
 }

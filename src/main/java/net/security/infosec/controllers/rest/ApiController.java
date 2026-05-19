@@ -318,7 +318,7 @@ public class ApiController {
     // ======== Job System API ========
 
     @GetMapping("/systems")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@securityCheck.canManageSystems(principal)")
     public Mono<Map<String, Object>> getSystems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -328,56 +328,65 @@ public class ApiController {
     }
 
     @GetMapping("/system/{uuid}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@securityCheck.canManageSystems(principal)")
     public Mono<JobSystemDTO> getSystem(@PathVariable UUID uuid) {
         return jobSystemService.getById(uuid);
     }
 
     @PostMapping("/system")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@securityCheck.canManageSystems(principal)")
     public Mono<JobSystemDTO> createSystem(@RequestBody JobSystemDTO dto) {
         return jobSystemService.create(dto);
     }
 
     @PutMapping("/system/{uuid}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@securityCheck.canManageSystems(principal)")
     public Mono<JobSystemDTO> updateSystem(@PathVariable UUID uuid, @RequestBody JobSystemDTO dto) {
         return jobSystemService.update(uuid, dto);
     }
 
     @DeleteMapping("/system/{uuid}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@securityCheck.canManageSystems(principal)")
     public Mono<String> deleteSystem(@PathVariable UUID uuid) {
         return jobSystemService.delete(uuid);
     }
 
     @GetMapping("/system/{uuid}/employees")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@securityCheck.canManageSystems(principal)")
     public Flux<EmployeeDTO> getSystemEmployees(@PathVariable UUID uuid) {
         return jobSystemService.getEmployees(uuid);
     }
 
     @PostMapping("/system/{uuid}/employees")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@securityCheck.canManageSystems(principal)")
     public Mono<EmployeeDTO> addSystemEmployee(@PathVariable UUID uuid, @RequestParam long employeeId) {
         return jobSystemService.addEmployee(uuid, employeeId);
     }
 
     @DeleteMapping("/system/{uuid}/employees/{employeeId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@securityCheck.canManageSystems(principal)")
     public Mono<Void> removeSystemEmployee(@PathVariable UUID uuid, @PathVariable long employeeId) {
         return jobSystemService.removeEmployee(uuid, employeeId);
     }
 
     @GetMapping("/system/{uuid}/employees/{employeeId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@securityCheck.canManageSystems(principal)")
     public Mono<EmployeeJobSystemDTO> getSystemEmployeeBinding(@PathVariable UUID uuid, @PathVariable long employeeId) {
         return jobSystemService.getBinding(uuid, employeeId);
     }
 
     @PutMapping("/system/{uuid}/employees/{employeeId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@securityCheck.canManageSystems(principal)")
     public Mono<EmployeeJobSystemDTO> updateSystemEmployeeBinding(@PathVariable UUID uuid, @PathVariable long employeeId, @RequestBody EmployeeJobSystemDTO dto) {
         return jobSystemService.updateBinding(uuid, employeeId, dto);
+    }
+
+    @GetMapping("/report/systems")
+    @PreAuthorize("@securityCheck.canManageSystems(principal)")
+    public Flux<SystemReportDTO> getReportSystems(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String employee) {
+        return jobSystemService.getReport(search, type, employee);
     }
 }

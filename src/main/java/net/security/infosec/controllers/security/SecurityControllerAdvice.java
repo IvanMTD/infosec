@@ -2,6 +2,7 @@ package net.security.infosec.controllers.security;
 
 import lombok.RequiredArgsConstructor;
 import net.security.infosec.models.entity.Implementer;
+import net.security.infosec.models.entity.DepartmentRole;
 import net.security.infosec.models.entity.Role;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.reactive.result.view.CsrfRequestDataValueProcessor;
@@ -126,5 +127,13 @@ public class SecurityControllerAdvice {
         }else{
             return Mono.just("18:00");
         }
+    }
+
+    @ModelAttribute(name = "isIB")
+    public Mono<Boolean> isIB(@AuthenticationPrincipal Implementer implementer){
+        if(implementer != null && implementer.getDepartmentRole() == DepartmentRole.IB){
+            return Mono.just(true);
+        }
+        return Mono.just(false);
     }
 }

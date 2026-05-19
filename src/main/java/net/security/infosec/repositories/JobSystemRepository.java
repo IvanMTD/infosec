@@ -9,4 +9,5 @@ import java.util.UUID;
 public interface JobSystemRepository extends ReactiveCrudRepository<JobSystem, UUID> {
 
     Flux<JobSystem> findAllByOrderByName();
+    Flux<JobSystem> findAll();
 }

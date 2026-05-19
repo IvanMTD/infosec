@@ -367,7 +367,7 @@ public class AdminController {
     }
 
     @GetMapping("/systems")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@securityCheck.canManageSystems(principal)")
     public Mono<Rendering> systemsPage() {
         return Mono.just(
             Rendering.view("template")
