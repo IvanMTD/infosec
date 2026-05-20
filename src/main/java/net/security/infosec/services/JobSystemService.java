@@ -138,7 +138,7 @@ public class JobSystemService {
         var spec = databaseClient.sql("""
                 UPDATE employee_job_system
                 SET connect_date = :connectDate, disconnect_date = :disconnectDate,
-                    status = :status, mchd = :mchd, role_in_system = :roleInSystem
+                    status = :status, mchd = :mchd, role_in_system = :roleInSystem, foundation = :foundation
                 WHERE employee_id = :employeeId AND job_system_uuid = :systemUuid
                 """)
             .bind("connectDate", dto.getConnectDate())
@@ -148,6 +148,7 @@ public class JobSystemService {
         spec = dto.getDisconnectDate() != null ? spec.bind("disconnectDate", dto.getDisconnectDate()) : spec.bindNull("disconnectDate", java.sql.Date.class);
         spec = dto.getMchd() != null ? spec.bind("mchd", dto.getMchd()) : spec.bindNull("mchd", String.class);
         spec = dto.getRoleInSystem() != null ? spec.bind("roleInSystem", dto.getRoleInSystem()) : spec.bindNull("roleInSystem", String.class);
+        spec = dto.getFoundation() != null ? spec.bind("foundation", dto.getFoundation()) : spec.bindNull("foundation", String.class);
         return spec.fetch().rowsUpdated()
             .then(empSysRepo.findAllByJobSystemUuid(systemUuid)
                 .filter(es -> es.getEmployeeId() == employeeId)
@@ -157,39 +158,52 @@ public class JobSystemService {
 
     // ======== Report ========
 
-    public Flux<SystemReportDTO> getReport(String search, String type, String employeeSearch) {
+    public Flux<SystemReportDTO> getReport(String search, String type, String employeeSearch, String status) {
         String lowerSearch = (search == null || search.isBlank()) ? null : search.toLowerCase();
         String lowerEmp = (employeeSearch == null || employeeSearch.isBlank()) ? null : employeeSearch.toLowerCase();
         boolean filterByType = type != null && !type.isEmpty() && !"ALL".equalsIgnoreCase(type);
+        boolean filterByStatus = status != null && !status.isEmpty() && !"ALL".equalsIgnoreCase(status);
 
         return repository.findAll()
             .sort(Comparator.comparing(sys -> sys.getName() != null ? sys.getName().toLowerCase() : ""))
             .filter(sys -> lowerSearch == null || matchesSystem(sys, lowerSearch) || lowerEmp != null)
             .filter(sys -> !filterByType || (sys.getSystemType() != null && sys.getSystemType().name().equalsIgnoreCase(type)))
-            .flatMapSequential(sys -> empSysRepo.findAllByJobSystemUuid(sys.getUuid())
+            .flatMapSequential(sys -> {
+                boolean sysMatches = lowerSearch != null && matchesSystem(sys, lowerSearch);
+                return empSysRepo.findAllByJobSystemUuid(sys.getUuid())
                 .flatMap(es -> employeeRepository.findById(es.getEmployeeId())
                     .map(emp -> buildBindingDTO(emp, es)))
                 .sort(Comparator.comparing(EmployeeBindingDTO::getStatus)
                     .thenComparing(b -> (b.getLastname() + " " + b.getName()).toLowerCase()))
                 .collectList()
                 .map(bindings -> {
-                    if (lowerEmp != null) {
+                    if (lowerEmp != null && !sysMatches) {
                         bindings = bindings.stream()
                             .filter(b -> matchesEmployeeName(b, lowerEmp))
+                            .collect(Collectors.toList());
+                    }
+                    if (filterByStatus) {
+                        bindings = bindings.stream()
+                            .filter(b -> status.equalsIgnoreCase(b.getStatus()))
                             .collect(Collectors.toList());
                     }
                     SystemReportDTO report = new SystemReportDTO();
                     report.setSystem(new JobSystemDTO(sys));
                     report.setEmployees(bindings);
                     return report;
-                })
-            )
-            .filter(report -> lowerEmp == null || !report.getEmployees().isEmpty());
+                });
+            })
+            .filter(report -> lowerSearch == null || lowerEmp == null
+                || (lowerSearch != null && report.getSystem() != null
+                    && report.getSystem().getName() != null
+                    && report.getSystem().getName().toLowerCase().contains(lowerSearch))
+                || !report.getEmployees().isEmpty());
     }
 
     private boolean matchesSystem(JobSystem sys, String lower) {
         if (sys.getName() != null && sys.getName().toLowerCase().contains(lower)) return true;
         if (sys.getShortDescription() != null && sys.getShortDescription().toLowerCase().contains(lower)) return true;
+        if (sys.getDetailedDescription() != null && sys.getDetailedDescription().toLowerCase().contains(lower)) return true;
         if (sys.getUrl() != null && sys.getUrl().toLowerCase().contains(lower)) return true;
         return false;
     }
@@ -214,6 +228,7 @@ public class JobSystemService {
         dto.setDisconnectDate(es.getDisconnectDate());
         dto.setMchd(es.getMchd());
         dto.setRoleInSystem(es.getRoleInSystem());
+        dto.setFoundation(es.getFoundation());
         return dto;
     }
 }

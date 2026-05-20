@@ -2,6 +2,8 @@ package net.security.infosec.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.security.infosec.models.dto.EmployeeBindingDTO;
+import net.security.infosec.models.dto.SystemReportDTO;
 import net.security.infosec.models.entity.Category;
 import net.security.infosec.models.entity.Task;
 import net.security.infosec.models.entity.Trouble;
@@ -27,6 +29,7 @@ public class ExcelReportService {
     private final TaskRepository taskRepository;
     private final TroubleTicketService troubleTicketService;
     private final TroubleRepository troubleRepository;
+    private final JobSystemService jobSystemService;
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
@@ -207,6 +210,124 @@ public class ExcelReportService {
                 return "с 01.01." + now.getYear() + " по 31.12." + now.getYear();
             default:
                 return "с " + from.format(DATE_FMT) + " по " + to.format(DATE_FMT);
+        }
+    }
+
+    public Mono<byte[]> exportSystemsReport(String search, String type, String employee) {
+        return jobSystemService.getReport(search, type, employee, "ALL")
+            .collectList()
+            .map(list -> {
+                try (var wb = new XSSFWorkbook()) {
+                    var sheet = wb.createSheet("Системы");
+                    var headerStyle = createExcelHeaderStyle(wb);
+                    var sysStyle = createExcelBoldStyle(wb);
+                    var greenStyle = createStatusStyle(wb, IndexedColors.LIGHT_GREEN);
+                    var redStyle = createStatusStyle(wb, IndexedColors.ROSE);
+                    var rowNum = 0;
+
+                    // Header
+                    var header = sheet.createRow(rowNum++);
+                    createExcelCell(header, 0, "Название системы", headerStyle);
+                    createExcelCell(header, 1, "ФИО", headerStyle);
+                    createExcelCell(header, 2, "Статус", headerStyle);
+                    createExcelCell(header, 3, "Дата подключения", headerStyle);
+                    createExcelCell(header, 4, "Дата отключения", headerStyle);
+                    createExcelCell(header, 5, "Роль в системе", headerStyle);
+                    createExcelCell(header, 6, "МЧД", headerStyle);
+                    createExcelCell(header, 7, "Основание", headerStyle);
+
+                    for (var report : list) {
+                        var sys = report.getSystem();
+                        var employees = report.getEmployees();
+
+                        if (employees.isEmpty()) {
+                            var r = sheet.createRow(rowNum++);
+                            createExcelCell(r, 0, sys.getName(), sysStyle);
+                            applyRowBorder(r, 7);
+                        } else {
+                            for (int i = 0; i < employees.size(); i++) {
+                                var emp = employees.get(i);
+                                var r = sheet.createRow(rowNum++);
+                                if (i == 0) {
+                                    createExcelCell(r, 0, sys.getName(), sysStyle);
+                                }
+                                var statusStyle = "ACTIVE".equals(emp.getStatus()) ? greenStyle : redStyle;
+                                createExcelCell(r, 1, emp.getLastname() + " " + emp.getName() + " " + emp.getMiddleName(), null);
+                                createExcelCell(r, 2, "ACTIVE".equals(emp.getStatus()) ? "Активный" : "Неактивный", statusStyle);
+                                createExcelCell(r, 3, emp.getConnectDate() != null ? emp.getConnectDate().format(DATE_FMT) : "", null);
+                                createExcelCell(r, 4, emp.getDisconnectDate() != null ? emp.getDisconnectDate().format(DATE_FMT) : "", null);
+                                createExcelCell(r, 5, emp.getRoleInSystem(), null);
+                                createExcelCell(r, 6, emp.getMchd(), null);
+                                createExcelCell(r, 7, emp.getFoundation(), null);
+                                if (i == employees.size() - 1) {
+                                    applyRowBorder(r, 7);
+                                }
+                            }
+                        }
+                    }
+
+                    // Auto-size columns
+                    for (int i = 0; i < 8; i++) {
+                        sheet.autoSizeColumn(i);
+                        int w = sheet.getColumnWidth(i);
+                        sheet.setColumnWidth(i, Math.min(w, 15000));
+                    }
+
+                    var out = new ByteArrayOutputStream();
+                    wb.write(out);
+                    return out.toByteArray();
+                } catch (Exception e) {
+                    log.error("Excel export failed", e);
+                    return new byte[0];
+                }
+            });
+    }
+
+    private CellStyle createExcelHeaderStyle(Workbook wb) {
+        var style = wb.createCellStyle();
+        var font = wb.createFont();
+        font.setBold(true);
+        font.setColor(IndexedColors.WHITE.getIndex());
+        style.setFont(font);
+        style.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        return style;
+    }
+
+    private CellStyle createExcelBoldStyle(Workbook wb) {
+        var style = wb.createCellStyle();
+        var font = wb.createFont();
+        font.setBold(true);
+        style.setFont(font);
+        style.setVerticalAlignment(VerticalAlignment.TOP);
+        return style;
+    }
+
+    private void createExcelCell(Row row, int col, String value, CellStyle style) {
+        var cell = row.createCell(col);
+        cell.setCellValue(value != null ? value : "");
+        if (style != null) cell.setCellStyle(style);
+    }
+
+    private CellStyle createStatusStyle(Workbook wb, IndexedColors color) {
+        var style = wb.createCellStyle();
+        style.setFillForegroundColor(color.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        return style;
+    }
+
+    private void applyRowBorder(Row row, int maxCol) {
+        for (int c = 0; c <= maxCol; c++) {
+            var cell = row.getCell(c);
+            if (cell == null) cell = row.createCell(c);
+            var orig = cell.getCellStyle();
+            var style = row.getSheet().getWorkbook().createCellStyle();
+            style.cloneStyleFrom(orig);
+            style.setBorderBottom(BorderStyle.MEDIUM);
+            cell.setCellStyle(style);
         }
     }
 }

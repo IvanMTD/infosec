@@ -15,20 +15,30 @@
                 </div>
                 <div class="stat-filter-card__body">
                     <div class="row g-2 align-items-center w-100">
-                        <div class="col-3">
+                        <div class="col-12 col-md-2">
                             <select id="typeFilter" class="form-select w-100" onchange="loadData()">
                                 <option value="ALL">Все</option>
                                 <option value="INTERNAL">Внутренние</option>
                                 <option value="EXTERNAL">Внешние</option>
                             </select>
                         </div>
-                        <div class="col-7">
+                        <div class="col-12 col-md-2">
+                            <select id="statusFilter" class="form-select w-100" onchange="loadData()">
+                                <option value="ALL">Все</option>
+                                <option value="ACTIVE">Активные</option>
+                                <option value="INACTIVE">Неактивные</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md">
                             <div class="input-group w-100">
                                 <input type="text" id="searchInput" class="form-control" placeholder="Поиск по названию системы или ФИО сотрудника..." onkeyup="debounceSearch()" onkeydown="if(event.key==='Enter')loadData()">
                                 <button class="btn btn-smoke" onclick="loadData()" title="Найти"><i class="bi bi-search"></i></button>
                             </div>
                         </div>
-                        <div class="col-2 text-end">
+                        <div class="col-12 col-md-1">
+                            <button class="btn btn-smoke w-100 h-100" onclick="exportExcel()" title="Выгрузить в Excel"><i class="bi bi-file-earmark-text"></i></button>
+                        </div>
+                        <div class="col-12 text-end">
                             <span class="text-muted" id="resultCount" style="font-size:0.85rem;"></span>
                         </div>
                     </div>
@@ -141,8 +151,9 @@ function renderEmpty() {
 function loadData() {
     var search = document.getElementById('searchInput').value.trim();
     var type = document.getElementById('typeFilter').value;
+    var status = document.getElementById('statusFilter').value;
 
-    var url = '/api/report/systems?search=' + encodeURIComponent(search) + '&type=' + encodeURIComponent(type) + '&employee=' + encodeURIComponent(search);
+    var url = '/api/report/systems?search=' + encodeURIComponent(search) + '&type=' + encodeURIComponent(type) + '&employee=' + encodeURIComponent(search) + '&status=' + encodeURIComponent(status);
 
     fetch(url, { headers: { 'Accept': 'application/json' } })
     .then(function(r) { return r.json(); })
@@ -227,5 +238,11 @@ function escapeJs(str) {
 
 // Init
 (function(){ loadData(); })();
+
+function exportExcel() {
+    var search = document.getElementById('searchInput').value.trim();
+    var type = document.getElementById('typeFilter').value;
+    window.location.href = '/api/report/systems/excel?search=' + encodeURIComponent(search) + '&type=' + encodeURIComponent(type) + '&employee=' + encodeURIComponent(search);
+}
 /*]]>*/
 </script>

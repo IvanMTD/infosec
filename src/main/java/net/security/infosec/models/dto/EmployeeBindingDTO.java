@@ -21,4 +21,5 @@ public class EmployeeBindingDTO {
     private LocalDate disconnectDate;
     private String mchd;
     private String roleInSystem;
+    private String foundation;
 }

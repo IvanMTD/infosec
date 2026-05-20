@@ -386,7 +386,21 @@ public class ApiController {
     public Flux<SystemReportDTO> getReportSystems(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String type,
+            @RequestParam(required = false) String employee,
+            @RequestParam(required = false, defaultValue = "ALL") String status) {
+        return jobSystemService.getReport(search, type, employee, status);
+    }
+
+    @GetMapping("/report/systems/excel")
+    @PreAuthorize("@securityCheck.canManageSystems(principal)")
+    public Mono<org.springframework.http.ResponseEntity<byte[]>> exportReportSystems(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String type,
             @RequestParam(required = false) String employee) {
-        return jobSystemService.getReport(search, type, employee);
+        return excelReportService.exportSystemsReport(search, type, employee)
+            .map(bytes -> org.springframework.http.ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=systems_report.xlsx")
+                .header(org.springframework.http.HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                .body(bytes));
     }
 }

@@ -168,6 +168,17 @@
                     <textarea id="bindRoleInSystem" class="form-control" placeholder="Описание роли" style="height:100px;"></textarea>
                     <label>Описание роли</label>
                 </div>
+                <div class="form-floating mb-3">
+                    <select id="bindFoundationType" class="form-select" onchange="toggleFoundationField()">
+                        <option value="">Нет</option>
+                        <option value="SPECIFIED">Указать</option>
+                    </select>
+                    <label>Основание</label>
+                </div>
+                <div class="form-floating mb-3" id="bindFoundationGroup" style="display:none;">
+                    <textarea id="bindFoundation" class="form-control" placeholder="Основание" style="height:100px;"></textarea>
+                    <label>Описание основания</label>
+                </div>
             </div>
             <div class="modal-footer" style="background: #fafafa; border-top: 1px solid #eee;">
                 <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
@@ -462,6 +473,9 @@ function openBindingModal(sysUuid, empId, empName) {
     document.getElementById('bindRoleType').value = '';
     document.getElementById('bindRoleGroup').style.display = 'none';
     document.getElementById('bindRoleInSystem').value = '';
+    document.getElementById('bindFoundationType').value = '';
+    document.getElementById('bindFoundationGroup').style.display = 'none';
+    document.getElementById('bindFoundation').value = '';
 
     // Загрузка данных
     fetchWithCsrf('/api/system/' + sysUuid + '/employees/' + empId)
@@ -482,6 +496,11 @@ function openBindingModal(sysUuid, empId, empName) {
             document.getElementById('bindRoleType').value = 'SPECIFIED';
             document.getElementById('bindRoleGroup').style.display = '';
             document.getElementById('bindRoleInSystem').value = b.roleInSystem;
+        }
+        if (b.foundation) {
+            document.getElementById('bindFoundationType').value = 'SPECIFIED';
+            document.getElementById('bindFoundationGroup').style.display = '';
+            document.getElementById('bindFoundation').value = b.foundation;
         }
     });
 
@@ -504,13 +523,19 @@ function toggleRoleField() {
     document.getElementById('bindRoleGroup').style.display = val === 'SPECIFIED' ? '' : 'none';
 }
 
+function toggleFoundationField() {
+    var val = document.getElementById('bindFoundationType').value;
+    document.getElementById('bindFoundationGroup').style.display = val === 'SPECIFIED' ? '' : 'none';
+}
+
 function saveBinding() {
     var dto = {
         connectDate: document.getElementById('bindConnectDate').value || null,
         status: document.getElementById('bindStatus').value,
         disconnectDate: document.getElementById('bindStatus').value === 'INACTIVE' ? (document.getElementById('bindDisconnectDate').value || null) : null,
         mchd: document.getElementById('bindMchdType').value === 'SPECIFIED' ? document.getElementById('bindMchd').value : null,
-        roleInSystem: document.getElementById('bindRoleType').value === 'SPECIFIED' ? document.getElementById('bindRoleInSystem').value : null
+        roleInSystem: document.getElementById('bindRoleType').value === 'SPECIFIED' ? document.getElementById('bindRoleInSystem').value : null,
+        foundation: document.getElementById('bindFoundationType').value === 'SPECIFIED' ? document.getElementById('bindFoundation').value : null
     };
 
     fetchWithCsrf('/api/system/' + bindSystemUuid + '/employees/' + bindEmployeeId, {

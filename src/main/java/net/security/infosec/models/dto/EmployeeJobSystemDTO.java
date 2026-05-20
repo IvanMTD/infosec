@@ -16,6 +16,7 @@ public class EmployeeJobSystemDTO {
     private String status;
     private String mchd;
     private String roleInSystem;
+    private String foundation;
 
     public EmployeeJobSystemDTO(EmployeeJobSystem entity) {
         setEmployeeId(entity.getEmployeeId());
@@ -25,5 +26,6 @@ public class EmployeeJobSystemDTO {
         setStatus(entity.getStatus());
         setMchd(entity.getMchd());
         setRoleInSystem(entity.getRoleInSystem());
+        setFoundation(entity.getFoundation());
     }
 }
