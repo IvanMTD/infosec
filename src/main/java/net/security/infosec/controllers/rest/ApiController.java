@@ -391,6 +391,13 @@ public class ApiController {
         return jobSystemService.getReport(search, type, employee, status);
     }
 
+    @GetMapping("/report/systems/stats")
+    @PreAuthorize("@securityCheck.canManageSystems(principal)")
+    public Mono<Map<String, Object>> getReportSystemsStats(
+            @RequestParam(required = false, defaultValue = "ALL") String type) {
+        return jobSystemService.getReportStats(type);
+    }
+
     @GetMapping("/report/systems/excel")
     @PreAuthorize("@securityCheck.canManageSystems(principal)")
     public Mono<org.springframework.http.ResponseEntity<byte[]>> exportReportSystems(

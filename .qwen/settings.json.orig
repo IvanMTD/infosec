@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mvnw *)"
+      "Bash(mvnw *)",
+      "Bash(del *)",
+      "Bash(ren *)",
+      "Bash(findstr *)",
+      "Bash(mvnw.cmd *)",
+      "Bash(java *)",
+      "Bash(set *)",
+      "Bash(do *)"
     ]
-  }
+  },
+  "$version": 3
 }

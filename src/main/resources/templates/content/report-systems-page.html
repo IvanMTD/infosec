@@ -16,15 +16,15 @@
                 <div class="stat-filter-card__body">
                     <div class="row g-2 align-items-center w-100">
                         <div class="col-12 col-md-2">
-                            <select id="typeFilter" class="form-select w-100" onchange="loadData()">
-                                <option value="ALL">Все</option>
+                            <select id="typeFilter" class="form-select w-100" onchange="loadStats();loadData()">
+                                <option value="ALL">Все системы</option>
                                 <option value="INTERNAL">Внутренние</option>
                                 <option value="EXTERNAL">Внешние</option>
                             </select>
                         </div>
                         <div class="col-12 col-md-2">
                             <select id="statusFilter" class="form-select w-100" onchange="loadData()">
-                                <option value="ALL">Все</option>
+                                <option value="ALL">Все статусы</option>
                                 <option value="ACTIVE">Активные</option>
                                 <option value="INACTIVE">Неактивные</option>
                             </select>
@@ -41,6 +41,36 @@
                         <div class="col-12 text-end">
                             <span class="text-muted" id="resultCount" style="font-size:0.85rem;"></span>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Indicators inside hero -->
+                <div class="d-flex gap-3 mt-3 flex-wrap px-3 pb-3" id="statsIndicators">
+                    <div class="stat-summary-card flex-grow-1" style="min-width:140px;">
+                        <div class="stat-summary-card__header">Количество систем</div>
+                        <div class="stat-summary-card__body">
+                            <div class="stat-total" id="statSystems">—</div>
+                        </div>
+                    </div>
+                    <div class="stat-summary-card flex-grow-1" style="min-width:140px;">
+                        <div class="stat-summary-card__header">Пользователей</div>
+                        <div class="stat-summary-card__body">
+                            <div class="stat-total" id="statTotal">—</div>
+                        </div>
+                    </div>
+                    <div class="stat-summary-card flex-grow-1" style="min-width:140px;">
+                        <div class="stat-summary-card__header">Активные</div>
+                        <div class="stat-summary-card__body">
+                            <div class="stat-total text-success" id="statActive">—</div>
+                        </div>
+                    </div>
+                    <div class="stat-summary-card flex-grow-1" style="min-width:140px;">
+                        <div class="stat-summary-card__header">Неактивные</div>
+                        <div class="stat-summary-card__body">
+                            <div class="stat-total text-danger" id="statInactive">—</div>
+                        </div>
+                        <!-- /Indicators -->
+
                     </div>
                 </div>
             </div>
@@ -161,13 +191,21 @@ function loadData() {
         var grid = document.getElementById('report-grid');
         if (!data || data.length === 0) {
             grid.innerHTML = renderEmpty();
-            document.getElementById('resultCount').textContent = '';
         } else {
-            var totalEmps = 0;
-            for (var i = 0; i < data.length; i++) totalEmps += data[i].employees ? data[i].employees.length : 0;
-            document.getElementById('resultCount').textContent = 'Систем: ' + data.length + ', сотрудников: ' + totalEmps;
             grid.innerHTML = data.map(renderSystemCard).join('');
         }
+    });
+}
+
+function loadStats() {
+    var type = document.getElementById('typeFilter').value;
+    fetch('/api/report/systems/stats?type=' + encodeURIComponent(type))
+    .then(function(r) { return r.json(); })
+    .then(function(s) {
+        document.getElementById('statSystems').textContent = s.systemsCount || 0;
+        document.getElementById('statTotal').textContent = s.totalEmployees || 0;
+        document.getElementById('statActive').textContent = s.activeCount || 0;
+        document.getElementById('statInactive').textContent = s.inactiveCount || 0;
     });
 }
 
@@ -237,7 +275,7 @@ function escapeJs(str) {
 }
 
 // Init
-(function(){ loadData(); })();
+(function(){ loadStats(); loadData(); })();
 
 function exportExcel() {
     var search = document.getElementById('searchInput').value.trim();

@@ -200,6 +200,27 @@ public class JobSystemService {
                 || !report.getEmployees().isEmpty());
     }
 
+    // ======== Stats ========
+
+    public Mono<Map<String, Object>> getReportStats(String type) {
+        boolean filterByType = type != null && !type.isEmpty() && !"ALL".equalsIgnoreCase(type);
+
+        return repository.findAll()
+            .filter(sys -> !filterByType || (sys.getSystemType() != null && sys.getSystemType().name().equalsIgnoreCase(type)))
+            .flatMap(sys -> empSysRepo.findAllByJobSystemUuid(sys.getUuid()).collectList().map(bindings -> {
+                long active = bindings.stream().filter(b -> "ACTIVE".equals(b.getStatus())).count();
+                long inactive = bindings.size() - active;
+                return new long[]{1, bindings.size(), active, inactive};
+            }))
+            .reduce(new long[]{0, 0, 0, 0}, (a, b) -> new long[]{a[0] + b[0], a[1] + b[1], a[2] + b[2], a[3] + b[3]})
+            .map(arr -> Map.<String, Object>of(
+                "systemsCount", arr[0],
+                "totalEmployees", arr[1],
+                "activeCount", arr[2],
+                "inactiveCount", arr[3]
+            ));
+    }
+
     private boolean matchesSystem(JobSystem sys, String lower) {
         if (sys.getName() != null && sys.getName().toLowerCase().contains(lower)) return true;
         if (sys.getShortDescription() != null && sys.getShortDescription().toLowerCase().contains(lower)) return true;
