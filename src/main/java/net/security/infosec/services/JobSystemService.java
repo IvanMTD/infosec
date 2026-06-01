@@ -110,7 +110,10 @@ public class JobSystemService {
     }
 
     public Mono<Void> removeEmployee(UUID systemUuid, long employeeId) {
-        return empSysRepo.deleteByEmployeeIdAndJobSystemUuid(employeeId, systemUuid);
+        return databaseClient.sql("DELETE FROM employee_job_system WHERE employee_id = :employeeId AND job_system_uuid = :systemUuid")
+            .bind("employeeId", employeeId)
+            .bind("systemUuid", systemUuid)
+            .fetch().rowsUpdated().then();
     }
 
     public Flux<EmployeeDTO> searchEmployees(String query) {
