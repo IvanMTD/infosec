@@ -9,6 +9,8 @@ import net.security.infosec.models.dto.JobSystemDTO;
 import net.security.infosec.models.dto.SystemReportDTO;
 import net.security.infosec.models.entity.EmployeeJobSystem;
 import net.security.infosec.models.entity.JobSystem;
+import net.security.infosec.repositories.DepartmentRepository;
+import net.security.infosec.repositories.DivisionRepository;
 import net.security.infosec.repositories.EmployeeJobSystemRepository;
 import net.security.infosec.repositories.EmployeeRepository;
 import net.security.infosec.repositories.JobSystemRepository;
@@ -31,6 +33,8 @@ public class JobSystemService {
     private final JobSystemRepository repository;
     private final EmployeeJobSystemRepository empSysRepo;
     private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
+    private final DivisionRepository divisionRepository;
     private final DatabaseClient databaseClient;
 
     public Mono<Map<String, Object>> getSystems(String search, String type, int page, int size) {
@@ -141,7 +145,8 @@ public class JobSystemService {
         var spec = databaseClient.sql("""
                 UPDATE employee_job_system
                 SET connect_date = :connectDate, disconnect_date = :disconnectDate,
-                    status = :status, mchd = :mchd, role_in_system = :roleInSystem, foundation = :foundation
+                    status = :status, mchd = :mchd, role_in_system = :roleInSystem, foundation = :foundation,
+                    mchd_basis = :mchdBasis, mchd_expiry = :mchdExpiry, accesses = :accesses
                 WHERE employee_id = :employeeId AND job_system_uuid = :systemUuid
                 """)
             .bind("connectDate", dto.getConnectDate())
@@ -152,6 +157,9 @@ public class JobSystemService {
         spec = dto.getMchd() != null ? spec.bind("mchd", dto.getMchd()) : spec.bindNull("mchd", String.class);
         spec = dto.getRoleInSystem() != null ? spec.bind("roleInSystem", dto.getRoleInSystem()) : spec.bindNull("roleInSystem", String.class);
         spec = dto.getFoundation() != null ? spec.bind("foundation", dto.getFoundation()) : spec.bindNull("foundation", String.class);
+        spec = dto.getMchdBasis() != null ? spec.bind("mchdBasis", dto.getMchdBasis()) : spec.bindNull("mchdBasis", String.class);
+        spec = dto.getMchdExpiry() != null ? spec.bind("mchdExpiry", dto.getMchdExpiry()) : spec.bindNull("mchdExpiry", java.sql.Date.class);
+        spec = dto.getAccesses() != null ? spec.bind("accesses", dto.getAccesses()) : spec.bindNull("accesses", String.class);
         return spec.fetch().rowsUpdated()
             .then(empSysRepo.findAllByJobSystemUuid(systemUuid)
                 .filter(es -> es.getEmployeeId() == employeeId)
@@ -175,7 +183,16 @@ public class JobSystemService {
                 boolean sysMatches = lowerSearch != null && matchesSystem(sys, lowerSearch);
                 return empSysRepo.findAllByJobSystemUuid(sys.getUuid())
                 .flatMap(es -> employeeRepository.findById(es.getEmployeeId())
-                    .map(emp -> buildBindingDTO(emp, es)))
+                    .flatMap(emp -> {
+                        var dept = emp.getDepartmentId() > 0
+                            ? departmentRepository.findById(emp.getDepartmentId()).map(d -> d.getTitle()).defaultIfEmpty("")
+                            : Mono.just("");
+                        var div = emp.getDivisionId() > 0
+                            ? divisionRepository.findById(emp.getDivisionId()).map(d -> d.getTitle()).defaultIfEmpty("")
+                            : Mono.just("");
+                        return Mono.zip(Mono.just(emp), Mono.just(es), dept, div);
+                    })
+                    .map(tuple -> buildBindingDTO(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4())))
                 .sort(Comparator.comparing(EmployeeBindingDTO::getStatus)
                     .thenComparing(b -> (b.getLastname() + " " + b.getName()).toLowerCase()))
                 .collectList()
@@ -237,7 +254,7 @@ public class JobSystemService {
         return full.contains(lower);
     }
 
-    private EmployeeBindingDTO buildBindingDTO(net.security.infosec.models.entity.Employee emp, EmployeeJobSystem es) {
+    private EmployeeBindingDTO buildBindingDTO(net.security.infosec.models.entity.Employee emp, EmployeeJobSystem es, String dept, String div) {
         EmployeeBindingDTO dto = new EmployeeBindingDTO();
         dto.setEmployeeId(emp.getId());
         dto.setLastname(emp.getLastname());
@@ -253,6 +270,11 @@ public class JobSystemService {
         dto.setMchd(es.getMchd());
         dto.setRoleInSystem(es.getRoleInSystem());
         dto.setFoundation(es.getFoundation());
+        dto.setMchdBasis(es.getMchdBasis());
+        dto.setMchdExpiry(es.getMchdExpiry());
+        dto.setAccesses(es.getAccesses());
+        dto.setDepartmentTitle(dept);
+        dto.setDivisionTitle(div);
         return dto;
     }
 }

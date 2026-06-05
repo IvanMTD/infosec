@@ -19,6 +19,9 @@ public class EmployeeJobSystem {
     private String mchd;
     private String roleInSystem;
     private String foundation;
+    private String mchdBasis;
+    private LocalDate mchdExpiry;
+    private String accesses;
 
     public EmployeeJobSystem(long employeeId, UUID jobSystemUuid) {
         this.employeeId = employeeId;

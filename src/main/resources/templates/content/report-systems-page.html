@@ -16,11 +16,21 @@
                 <div class="stat-filter-card__body">
                     <div class="row g-2 align-items-center w-100">
                         <div class="col-12 col-md-2">
-                            <select id="typeFilter" class="form-select w-100" onchange="loadStats();loadData()">
+                            <select id="typeFilter" class="form-select w-100" onchange="loadData();loadSystemList()">
                                 <option value="ALL">Все системы</option>
                                 <option value="INTERNAL">Внутренние</option>
                                 <option value="EXTERNAL">Внешние</option>
                             </select>
+                        </div>
+                        <div class="col-12 col-md-2">
+                            <div class="dropdown w-100">
+                                <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle d-flex justify-content-between align-items-center" type="button" id="systemDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false" style="border:1px solid #dee2e6; border-radius:0.375rem;">
+                                    <span class="text-truncate">Все системы</span>
+                                </button>
+                                <ul class="dropdown-menu px-2" id="systemCheckList" style="min-width:350px;max-height:250px;overflow-y:auto;" onclick="event.stopPropagation()">
+                                    <li class="text-muted text-center py-1">Загрузка...</li>
+                                </ul>
+                            </div>
                         </div>
                         <div class="col-12 col-md-2">
                             <select id="statusFilter" class="form-select w-100" onchange="loadData()">
@@ -162,7 +172,10 @@ function renderEmployeeCard(emp, sysUuid) {
 
     return '<div class="d-flex align-items-center justify-content-between py-1 border-bottom" style="cursor:pointer;" onclick="openEmpDetail(\'' + sysUuid + '\', ' + emp.employeeId + ', \'' + escapeJs(emp.lastname + ' ' + emp.name) + '\')">'
         + '<div>' + statusDot + '<strong>' + escapeHtml(emp.lastname) + ' ' + escapeHtml(emp.name) + ' ' + escapeHtml(emp.middleName) + '</strong>'
-        + (emp.position ? ' <small class="text-muted">(' + escapeHtml(emp.position) + ')</small>' : '') + '</div>'
+        + (emp.position ? ' <small class="text-muted">(' + escapeHtml(emp.position) + ')</small>' : '')
+        + (emp.departmentTitle ? ' <span class="badge rounded-4" style="background:#d4edda;color:#155724;">' + escapeHtml(emp.departmentTitle) + '</span>' : '')
+        + (emp.divisionTitle ? ' <span class="badge rounded-4 ms-1" style="background:#fff3cd;color:#856404;">' + escapeHtml(emp.divisionTitle) + '</span>' : '')
+        + '</div>'
         + '<div>' + dates + '</div>'
         + '</div>';
 }
@@ -188,6 +201,11 @@ function loadData() {
     fetch(url, { headers: { 'Accept': 'application/json' } })
     .then(function(r) { return r.json(); })
     .then(function(data) {
+        var selected = getSelectedSystemNames();
+        if (selected.length > 0) {
+            data = data.filter(function(r) { return selected.indexOf(r.system.name) >= 0; });
+        }
+        updateStats(data);
         var grid = document.getElementById('report-grid');
         if (!data || data.length === 0) {
             grid.innerHTML = renderEmpty();
@@ -195,6 +213,67 @@ function loadData() {
             grid.innerHTML = data.map(renderSystemCard).join('');
         }
     });
+}
+
+function getSelectedSystemNames() {
+    var checks = document.querySelectorAll('#systemCheckList input[type="checkbox"]:checked');
+    var names = [];
+    for (var i = 0; i < checks.length; i++) names.push(checks[i].value);
+    return names;
+}
+
+function loadSystemList() {
+    var type = document.getElementById('typeFilter').value;
+    var url = '/api/report/systems?type=' + encodeURIComponent(type);
+    fetch(url, { headers: { 'Accept': 'application/json' } })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        var list = document.getElementById('systemCheckList');
+        if (!data || data.length === 0) {
+            list.innerHTML = '<li class="text-muted text-center py-1">Нет систем</li>';
+            return;
+        }
+        var html = '';
+        for (var i = 0; i < data.length; i++) {
+            html += '<li class="dropdown-item" style="cursor:default;">'
+                + '<label class="w-100 mb-0" style="cursor:pointer;">'
+                + '<input type="checkbox" value="' + escapeHtml(data[i].system.name) + '" onchange="onSystemCheckChange()" class="me-2">'
+                + escapeHtml(data[i].system.name) + '</label></li>';
+        }
+        list.innerHTML = html;
+        onSystemCheckChange();
+    });
+}
+
+function onSystemCheckChange() {
+    var selected = getSelectedSystemNames();
+    var span = document.querySelector('#systemDropdownBtn span');
+    if (selected.length === 0) {
+        span.textContent = 'Все системы';
+    } else if (selected.length <= 2) {
+        span.textContent = selected.join(', ');
+    } else {
+        span.textContent = 'Выбрано: ' + selected.length;
+    }
+    loadData();
+}
+
+function updateStats(data) {
+    var systems = data ? data.length : 0;
+    var total = 0, active = 0, inactive = 0;
+    if (data) {
+        for (var i = 0; i < data.length; i++) {
+            var emps = data[i].employees || [];
+            total += emps.length;
+            for (var j = 0; j < emps.length; j++) {
+                if (emps[j].status === 'ACTIVE') active++; else inactive++;
+            }
+        }
+    }
+    document.getElementById('statSystems').textContent = systems;
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statActive').textContent = active;
+    document.getElementById('statInactive').textContent = inactive;
 }
 
 function loadStats() {
@@ -250,7 +329,11 @@ function openEmpDetail(sysUuid, empId, empName) {
             + '<p><strong>Дата подключения:</strong> ' + (b.connectDate || '—') + '</p>'
             + (b.status === 'INACTIVE' ? '<p><strong>Дата отключения:</strong> ' + (b.disconnectDate || '—') + '</p>' : '')
             + '<p><strong>МЧД:</strong> ' + (b.mchd ? '<br><span style="white-space:pre-wrap;">' + escapeHtml(b.mchd) + '</span>' : '—') + '</p>'
-            + '<p><strong>Роль в системе:</strong> ' + (b.roleInSystem ? '<br><span style="white-space:pre-wrap;">' + escapeHtml(b.roleInSystem) + '</span>' : '—') + '</p>';
+            + '<p><strong>Основание выдачи МЧД:</strong> ' + (b.mchdBasis ? '<br><span style="white-space:pre-wrap;">' + escapeHtml(b.mchdBasis) + '</span>' : '—') + '</p>'
+            + '<p><strong>Срок действия МЧД:</strong> ' + (b.mchdExpiry || '—') + '</p>'
+            + '<p><strong>Роль в системе:</strong> ' + (b.roleInSystem ? '<br><span style="white-space:pre-wrap;">' + escapeHtml(b.roleInSystem) + '</span>' : '—') + '</p>'
+            + '<p><strong>Допуски:</strong> ' + (b.accesses ? '<br><span style="white-space:pre-wrap;">' + escapeHtml(b.accesses) + '</span>' : '—') + '</p>'
+            + '<p><strong>Основание заведения пользователя:</strong> ' + (b.foundation ? '<br><span style="white-space:pre-wrap;">' + escapeHtml(b.foundation) + '</span>' : '—') + '</p>';
 
         if (!empDetailBsModal) empDetailBsModal = new bootstrap.Modal(document.getElementById('empDetailModal'));
         empDetailBsModal.show();
@@ -275,12 +358,18 @@ function escapeJs(str) {
 }
 
 // Init
-(function(){ loadStats(); loadData(); })();
+(function(){ loadData(); loadSystemList(); })();
 
 function exportExcel() {
     var search = document.getElementById('searchInput').value.trim();
     var type = document.getElementById('typeFilter').value;
-    window.location.href = '/api/report/systems/excel?search=' + encodeURIComponent(search) + '&type=' + encodeURIComponent(type) + '&employee=' + encodeURIComponent(search);
+    var status = document.getElementById('statusFilter').value;
+    var selected = getSelectedSystemNames();
+    var url = '/api/report/systems/excel?search=' + encodeURIComponent(search) + '&type=' + encodeURIComponent(type) + '&employee=' + encodeURIComponent(search) + '&status=' + encodeURIComponent(status);
+    if (selected.length > 0) {
+        url += '&systems=' + encodeURIComponent(selected.join(','));
+    }
+    window.location.href = url;
 }
 /*]]>*/
 </script>

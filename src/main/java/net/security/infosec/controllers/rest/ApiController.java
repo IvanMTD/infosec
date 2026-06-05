@@ -403,8 +403,10 @@ public class ApiController {
     public Mono<org.springframework.http.ResponseEntity<byte[]>> exportReportSystems(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String type,
-            @RequestParam(required = false) String employee) {
-        return excelReportService.exportSystemsReport(search, type, employee)
+            @RequestParam(required = false) String employee,
+            @RequestParam(required = false, defaultValue = "ALL") String status,
+            @RequestParam(required = false) String systems) {
+        return excelReportService.exportSystemsReport(search, type, employee, status, systems)
             .map(bytes -> org.springframework.http.ResponseEntity.ok()
                 .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=systems_report.xlsx")
                 .header(org.springframework.http.HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")

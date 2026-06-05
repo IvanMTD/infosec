@@ -17,6 +17,9 @@ public class EmployeeJobSystemDTO {
     private String mchd;
     private String roleInSystem;
     private String foundation;
+    private String mchdBasis;
+    private LocalDate mchdExpiry;
+    private String accesses;
 
     public EmployeeJobSystemDTO(EmployeeJobSystem entity) {
         setEmployeeId(entity.getEmployeeId());
@@ -27,5 +30,8 @@ public class EmployeeJobSystemDTO {
         setMchd(entity.getMchd());
         setRoleInSystem(entity.getRoleInSystem());
         setFoundation(entity.getFoundation());
+        setMchdBasis(entity.getMchdBasis());
+        setMchdExpiry(entity.getMchdExpiry());
+        setAccesses(entity.getAccesses());
     }
 }

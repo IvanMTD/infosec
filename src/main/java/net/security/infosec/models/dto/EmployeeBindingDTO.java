@@ -22,4 +22,9 @@ public class EmployeeBindingDTO {
     private String mchd;
     private String roleInSystem;
     private String foundation;
+    private String mchdBasis;
+    private LocalDate mchdExpiry;
+    private String accesses;
+    private String departmentTitle;
+    private String divisionTitle;
 }

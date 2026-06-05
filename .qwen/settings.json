@@ -8,7 +8,8 @@
       "Bash(mvnw.cmd *)",
       "Bash(java *)",
       "Bash(set *)",
-      "Bash(do *)"
+      "Bash(do *)",
+      "Agent(Explore)"
     ]
   },
   "$version": 4

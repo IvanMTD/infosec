@@ -157,6 +157,14 @@
                     <textarea id="bindMchd" class="form-control" placeholder="Описание МЧД" style="height:100px;"></textarea>
                     <label>Описание МЧД</label>
                 </div>
+                <div class="form-floating mb-3" id="bindMchdBasisGroup" style="display:none;">
+                    <textarea id="bindMchdBasis" class="form-control" placeholder="Основание выдачи МЧД" style="height:100px;"></textarea>
+                    <label>Основание выдачи МЧД</label>
+                </div>
+                <div class="form-floating mb-3" id="bindMchdExpiryGroup" style="display:none;">
+                    <input type="date" id="bindMchdExpiry" class="form-control" placeholder="Срок действия МЧД">
+                    <label>Срок действия МЧД</label>
+                </div>
                 <div class="form-floating mb-3">
                     <select id="bindRoleType" class="form-select" onchange="toggleRoleField()">
                         <option value="">Нет</option>
@@ -168,12 +176,16 @@
                     <textarea id="bindRoleInSystem" class="form-control" placeholder="Описание роли" style="height:100px;"></textarea>
                     <label>Описание роли</label>
                 </div>
+                <div class="form-floating mb-3" id="bindAccessesGroup" style="display:none;">
+                    <textarea id="bindAccesses" class="form-control" placeholder="Допуски" style="height:100px;"></textarea>
+                    <label>Допуски</label>
+                </div>
                 <div class="form-floating mb-3">
                     <select id="bindFoundationType" class="form-select" onchange="toggleFoundationField()">
                         <option value="">Нет</option>
                         <option value="SPECIFIED">Указать</option>
                     </select>
-                    <label>Основание</label>
+                    <label>Основание заведения пользователя</label>
                 </div>
                 <div class="form-floating mb-3" id="bindFoundationGroup" style="display:none;">
                     <textarea id="bindFoundation" class="form-control" placeholder="Основание" style="height:100px;"></textarea>
@@ -476,6 +488,12 @@ function openBindingModal(sysUuid, empId, empName) {
     document.getElementById('bindFoundationType').value = '';
     document.getElementById('bindFoundationGroup').style.display = 'none';
     document.getElementById('bindFoundation').value = '';
+    document.getElementById('bindMchdBasisGroup').style.display = 'none';
+    document.getElementById('bindMchdBasis').value = '';
+    document.getElementById('bindMchdExpiryGroup').style.display = 'none';
+    document.getElementById('bindMchdExpiry').value = '';
+    document.getElementById('bindAccessesGroup').style.display = 'none';
+    document.getElementById('bindAccesses').value = '';
 
     // Загрузка данных
     fetchWithCsrf('/api/system/' + sysUuid + '/employees/' + empId)
@@ -502,6 +520,19 @@ function openBindingModal(sysUuid, empId, empName) {
             document.getElementById('bindFoundationGroup').style.display = '';
             document.getElementById('bindFoundation').value = b.foundation;
         }
+        if (b.mchdBasis || b.mchdExpiry) {
+            if (b.mchdBasis) {
+                document.getElementById('bindMchdBasis').value = b.mchdBasis;
+            }
+            if (b.mchdExpiry) {
+                document.getElementById('bindMchdExpiry').value = b.mchdExpiry;
+            }
+        }
+        if (b.accesses) {
+            document.getElementById('bindAccesses').value = b.accesses;
+        }
+        toggleMchdField();
+        toggleRoleField();
     });
 
     if (!bindBsModal) bindBsModal = new bootstrap.Modal(document.getElementById('bindingModal'));
@@ -515,12 +546,17 @@ function toggleDisconnectDate() {
 
 function toggleMchdField() {
     var val = document.getElementById('bindMchdType').value;
-    document.getElementById('bindMchdGroup').style.display = val === 'SPECIFIED' ? '' : 'none';
+    var show = val === 'SPECIFIED';
+    document.getElementById('bindMchdGroup').style.display = show ? '' : 'none';
+    document.getElementById('bindMchdBasisGroup').style.display = show ? '' : 'none';
+    document.getElementById('bindMchdExpiryGroup').style.display = show ? '' : 'none';
 }
 
 function toggleRoleField() {
     var val = document.getElementById('bindRoleType').value;
-    document.getElementById('bindRoleGroup').style.display = val === 'SPECIFIED' ? '' : 'none';
+    var show = val === 'SPECIFIED';
+    document.getElementById('bindRoleGroup').style.display = show ? '' : 'none';
+    document.getElementById('bindAccessesGroup').style.display = show ? '' : 'none';
 }
 
 function toggleFoundationField() {
@@ -535,7 +571,10 @@ function saveBinding() {
         disconnectDate: document.getElementById('bindStatus').value === 'INACTIVE' ? (document.getElementById('bindDisconnectDate').value || null) : null,
         mchd: document.getElementById('bindMchdType').value === 'SPECIFIED' ? document.getElementById('bindMchd').value : null,
         roleInSystem: document.getElementById('bindRoleType').value === 'SPECIFIED' ? document.getElementById('bindRoleInSystem').value : null,
-        foundation: document.getElementById('bindFoundationType').value === 'SPECIFIED' ? document.getElementById('bindFoundation').value : null
+        foundation: document.getElementById('bindFoundationType').value === 'SPECIFIED' ? document.getElementById('bindFoundation').value : null,
+        mchdBasis: document.getElementById('bindMchdType').value === 'SPECIFIED' ? document.getElementById('bindMchdBasis').value : null,
+        mchdExpiry: document.getElementById('bindMchdType').value === 'SPECIFIED' ? (document.getElementById('bindMchdExpiry').value || null) : null,
+        accesses: document.getElementById('bindRoleType').value === 'SPECIFIED' ? document.getElementById('bindAccesses').value : null
     };
 
     fetchWithCsrf('/api/system/' + bindSystemUuid + '/employees/' + bindEmployeeId, {

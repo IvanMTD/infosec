@@ -213,8 +213,13 @@ public class ExcelReportService {
         }
     }
 
-    public Mono<byte[]> exportSystemsReport(String search, String type, String employee) {
-        return jobSystemService.getReport(search, type, employee, "ALL")
+    public Mono<byte[]> exportSystemsReport(String search, String type, String employee, String status, String systems) {
+        var selectedSystems = (systems != null && !systems.isBlank())
+            ? Set.of(systems.split(","))
+            : Set.<String>of();
+
+        return jobSystemService.getReport(search, type, employee, status)
+            .filter(report -> selectedSystems.isEmpty() || selectedSystems.contains(report.getSystem().getName()))
             .collectList()
             .map(list -> {
                 try (var wb = new XSSFWorkbook()) {
@@ -223,6 +228,7 @@ public class ExcelReportService {
                     var sysStyle = createExcelBoldStyle(wb);
                     var greenStyle = createStatusStyle(wb, IndexedColors.LIGHT_GREEN);
                     var redStyle = createStatusStyle(wb, IndexedColors.ROSE);
+                    var wrapStyle = createWrapStyle(wb);
                     var rowNum = 0;
 
                     // Header
@@ -234,7 +240,10 @@ public class ExcelReportService {
                     createExcelCell(header, 4, "Дата отключения", headerStyle);
                     createExcelCell(header, 5, "Роль в системе", headerStyle);
                     createExcelCell(header, 6, "МЧД", headerStyle);
-                    createExcelCell(header, 7, "Основание", headerStyle);
+                    createExcelCell(header, 7, "Основание заведения", headerStyle);
+                    createExcelCell(header, 8, "Основание МЧД", headerStyle);
+                    createExcelCell(header, 9, "Срок МЧД", headerStyle);
+                    createExcelCell(header, 10, "Допуски", headerStyle);
 
                     for (var report : list) {
                         var sys = report.getSystem();
@@ -243,7 +252,7 @@ public class ExcelReportService {
                         if (employees.isEmpty()) {
                             var r = sheet.createRow(rowNum++);
                             createExcelCell(r, 0, sys.getName(), sysStyle);
-                            applyRowBorder(r, 7);
+                            applyRowBorder(r, 10);
                         } else {
                             for (int i = 0; i < employees.size(); i++) {
                                 var emp = employees.get(i);
@@ -256,18 +265,21 @@ public class ExcelReportService {
                                 createExcelCell(r, 2, "ACTIVE".equals(emp.getStatus()) ? "Активный" : "Неактивный", statusStyle);
                                 createExcelCell(r, 3, emp.getConnectDate() != null ? emp.getConnectDate().format(DATE_FMT) : "", null);
                                 createExcelCell(r, 4, emp.getDisconnectDate() != null ? emp.getDisconnectDate().format(DATE_FMT) : "", null);
-                                createExcelCell(r, 5, emp.getRoleInSystem(), null);
-                                createExcelCell(r, 6, emp.getMchd(), null);
-                                createExcelCell(r, 7, emp.getFoundation(), null);
+                                createExcelCell(r, 5, emp.getRoleInSystem(), wrapStyle);
+                                createExcelCell(r, 6, emp.getMchd(), wrapStyle);
+                                createExcelCell(r, 7, emp.getFoundation(), wrapStyle);
+                                createExcelCell(r, 8, emp.getMchdBasis(), wrapStyle);
+                                createExcelCell(r, 9, emp.getMchdExpiry() != null ? emp.getMchdExpiry().format(DATE_FMT) : "", null);
+                                createExcelCell(r, 10, emp.getAccesses(), wrapStyle);
                                 if (i == employees.size() - 1) {
-                                    applyRowBorder(r, 7);
+                                    applyRowBorder(r, 10);
                                 }
                             }
                         }
                     }
 
                     // Auto-size columns
-                    for (int i = 0; i < 8; i++) {
+                    for (int i = 0; i < 11; i++) {
                         sheet.autoSizeColumn(i);
                         int w = sheet.getColumnWidth(i);
                         sheet.setColumnWidth(i, Math.min(w, 15000));
@@ -309,6 +321,13 @@ public class ExcelReportService {
         var cell = row.createCell(col);
         cell.setCellValue(value != null ? value : "");
         if (style != null) cell.setCellStyle(style);
+    }
+
+    private CellStyle createWrapStyle(Workbook wb) {
+        var style = wb.createCellStyle();
+        style.setWrapText(true);
+        style.setVerticalAlignment(VerticalAlignment.TOP);
+        return style;
     }
 
     private CellStyle createStatusStyle(Workbook wb, IndexedColors color) {
