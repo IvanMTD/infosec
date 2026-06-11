@@ -7,12 +7,14 @@ import org.springframework.data.annotation.Id;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalTime;
 import java.util.*;
 
 @Data
 @RequiredArgsConstructor
+@Table("implementer")
 public class Implementer implements UserDetails {
     @Id
     private int id;

@@ -10,6 +10,7 @@ import net.security.infosec.services.EmployeeService;
 import net.security.infosec.services.ExcelReportService;
 import net.security.infosec.services.ImplementerService;
 import net.security.infosec.services.JobSystemService;
+import net.security.infosec.services.LdapSyncService;
 import net.security.infosec.services.TaskService;
 import net.security.infosec.services.TroubleTicketService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,6 +38,7 @@ public class ApiController {
     private final DivisionService divisionService;
     private final ExcelReportService excelReportService;
     private final JobSystemService jobSystemService;
+    private final LdapSyncService ldapSyncService;
     private final TroubleTicketService troubleTicketService;
     private final TaskService taskService;
     private final ImplementerService implementerService;
@@ -411,5 +413,12 @@ public class ApiController {
                 .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=systems_report.xlsx")
                 .header(org.springframework.http.HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
                 .body(bytes));
+    }
+
+    @PostMapping("/admin/sync-directory")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Map<String, Object>> syncDirectory() {
+        return Mono.fromCallable(() -> ldapSyncService.syncAll())
+            .subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic());
     }
 }

@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 /*
 create table if not exists division(
@@ -17,6 +18,7 @@ create table if not exists division(
 
 @Data
 @NoArgsConstructor
+@Table("division")
 public class Division {
     @Id
     private long id;

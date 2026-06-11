@@ -1338,9 +1338,12 @@
     // инициализация при загрузке
     document.addEventListener('DOMContentLoaded', function(){
         initAllSortable();
-        // отрисовать сотрудников первого отдела
-        if(departments.length > 0 && departments[0].divisions.length > 0){
-            selectDivision('btn-div-0-0');
+        if(departments.length > 0){
+            if(departments[0].divisions.length > 0){
+                selectDivision('btn-div-0-0');
+            } else {
+                selectDepartment('btn-dep-0');
+            }
         }
     });
 </script>

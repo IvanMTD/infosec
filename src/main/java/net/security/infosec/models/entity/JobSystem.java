@@ -4,11 +4,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.security.infosec.models.dto.JobSystemDTO;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
+@Table("job_system")
 public class JobSystem {
     @Id
     private UUID uuid;

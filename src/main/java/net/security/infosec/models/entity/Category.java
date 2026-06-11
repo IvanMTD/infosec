@@ -4,9 +4,11 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import net.security.infosec.models.dto.TicketDataTransferObject;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Data
 @RequiredArgsConstructor
+@Table("category")
 public class Category {
     @Id
     private int id;

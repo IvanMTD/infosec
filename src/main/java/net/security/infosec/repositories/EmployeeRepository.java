@@ -25,4 +25,6 @@ public interface EmployeeRepository extends R2dbcRepository<Employee,Long> {
     Flux<Employee> findAllByPhoneLikeIgnoreCase(String phone);
 
     Mono<Employee> findByLastnameIgnoreCaseAndNameIgnoreCaseAndMiddleNameIgnoreCase(String lastname, String name, String middleName);
+
+    Flux<Employee> findByEmailIgnoreCase(String email);
 }

@@ -91,6 +91,13 @@
                         </form>
                     </div>
 
+                    <!-- Sync with AD button (admin only) -->
+                    <div class="profile-card__footer" th:if="${admin}">
+                        <button class="btn btn-smoke w-100" onclick="syncDirectory()">
+                            <i class="bi bi-arrow-repeat"></i> Синхронизировать с AD
+                        </button>
+                    </div>
+
                 </div>
                 <!-- /Profile Card -->
 
@@ -98,3 +105,32 @@
         </div>
     </div>
 </div>
+
+<script>
+function syncDirectory() {
+    if (!confirm('Запустить синхронизацию справочника с Active Directory? Это может занять несколько секунд.')) return;
+    var btn = event.target;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Синхронизация...';
+
+    var csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    var csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    var headers = { 'Content-Type': 'application/json' };
+    headers[csrfHeader] = csrfToken;
+
+    fetch('/api/admin/sync-directory', {
+        method: 'POST',
+        headers: headers
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        alert('Готово!\nИз AD: ' + data.adTotal + '\nСоздано: ' + data.created + '\nОбновлено: ' + data.updated + '\nОткреплено: ' + data.unlinked);
+        location.reload();
+    })
+    .catch(function(e) {
+        alert('Ошибка: ' + e);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Синхронизировать с AD';
+    });
+}
+</script>

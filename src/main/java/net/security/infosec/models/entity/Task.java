@@ -12,8 +12,11 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
+import org.springframework.data.relational.core.mapping.Table;
+
 @Data
 @RequiredArgsConstructor
+@Table("task")
 public class Task {
     @Id
     private int id;
