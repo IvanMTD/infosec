@@ -2,6 +2,7 @@ package net.security.infosec.controllers.rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.security.infosec.services.DynamicLdapTemplate;
 import net.security.infosec.services.LdapSyncService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ldap.core.LdapTemplate;
@@ -22,11 +23,14 @@ import java.util.*;
 @RequiredArgsConstructor
 public class TestApiController {
 
-    private final LdapTemplate ldapTemplate;
+    private final DynamicLdapTemplate dynamicLdap;
     private final LdapSyncService ldapSyncService;
 
-    @Value("${spring.ldap.base}")
-    private String baseDn;
+    private LdapTemplate getLdap() {
+        LdapTemplate t = dynamicLdap.createTemplate();
+        if (t == null) throw new IllegalStateException("LDAP отключен");
+        return t;
+    }
 
     @GetMapping("/ldap/users")
     public List<Map<String, Object>> ldapUsers(@RequestParam(defaultValue = "") String search) {
@@ -45,7 +49,8 @@ public class TestApiController {
                    + "(cn=*" + search + "*))";
         }
         try {
-            return ldapTemplate.search(baseDn, filter, new LdapUserMapper());
+            LdapTemplate t = getLdap();
+            return t.search("", filter, new LdapUserMapper());
         } catch (Exception e) {
             log.error("LDAP error", e);
             return List.of(Map.of("error", e.getMessage()));
@@ -55,7 +60,8 @@ public class TestApiController {
     @GetMapping("/ldap/ous")
     public List<Map<String, Object>> ldapOUs() {
         try {
-            return ldapTemplate.search(baseDn, "(objectClass=organizationalUnit)", new LdapOUMapper());
+            LdapTemplate t = getLdap();
+            return t.search("", "(objectClass=organizationalUnit)", new LdapOUMapper());
         } catch (Exception e) {
             log.error("LDAP error", e);
             return List.of(Map.of("error", e.getMessage()));

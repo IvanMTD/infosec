@@ -25,20 +25,33 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LdapSyncService {
 
-    private final LdapTemplate ldapTemplate;
+    private final DynamicLdapTemplate dynamicLdap;
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
     private final DivisionRepository divisionRepository;
     private final DatabaseClient databaseClient;
+    private final AppSettingsService appSettingsService;
 
-    @org.springframework.beans.factory.annotation.Value("${spring.ldap.base}")
-    private String baseDn;
+    private String getBaseDn() {
+        return ""; // Контекст уже содержит base — используем относительный путь
+    }
+
+    private LdapTemplate getLdap() {
+        LdapTemplate t = dynamicLdap.createTemplate();
+        if (t == null) throw new IllegalStateException("LDAP не настроен или отключен");
+        return t;
+    }
 
     /**
      * Автоматическая синхронизация раз в час.
      */
     @Scheduled(cron = "0 0 * * * *")
     public void scheduledSync() {
+        Boolean enabled = appSettingsService.isLdapSyncEnabled().block();
+        if (enabled == null || !enabled) {
+            log.debug("LDAP синхронизация отключена — пропускаем");
+            return;
+        }
         log.info("Запуск плановой синхронизации с AD...");
         try {
             Map<String, Object> result = syncAll();
@@ -71,7 +84,7 @@ public class LdapSyncService {
 
         List<Map<String, Object>> adUsers;
         try {
-            adUsers = ldapTemplate.search(baseDn, filter, new AdUserMapper());
+            adUsers = getLdap().search(getBaseDn(), filter, new AdUserMapper());
         } catch (Exception e) {
             log.error("LDAP search error", e);
             return List.of(Map.of("error", e.getMessage()));
@@ -167,7 +180,7 @@ public class LdapSyncService {
         // 1. Все активные из AD
         List<Map<String, Object>> adUsers;
         try {
-            adUsers = ldapTemplate.search(baseDn,
+            adUsers = getLdap().search(getBaseDn(),
                 "(&(objectCategory=person)(mail=*)(|(&(objectClass=user)(givenName=*)(sn=*)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))(objectClass=contact)))",
                 new AdUserMapper());
         } catch (Exception e) {
@@ -328,7 +341,7 @@ public class LdapSyncService {
         // 1. Все активные из AD (обязательно с телефоном и почтой)
         List<Map<String, Object>> adUsers;
         try {
-            adUsers = ldapTemplate.search(baseDn,
+            adUsers = getLdap().search(getBaseDn(),
                 "(&(objectCategory=person)(mail=*)(telephoneNumber=*)(|(&(objectClass=user)(givenName=*)(sn=*)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))(objectClass=contact)))",
                 new AdUserMapper());
         } catch (Exception e) {

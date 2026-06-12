@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.security.infosec.models.dto.*;
 import net.security.infosec.models.entity.*;
+import net.security.infosec.services.AppSettingsService;
 import net.security.infosec.services.DepartmentService;
 import net.security.infosec.services.DivisionService;
+import net.security.infosec.services.DynamicLdapTemplate;
 import net.security.infosec.services.EmployeeService;
 import net.security.infosec.services.ExcelReportService;
 import net.security.infosec.services.ImplementerService;
@@ -39,6 +41,8 @@ public class ApiController {
     private final ExcelReportService excelReportService;
     private final JobSystemService jobSystemService;
     private final LdapSyncService ldapSyncService;
+    private final AppSettingsService appSettingsService;
+    private final DynamicLdapTemplate dynamicLdap;
     private final TroubleTicketService troubleTicketService;
     private final TaskService taskService;
     private final ImplementerService implementerService;
@@ -420,5 +424,41 @@ public class ApiController {
     public Mono<Map<String, Object>> syncDirectory() {
         return Mono.fromCallable(() -> ldapSyncService.syncAll())
             .subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic());
+    }
+
+    @GetMapping("/admin/settings/ldap-sync")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Boolean> getLdapSyncEnabled() {
+        return appSettingsService.isLdapSyncEnabled();
+    }
+
+    @PutMapping("/admin/settings/ldap-sync")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Void> setLdapSyncEnabled(@RequestBody Map<String, Boolean> body) {
+        return appSettingsService.setLdapSyncEnabled(body.getOrDefault("enabled", false));
+    }
+
+    @GetMapping("/admin/settings/ldap-config")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Map<String, String>> getLdapConfig() {
+        return appSettingsService.getLdapConfig();
+    }
+
+    @PutMapping("/admin/settings/ldap-config")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Void> saveLdapConfig(@RequestBody Map<String, String> config) {
+        return appSettingsService.saveLdapConfig(config);
+    }
+
+    @PostMapping("/admin/settings/ldap-test")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Mono<Map<String, Object>> testLdapConnection() {
+        return Mono.fromCallable(() -> {
+            String error = dynamicLdap.testConnection();
+            Map<String, Object> result = new java.util.LinkedHashMap<>();
+            if (error == null) result.put("ok", true);
+            else { result.put("ok", false); result.put("error", error); }
+            return result;
+        }).subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic());
     }
 }

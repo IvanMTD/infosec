@@ -93,7 +93,28 @@
 
                     <!-- Sync with AD button (admin only) -->
                     <div class="profile-card__footer" th:if="${admin}">
-                        <button class="btn btn-smoke w-100" onclick="syncDirectory()">
+                        <div class="mb-2">
+                            <label class="info-card__label">LDAP URL</label>
+                            <input type="text" id="ldapUrl" class="form-control form-control-sm" placeholder="ldap://dc.domain.ru:389">
+                        </div>
+                        <div class="mb-2">
+                            <label class="info-card__label">LDAP Base DN</label>
+                            <input type="text" id="ldapBase" class="form-control form-control-sm" placeholder="OU=Подразделение,DC=domain,DC=ru">
+                        </div>
+                        <div class="mb-2">
+                            <label class="info-card__label">LDAP Bind DN</label>
+                            <input type="text" id="ldapBindDn" class="form-control form-control-sm" placeholder="CN=svc-user,OU=Service Accounts,DC=domain,DC=ru">
+                        </div>
+                        <div class="mb-2">
+                            <label class="info-card__label">LDAP Bind Password</label>
+                            <input type="password" id="ldapBindPass" class="form-control form-control-sm" placeholder="••••••••">
+                        </div>
+                        <div class="form-check form-switch mb-2" th:if="${admin}">
+                            <input class="form-check-input" type="checkbox" id="ldapSyncToggle" onchange="toggleLdapSync()">
+                            <label class="form-check-label" for="ldapSyncToggle" style="font-size:0.82rem;color:#aaa;">LDAP синхронизация</label>
+                        </div>
+                        <div id="ldapError" style="color:#dc3545;font-size:0.82rem;display:none;word-break:break-all;" class="mb-2"></div>
+                        <button class="btn btn-smoke w-100" id="syncBtn" style="display:none;" onclick="syncDirectory()">
                             <i class="bi bi-arrow-repeat"></i> Синхронизировать с AD
                         </button>
                     </div>
@@ -132,5 +153,91 @@ function syncDirectory() {
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Синхронизировать с AD';
     });
+}
+
+// Init LDAP toggle
+(function(){
+    fetch('/api/admin/settings/ldap-config')
+    .then(function(r) { return r.json(); })
+    .then(function(cfg) {
+        document.getElementById('ldapUrl').value = cfg['ldap.url'] || '';
+        document.getElementById('ldapBase').value = cfg['ldap.base'] || '';
+        document.getElementById('ldapBindDn').value = cfg['ldap.bind.dn'] || '';
+        var pass = cfg['ldap.bind.pass'] || '';
+        if (pass === '***') {
+            document.getElementById('ldapBindPass').value = '';
+            document.getElementById('ldapBindPass').placeholder = '•••••••• (сохранён)';
+        } else {
+            document.getElementById('ldapBindPass').value = pass;
+        }
+        var enabled = cfg['ldap.sync.enabled'] === 'true';
+        document.getElementById('ldapSyncToggle').checked = enabled;
+        document.getElementById('syncBtn').style.display = enabled ? '' : 'none';
+    });
+})();
+
+function toggleLdapSync() {
+    var enabled = document.getElementById('ldapSyncToggle').checked;
+    var url = document.getElementById('ldapUrl').value.trim();
+    var base = document.getElementById('ldapBase').value.trim();
+    var dn = document.getElementById('ldapBindDn').value.trim();
+    var pass = document.getElementById('ldapBindPass').value;
+    var errDiv = document.getElementById('ldapError');
+
+    if (enabled) {
+        if (!url || !base || !dn) {
+            errDiv.textContent = 'Заполните URL, Base DN и Bind DN';
+            errDiv.style.display = '';
+            document.getElementById('ldapSyncToggle').checked = false;
+            return;
+        }
+        if (!pass && document.getElementById('ldapBindPass').placeholder.indexOf('сохранён') < 0) {
+            errDiv.textContent = 'Введите пароль';
+            errDiv.style.display = '';
+            document.getElementById('ldapSyncToggle').checked = false;
+            return;
+        }
+        // Сохраняем настройки и тестируем соединение
+        var csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+        var csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+        var headers = { 'Content-Type': 'application/json' };
+        headers[csrfHeader] = csrfToken;
+
+        fetch('/api/admin/settings/ldap-config', {
+            method: 'PUT',
+            headers: headers,
+            body: JSON.stringify({
+                'ldap.url': url,
+                'ldap.base': base,
+                'ldap.bind.dn': dn,
+                'ldap.bind.pass': pass,
+                'ldap.sync.enabled': 'true'
+            })
+        })
+        .then(function() { return fetch('/api/admin/settings/ldap-test', { method: 'POST', headers: headers }); })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            if (res.ok) {
+                errDiv.style.display = 'none';
+                document.getElementById('syncBtn').style.display = '';
+            } else {
+                errDiv.textContent = 'Ошибка подключения: ' + (res.error || 'неизвестная');
+                errDiv.style.display = '';
+                document.getElementById('ldapSyncToggle').checked = false;
+                document.getElementById('syncBtn').style.display = 'none';
+            }
+        });
+    } else {
+        errDiv.style.display = 'none';
+        document.getElementById('syncBtn').style.display = 'none';
+        var csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+        var csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+        var headers = { 'Content-Type': 'application/json' };
+        headers[csrfHeader] = csrfToken;
+        fetch('/api/admin/settings/ldap-sync', {
+            method: 'PUT', headers: headers,
+            body: JSON.stringify({ enabled: false })
+        });
+    }
 }
 </script>
