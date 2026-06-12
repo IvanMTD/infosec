@@ -104,3 +104,4 @@ public void scheduledSync() { syncAll(); }
 - `spring-ldap-integration` — LdapTemplate, фильтры, конфигурация
 - `r2dbc-database-client-cud` — DatabaseClient для CUD
 - `webflux-preauthorize-reactive-return` — Mono обёртка для @PreAuthorize
+- `app-settings-feature-toggle` — тумблер включения/выключения фичи из БД
