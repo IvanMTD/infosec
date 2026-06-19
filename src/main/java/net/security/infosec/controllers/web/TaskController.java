@@ -343,7 +343,7 @@ public class TaskController {
                         .modelAttribute("charts", chartFlux)
                         .modelAttribute("statistics",statistics)
                         .modelAttribute("taskList", taskService.getImplementerTasksForDates(implementer,dateDTO))
-                        .modelAttribute("dates", new DateDTO())
+                        .modelAttribute("dates", dateDTO)
                         .build()
         );
         });
@@ -933,7 +933,7 @@ public class TaskController {
                             .modelAttribute("charts", chartFlux)
                             .modelAttribute("statistics", statistics)
                             .modelAttribute("taskList", taskService.getFromDate(dateDTO))
-                            .modelAttribute("dates", new DateDTO())
+                            .modelAttribute("dates", dateDTO)
                             .modelAttribute("users", implementerService.getAll())
                             .modelAttribute("departmentRoles", DepartmentRole.values())
                             .modelAttribute("userId",userId)
@@ -1021,7 +1021,7 @@ public class TaskController {
                             .modelAttribute("charts", chartFlux)
                             .modelAttribute("statistics",statistics)
                             .modelAttribute("taskList", implementerService.getUserById(userId).flatMapMany(implementer -> taskService.getImplementerTasksForDates(implementer, dateDTO)))
-                            .modelAttribute("dates", new DateDTO())
+                            .modelAttribute("dates", dateDTO)
                             .modelAttribute("users", implementerService.getAll())
                             .modelAttribute("departmentRoles", DepartmentRole.values())
                             .modelAttribute("userId",userId)

@@ -279,10 +279,11 @@
         var userId = (parts.length > 4) ? parts[4] : '0';
         var baseUrl = '/api/report/excel?mode=' + mode + '&userId=' + userId;
 
-        var dateFrom = document.getElementById('dateFrom');
-        var dateTo = document.getElementById('dateTo');
-        if(dateFrom && dateTo && dateFrom.value && dateTo.value){
-            baseUrl += '&dateFrom=' + dateFrom.value + '&dateTo=' + dateTo.value;
+        var dateFrom = /*[[${dates.begin}]]*/ '';
+        var dateTo = /*[[${dates.end}]]*/ '';
+        if(dateFrom && dateTo){
+            baseUrl += '&dateFrom=' + dateFrom + '&dateTo=' + dateTo;
+            baseUrl = baseUrl.replace(/mode=\w+/, 'mode=date');
         }
 
         window.open(baseUrl, '_blank');
