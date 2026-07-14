@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -209,33 +210,52 @@ public class TaskService {
 
     /* ==================== KPI ==================== */
     public Flux<KpiEntry> getKpiData(String departmentRole, int employeeId, LocalDate from, LocalDate to) {
-        return taskRepository.findAllByExecuteDateBetween(from, to)
-            .filter(t -> t.getStartTime() != null && t.getEndTime() != null && t.getStartTime().isBefore(t.getEndTime()))
+        return taskRepository.findAll()
+            .filter(t -> t.getStartTime() != null && t.getEndTime() != null
+                && t.getStartTime().isBefore(t.getEndTime())
+                && !t.getStartTime().toLocalDate().isAfter(to)
+                && !t.getEndTime().toLocalDate().isBefore(from))
             .filter(t -> {
                 if (employeeId > 0) return t.getImplementerId() == employeeId;
                 return true;
             })
             .flatMap(task -> {
                 long minutes = Duration.between(task.getStartTime(), task.getEndTime()).toMinutes();
+                LocalDate startDate = task.getStartTime().toLocalDate();
+                LocalDate endDate = task.getEndTime().toLocalDate();
+                long days = ChronoUnit.DAYS.between(startDate, endDate) + 1;
+                long minutesPerDay = minutes / days;
+                long remainder = minutes % days;
+
                 return implementerRepository.findById(task.getImplementerId())
-                    .flatMap(implementer -> {
+                    .flatMapMany(implementer -> {
                         // фильтр по departmentRole
                         if (departmentRole != null && !"ALL".equals(departmentRole)) {
                             if (!departmentRole.equals(implementer.getDepartmentRole().name())) {
-                                return Mono.empty();
+                                return Flux.empty();
                             }
                         }
                         return troubleRepository.findById(task.getTroubleId())
                             .defaultIfEmpty(new net.security.infosec.models.entity.Trouble())
-                            .map(trouble -> new KpiEntry(
-                                task.getImplementerId(),
-                                implementer.getFullName(),
-                                task.getExecuteDate(),
-                                task.getTroubleId(),
-                                trouble.getName() != null ? trouble.getName() : "",
-                                "",
-                                minutes
-                            ));
+                            .flatMapMany(trouble -> {
+                                List<KpiEntry> entries = new ArrayList<>();
+                                String troubleName = trouble.getName() != null ? trouble.getName() : "";
+                                for (long i = 0; i < days; i++) {
+                                    LocalDate date = startDate.plusDays(i);
+                                    if (date.isBefore(from) || date.isAfter(to)) continue;
+                                    long dayMinutes = minutesPerDay + (i < remainder ? 1 : 0);
+                                    entries.add(new KpiEntry(
+                                        task.getImplementerId(),
+                                        implementer.getFullName(),
+                                        date,
+                                        task.getTroubleId(),
+                                        troubleName,
+                                        "",
+                                        dayMinutes
+                                    ));
+                                }
+                                return Flux.fromIterable(entries);
+                            });
                     });
             });
     }
