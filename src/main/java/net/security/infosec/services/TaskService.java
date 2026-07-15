@@ -16,8 +16,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.DayOfWeek;
-import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class TaskService {
+    private static final long WORK_MINUTES_PER_DAY = 7 * 60; // 8-часовой день минус 1 час обеда
+
     private final TaskRepository taskRepository;
     private final ImplementerRepository implementerRepository;
     private final TroubleRepository troubleRepository;
@@ -220,12 +222,11 @@ public class TaskService {
                 return true;
             })
             .flatMap(task -> {
-                long minutes = Duration.between(task.getStartTime(), task.getEndTime()).toMinutes();
                 LocalDate startDate = task.getStartTime().toLocalDate();
                 LocalDate endDate = task.getEndTime().toLocalDate();
+                LocalTime startTime = task.getStartTime().toLocalTime();
+                LocalTime endTime = task.getEndTime().toLocalTime();
                 long days = ChronoUnit.DAYS.between(startDate, endDate) + 1;
-                long minutesPerDay = minutes / days;
-                long remainder = minutes % days;
 
                 return implementerRepository.findById(task.getImplementerId())
                     .flatMapMany(implementer -> {
@@ -235,6 +236,11 @@ public class TaskService {
                                 return Flux.empty();
                             }
                         }
+                        LocalTime workDayEnd = implementer.getWorkDayEnd() != null
+                            ? implementer.getWorkDayEnd()
+                            : LocalTime.of(18, 0);
+                        LocalTime workDayStart = workDayEnd.minusHours(7);
+
                         return troubleRepository.findById(task.getTroubleId())
                             .defaultIfEmpty(new net.security.infosec.models.entity.Trouble())
                             .flatMapMany(trouble -> {
@@ -243,20 +249,40 @@ public class TaskService {
                                 for (long i = 0; i < days; i++) {
                                     LocalDate date = startDate.plusDays(i);
                                     if (date.isBefore(from) || date.isAfter(to)) continue;
-                                    long dayMinutes = minutesPerDay + (i < remainder ? 1 : 0);
-                                    entries.add(new KpiEntry(
-                                        task.getImplementerId(),
-                                        implementer.getFullName(),
-                                        date,
-                                        task.getTroubleId(),
-                                        troubleName,
-                                        "",
-                                        dayMinutes
-                                    ));
+
+                                    long dayMinutes;
+                                    if (days == 1) {
+                                        dayMinutes = overlapMinutes(startTime, endTime, workDayStart, workDayEnd);
+                                    } else if (i == 0) {
+                                        dayMinutes = overlapMinutes(startTime, workDayEnd, workDayStart, workDayEnd);
+                                    } else if (i == days - 1) {
+                                        dayMinutes = overlapMinutes(workDayStart, endTime, workDayStart, workDayEnd);
+                                    } else {
+                                        dayMinutes = WORK_MINUTES_PER_DAY;
+                                    }
+
+                                    if (dayMinutes > 0) {
+                                        entries.add(new KpiEntry(
+                                            task.getImplementerId(),
+                                            implementer.getFullName(),
+                                            date,
+                                            task.getTroubleId(),
+                                            troubleName,
+                                            "",
+                                            dayMinutes
+                                        ));
+                                    }
                                 }
                                 return Flux.fromIterable(entries);
                             });
                     });
             });
+    }
+
+    private long overlapMinutes(LocalTime from, LocalTime to, LocalTime workStart, LocalTime workEnd) {
+        LocalTime effectiveFrom = from.isAfter(workStart) ? from : workStart;
+        LocalTime effectiveTo = to.isBefore(workEnd) ? to : workEnd;
+        if (!effectiveFrom.isBefore(effectiveTo)) return 0;
+        return ChronoUnit.MINUTES.between(effectiveFrom, effectiveTo);
     }
 }
